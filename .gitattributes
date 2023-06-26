@@ -1,4 +1,1 @@
-bundle/models filter=lfs diff=lfs merge=lfs -binary
-bundle/models/b6e8497ba978a6f5fbb647e419d2696cd80df5a23cb6a8ea532021911bd76acb.onnx filter=lfs diff=lfs merge=lfs -text
-bundle/models/17b7466d93bb60b0e88affa2b0e8b3eee309c7de183d394ce4b956339ebd95e6.onnx filter=lfs diff=lfs merge=lfs -text
-bundle/models/7001d60734fdc112dd9c062635fb59cd401fb82a9d4213134bce4dbd655c803a.onnx filter=lfs diff=lfs merge=lfs -text
+bundle/models/* filter=lfs diff=lfs merge=lfs -binary

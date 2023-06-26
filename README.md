@@ -60,8 +60,16 @@ type Config = {
   publicPath: string; // The public path used for model and wasm files
   debug: bool; // enable or disable useful console.log outputs
   proxyToWorker: bool; // Wether or wether not to proxy the calculations to a webworker. (Default true)
+  model: 'small' | 'medium'; // The model to use. (Default "medium")
 };
 ```
+
+### Download Size vs Quality
+
+The onnx model is shipped in various size and needs.
+
+- small (~40 MB) is the smallest model and is in most cases working fine but sometimes shows some artifacts. It's a quantized model.
+- medium (~80MB) is the default model.
 
 ### Download Progress Monitoring
 

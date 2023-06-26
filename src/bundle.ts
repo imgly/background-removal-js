@@ -9,12 +9,26 @@ type Entry = {
 };
 const bundle: Map<string, Entry> = new Map([
   [
-    'model',
+    'small',
     {
       url: require('../bundle/models/7001d60734fdc112dd9c062635fb59cd401fb82a9d4213134bce4dbd655c803a.onnx'),
       size: 44342436
     }
   ],
+  [
+    'medium',
+    {
+      url: require('../bundle/models/b6e8497ba978a6f5fbb647e419d2696cd80df5a23cb6a8ea532021911bd76acb.onnx'),
+      size: 88188479
+    }
+  ],
+  // [
+  //   'large',
+  //   {
+  //     url: require('../bundle/models/17b7466d93bb60b0e88affa2b0e8b3eee309c7de183d394ce4b956339ebd95e6.onnx'),
+  //     size: 176173887
+  //   }
+  // ],
   [
     'ort-wasm-simd-threaded.wasm',
     {

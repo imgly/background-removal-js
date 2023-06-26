@@ -13,7 +13,8 @@ export async function runInference(
 ): Promise<ImageData> {
   const session = await memoize(async (config: Config, imports: Imports) => {
     if (config.debug) console.debug('Loading model...');
-    const blob = await Bundle.fetch('model', config);
+    const model = config.model;
+    const blob = await Bundle.fetch(model, config);
     const arrayBuffer = await blob.arrayBuffer();
     const session = await imports.createSession(arrayBuffer);
     return session;
