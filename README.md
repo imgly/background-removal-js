@@ -155,4 +155,3 @@ The software is free for use under the GPL License. Please contact [support@img.
 
 This library is made by IMG.LY shipping the world's premier SDKs for building creative applications.
 Start your trial of the [CreativeEditor SDK](https://img.ly/products/creative-sdk?utm_source=github&utm_medium=project&utm_campaign=bg-removal), [PhotoEditor SDK](https://img.ly/products/photo-sdk?utm_source=github&utm_medium=project&utm_campaign=bg-removal) & [VideoEditor SDK](https://img.ly/products/video-sdk?utm_source=github&utm_medium=project&utm_campaign=bg-removal).
-

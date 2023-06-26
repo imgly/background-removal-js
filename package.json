@@ -1,6 +1,6 @@
 {
   "name": "@imgly/background-removal",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Background Removal in the Browser",
   "keywords": [
     "background-removal",
@@ -10,6 +10,10 @@
     "image-matting",
     "onnx"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/imgly/background-removal-js.git"
+  },
   "license": "SEE LICENSE IN LICENSE.md",
   "author": {
     "name": "IMG.LY GmbH",
