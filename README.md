@@ -19,7 +19,7 @@ The key features of @imgly/background-removal are:
 
 - **Seamless Integration with IMG.LY's CE.SDK**: @imgly/background-removal provides seamless integration with [IMG.LY's CE.SDK](https://img.ly/creative-sdk?utm_source=github&utm_medium=project&utm_campaign=bg-removal), allowing developers to easily incorporate powerful in-browser image matting and background removal capabilities into their projects.
 
-The Neural Network ([ONNX model](https://onnx.ai/)) and WASM files used by @imgly/background-removal is hosted on [UNPKG](https://www.unpkg.com/), making it readily available for download to all users of the library. See section Custom Asset Serving if you want to host data on your own servers.
+The Neural Network ([ONNX model](https://onnx.ai/)) and WASM files used by @imgly/background-removal are hosted on [UNPKG](https://www.unpkg.com/), making it readily available for download to all users of the library. See the section Custom Asset Serving if you want to host data on your own servers.
 
 <p align="center">
 <img src="https://img.ly/showcases/cesdk/web/s/case-thumbnail/background-removal/background-removal-0.png?utm_source=github&utm_medium=project&utm_campaign=bg-removal" alt="background removal js showcase" />
@@ -59,14 +59,14 @@ The library does not need any configuration to get started. However, there are o
 type Config = {
   publicPath: string; // The public path used for model and wasm files
   debug: bool; // enable or disable useful console.log outputs
-  proxyToWorker: bool; // Wether or wether not to proxy the calculations to a webworker. (Default true)
+  proxyToWorker: bool; // Whether to proxy the calculations to a web worker. (Default true)
   model: 'small' | 'medium'; // The model to use. (Default "medium")
 };
 ```
 
 ### Download Size vs Quality
 
-The onnx model is shipped in various size and needs.
+The onnx model is shipped in various sizes and needs.
 
 - small (~40 MB) is the smallest model and is in most cases working fine but sometimes shows some artifacts. It's a quantized model.
 - medium (~80MB) is the default model.
@@ -85,7 +85,7 @@ let config: Config = {
 
 ### Performance
 
-The performance is largely dependend on the feature set available. Most promintently, ensure that `SharedArrayBuffer` is available [MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/SharedArrayBuffer). Due to the security requirements of `SharedArrayBuffer` two headers need to be set to cross-origin isolate your site:
+The performance is largely dependent on the feature set available. Most prominently, ensure that `SharedArrayBuffer` is available [MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/SharedArrayBuffer). Due to the security requirements of `SharedArrayBuffer` two headers need to be set to cross-origin isolate your site:
 
 ```typescript
 'Cross-Origin-Opener-Policy': 'same-origin',
@@ -147,7 +147,7 @@ let config: Config = {
 
 @imgly/background-removal is ideal for developers and projects that require efficient and cost-effective background removal directly in the browser. It caters to a wide range of use cases, including but not limited to:
 
-- _E-commerce applications_ that need to remove backgrounds from product images in real-time.
+- _E-commerce applications_ that need to remove backgrounds from product images in real time.
 
 - _Image editing applications_ that require background removal capabilities for enhancing user experience.
 
