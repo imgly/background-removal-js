@@ -1,6 +1,6 @@
 {
   "name": "@imgly/background-removal",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Background Removal in the Browser",
   "keywords": [
     "background-removal",
@@ -47,7 +47,7 @@
     "@types/node": "^20.3.1",
     "assert": "^2.0.0",
     "lodash": "^4.17.21",
-    "onnxruntime-web": "~1.15.0",
+    "onnxruntime-web": "^1.15.1",
     "ts-loader": "^9.4.3",
     "tslib": "^2.5.3",
     "typescript": "^5.1.3",

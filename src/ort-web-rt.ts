@@ -13,13 +13,26 @@ function createOnnxRuntime(config: any): Imports {
         simd: await simd(),
         threads: await threads(),
         SharedArrayBuffer: typeof SharedArrayBuffer !== 'undefined',
-        numThreads: navigator.hardwareConcurrency ?? 4
+        numThreads: navigator.hardwareConcurrency ?? 4,
+        // @ts-ignore
+        webgpu: navigator.gpu !== undefined
       };
+      if (config.debug) {
+        console.debug('Capabilities:', capabilities);
+        ort.env.debug = true;
+        ort.env.logLevel = 'verbose';
+      }
 
       ort.env.wasm.numThreads = capabilities.numThreads;
       ort.env.wasm.simd = capabilities.simd;
       ort.env.wasm.proxy = config.proxyToWorker;
       ort.env.wasm.wasmPaths = {
+        // 'ort-wasm-simd-threaded.jsep.wasm':  URL.createObjectURL(
+        //   await Bundle.fetch('ort-wasm-simd-threaded.jsep.wasm', config)
+        // ),
+        // 'ort-wasm-simd.jsep.wasm': URL.createObjectURL(
+        //   await Bundle.fetch('ort-wasm-simd.jsep.wasm', config)
+        // ),
         'ort-wasm-simd-threaded.wasm': URL.createObjectURL(
           await Bundle.fetch('ort-wasm-simd-threaded.wasm', config)
         ),
@@ -33,9 +46,11 @@ function createOnnxRuntime(config: any): Imports {
           await Bundle.fetch('ort-wasm.wasm', config)
         )
       };
+
       if (config.debug) {
         console.debug('ort.env.wasm:', ort.env.wasm);
       }
+
       const ort_config: ort.InferenceSession.SessionOptions = {
         executionProviders: ['wasm'],
         graphOptimizationLevel: 'all',
@@ -46,12 +61,14 @@ function createOnnxRuntime(config: any): Imports {
       const session = await ort.InferenceSession.create(
         model,
         ort_config
-      ).catch((e) => {
+      ).catch((e: any) => {
         throw new Error(
           `Failed to create session: ${e}. Please check if the publicPath is set correctly.`
         );
       });
-      // we need to revoke those
+
+      // URL.revokeObjectURL(ort.env.wasm.wasmPaths['ort-wasm-simd-threaded.jsep.wasm']!);
+      // URL.revokeObjectURL(ort.env.wasm.wasmPaths['ort-wasm-simd.jsep.wasm']!);
       URL.revokeObjectURL(
         ort.env.wasm.wasmPaths['ort-wasm-simd-threaded.wasm']!
       );

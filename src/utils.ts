@@ -69,7 +69,11 @@ async function imageDataResize(
   return imageBitmapToImageData(bitmap);
 }
 
-function imageDataToFloat32Array(image: ImageData): Float32Array {
+function imageDataToFloat32Array(
+  image: ImageData,
+  mean: number[] = [128, 128, 128],
+  std: number[] = [256, 256, 256]
+): Float32Array {
   var imageBufferData = image.data;
 
   const stride = image.width * image.height;
@@ -77,9 +81,10 @@ function imageDataToFloat32Array(image: ImageData): Float32Array {
 
   // r_0, r_1, .... g_0,g_1, .... b_0
   for (let i = 0, j = 0; i < imageBufferData.length; i += 4, j += 1) {
-    float32Data[j] = imageBufferData[i] / 255.0 - 0.5;
-    float32Data[j + stride] = imageBufferData[i + 1] / 255.0 - 0.5;
-    float32Data[j + stride + stride] = imageBufferData[i + 2] / 255.0 - 0.5;
+    float32Data[j] = (imageBufferData[i] - mean[0]) / std[0];
+    float32Data[j + stride] = (imageBufferData[i + 1] - mean[1]) / std[1];
+    float32Data[j + stride + stride] =
+      (imageBufferData[i + 2] - mean[2]) / std[2];
   }
 
   return float32Data;
