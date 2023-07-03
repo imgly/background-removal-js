@@ -82,7 +82,7 @@ On the first run, the necessary data will be fetched and stored in the browser c
 ```typescript
 let config: Config = {
   progress: (key, current, total) => {
-    console.log(`Downloading ${key}: ${(current} of ${total}`);
+    console.log(`Downloading ${key}: ${current} of ${total}`);
   }
 }
 ```
