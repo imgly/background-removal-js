@@ -92,7 +92,10 @@ async function fetchKey(key: string, config: Config) {
 
   const response = await fetch(url, config.fetchArgs);
 
-  let chunks = await fetchChunked(response, entry, config, key);
+  const chunks = config.progress
+    ? await fetchChunked(response, entry, config, key)
+    : [await response.blob()];
+
   const data = new Blob(chunks, { type: entry.mime });
   if (data.size !== entry.size) {
     throw new Error(
