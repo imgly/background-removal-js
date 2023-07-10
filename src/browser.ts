@@ -12,6 +12,8 @@ import { memoize } from 'lodash';
 
 type ImageSource = ImageData | ArrayBuffer | Uint8Array | Blob | URL | string;
 
+const memoizedCreateOnnxRuntime = memoize(createOnnxRuntime);
+
 async function removeBackground(
   image: ImageSource,
   config?: Config
@@ -32,7 +34,7 @@ async function removeBackground(
     }
   }
 
-  const imports = memoize(createOnnxRuntime)(config);
+  const imports = memoizedCreateOnnxRuntime(config);
 
   image = await utils.imageSourceToImageData(image);
 

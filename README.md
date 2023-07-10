@@ -84,7 +84,7 @@ let config: Config = {
   progress: (key, current, total) => {
     console.log(`Downloading ${key}: ${current} of ${total}`);
   }
-}
+};
 ```
 
 ### Performance
