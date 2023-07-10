@@ -128,10 +128,7 @@ async function imageSourceToImageData(
     const response = await fetch(image, {});
     image = await response.blob();
   }
-  if (image instanceof ArrayBuffer) {
-    image = new Blob([image]);
-  }
-  if (image instanceof Uint8Array) {
+  if (image instanceof ArrayBuffer || ArrayBuffer.isView(image)) {
     image = new Blob([image]);
   }
   if (image instanceof Blob) {
