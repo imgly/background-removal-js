@@ -10,10 +10,6 @@ export {
   imageSourceToImageData
 };
 
-function createCanvas() {
-  return document.createElement('canvas');
-}
-
 async function imageDecode(blob: Blob): Promise<ImageData> {
   const imageBitmap = await createImageBitmap(blob);
   const imageData = imageBitmapToImageData(imageBitmap);
@@ -21,32 +17,19 @@ async function imageDecode(blob: Blob): Promise<ImageData> {
 }
 
 async function imageEncode(
-  imagedata: ImageData,
-  quality: number = 0.8
+  imageData: ImageData,
+  quality: number = 0.8,
+  type: string = 'image/png'
 ): Promise<Blob> {
-  var canvas = createCanvas();
+  var canvas = new OffscreenCanvas(imageData.width, imageData.height);
   var ctx = canvas.getContext('2d')!;
-  canvas.width = imagedata.width;
-  canvas.height = imagedata.height;
-  ctx.putImageData(imagedata, 0, 0);
-  return new Promise((resolve, _reject) => {
-    canvas.toBlob(
-      (blob) => {
-        resolve(blob!);
-      },
-      'image/png',
-      quality
-    );
-  });
+  ctx.putImageData(imageData, 0, 0);
+  return canvas.convertToBlob({ quality, type });
 }
 
 function imageBitmapToImageData(imageBitmap: ImageBitmap): ImageData {
-  const canvas = createCanvas();
-  const ctx = canvas.getContext('2d')!;
-
-  // Set the canvas dimensions to match the ImageBitmap
-  canvas.width = imageBitmap.width;
-  canvas.height = imageBitmap.height;
+  var canvas = new OffscreenCanvas(imageBitmap.width, imageBitmap.height);
+  var ctx = canvas.getContext('2d')!;
 
   // Draw the ImageBitmap onto the canvas
   ctx.drawImage(imageBitmap, 0, 0);
