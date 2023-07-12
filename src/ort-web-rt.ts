@@ -28,22 +28,22 @@ function createOnnxRuntime(config: any): Imports {
       ort.env.wasm.proxy = config.proxyToWorker;
       ort.env.wasm.wasmPaths = {
         // 'ort-wasm-simd-threaded.jsep.wasm':  URL.createObjectURL(
-        //   await Bundle.fetch('ort-wasm-simd-threaded.jsep.wasm', config)
+        //   await Bundle.load('ort-wasm-simd-threaded.jsep.wasm', config)
         // ),
         // 'ort-wasm-simd.jsep.wasm': URL.createObjectURL(
-        //   await Bundle.fetch('ort-wasm-simd.jsep.wasm', config)
+        //   await Bundle.load('ort-wasm-simd.jsep.wasm', config)
         // ),
         'ort-wasm-simd-threaded.wasm': URL.createObjectURL(
-          await Bundle.fetch('ort-wasm-simd-threaded.wasm', config)
+          await Bundle.load('ort-wasm-simd-threaded.wasm', config)
         ),
         'ort-wasm-simd.wasm': URL.createObjectURL(
-          await Bundle.fetch('ort-wasm-simd.wasm', config)
+          await Bundle.load('ort-wasm-simd.wasm', config)
         ),
         'ort-wasm-threaded.wasm': URL.createObjectURL(
-          await Bundle.fetch('ort-wasm-threaded.wasm', config)
+          await Bundle.load('ort-wasm-threaded.wasm', config)
         ),
         'ort-wasm.wasm': URL.createObjectURL(
-          await Bundle.fetch('ort-wasm.wasm', config)
+          await Bundle.load('ort-wasm.wasm', config)
         )
       };
 

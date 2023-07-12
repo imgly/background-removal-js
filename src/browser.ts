@@ -5,20 +5,41 @@ export type { ImageSource, Config };
 // Imports
 import { runInference } from './inference';
 import { Config, validateConfig } from './schema';
-
 import { createOnnxRuntime } from './ort-web-rt';
 import * as utils from './utils';
+import * as Bundle from './bundle';
+import { Imports } from './tensor';
+
 import { memoize } from 'lodash';
 
 type ImageSource = ImageData | ArrayBuffer | Uint8Array | Blob | URL | string;
 
-const memoizedCreateOnnxRuntime = memoize(createOnnxRuntime);
+async function createSession(config: Config, imports: Imports) {
+  if (config.debug) console.debug('Loading model...');
+  console.log('createSession called');
+  console.log(config);
+  console.log(imports);
+  const model = config.model;
+  const blob = await Bundle.load(model, config);
+  const arrayBuffer = await blob.arrayBuffer();
+  const session = await imports.createSession(arrayBuffer);
+  return session;
+}
+
+async function _init(config?: Config) {
+  config = validateConfig(config);
+  const imports = createOnnxRuntime(config);
+  const session = await createSession(config, imports);
+  return { config, imports, session };
+}
+
+const init = memoize(_init, (config) => JSON.stringify(config));
 
 async function removeBackground(
   image: ImageSource,
-  config?: Config
+  configuration?: Config
 ): Promise<Blob> {
-  config = validateConfig(config);
+  const { config, imports, session } = await init(configuration);
 
   if (config.debug) {
     config.progress =
@@ -34,8 +55,6 @@ async function removeBackground(
     }
   }
 
-  const imports = memoizedCreateOnnxRuntime(config);
-
   image = await utils.imageSourceToImageData(image);
 
   if (!(image instanceof ImageData)) {
@@ -44,7 +63,7 @@ async function removeBackground(
     );
   }
 
-  const imageData = await runInference(image, config, imports);
+  const imageData = await runInference(image, config, imports, session);
 
   return await utils.imageEncode(imageData);
 }

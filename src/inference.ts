@@ -2,24 +2,13 @@ import { imageDataResize, imageDataToFloat32Array } from './utils';
 import { Imports } from './tensor';
 import { calculateProportionalSize } from './utils';
 import { Config } from './schema';
-import * as Bundle from './bundle';
-
-import { memoize } from 'lodash';
 
 export async function runInference(
   imageData: ImageData,
   config: Config,
-  imports: Imports
+  imports: Imports,
+  session: any
 ): Promise<ImageData> {
-  const session = await memoize(async (config: Config, imports: Imports) => {
-    if (config.debug) console.debug('Loading model...');
-    const model = config.model;
-    const blob = await Bundle.fetch(model, config);
-    const arrayBuffer = await blob.arrayBuffer();
-    const session = await imports.createSession(arrayBuffer);
-    return session;
-  })(config, imports);
-
   if (config.progress) config.progress('compute:inference', 0, 1);
   const resolution = 1024;
   const src_width = imageData.width;

@@ -1,7 +1,6 @@
-export { preload, fetchKey as fetch };
+export { preload, load };
 
 import { Config } from './schema';
-import _ from 'lodash';
 
 type Entry = {
   url: string;
@@ -83,7 +82,7 @@ const bundle: Map<string, Entry> = new Map([
   ]
 ]);
 
-async function fetchKey(key: string, config: Config) {
+async function load(key: string, config: Config) {
   const entry = bundle.get(key)!;
   let url = entry.url;
   if (config.publicPath) {
@@ -134,7 +133,7 @@ async function preload(config: Config) {
   // This will warmup the caches
   let result = new Map(bundle);
   result.forEach(async (_, key) => {
-    await fetchKey(key, config);
+    await load(key, config);
   });
   return result;
 }
