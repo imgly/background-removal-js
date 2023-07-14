@@ -16,9 +16,6 @@ type ImageSource = ImageData | ArrayBuffer | Uint8Array | Blob | URL | string;
 
 async function createSession(config: Config, imports: Imports) {
   if (config.debug) console.debug('Loading model...');
-  console.log('createSession called');
-  console.log(config);
-  console.log(imports);
   const model = config.model;
   const blob = await Bundle.load(model, config);
   const arrayBuffer = await blob.arrayBuffer();
