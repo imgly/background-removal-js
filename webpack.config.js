@@ -48,20 +48,6 @@ module.exports = (env, argv) => {
       }
     }
   };
-  const umdConfig = {
-    ...commonConfig,
-    entry: './src/browser.ts',
-    target: 'web',
-    output: {
-      filename: 'browser.js',
-      path: path.resolve(__dirname, 'dist'),
-      publicPath: publicPath,
-      library: {
-        type: 'umd',
-        name: 'backgroundRemoval'
-      }
-    }
-  };
 
   const esmConfig = {
     ...commonConfig,
@@ -71,7 +57,7 @@ module.exports = (env, argv) => {
     entry: './src/browser.ts',
     target: 'web',
     output: {
-      filename: 'browser.mjs',
+      filename: 'browser.esm.js',
       path: path.resolve(__dirname, 'dist'),
       publicPath: publicPath,
       library: {
@@ -94,5 +80,5 @@ module.exports = (env, argv) => {
     }
   };
 
-  return [umdConfig, esmConfig];
+  return [esmConfig];
 };
