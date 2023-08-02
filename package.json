@@ -23,9 +23,7 @@
   "bugs": {
     "email": "support@img.ly"
   },
-  "main": "./dist/browser.js",
-  "module": "./dist/browser.mjs",
-  "browser": "./dist/browser.js",
+  "module": "./dist/browser.esm.js",
   "homepage": "https://img.ly/showcases/cesdk/web/background-removal/web",
   "types": "./dist/browser.d.ts",
   "files": [
