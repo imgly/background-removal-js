@@ -124,8 +124,10 @@ async function transform(fileName, entry) {
   const destFile = path.resolve(DefaultOutDir, fileHash);
   await deleteFile(destFile);
   await copyFile(fileName, destFile);
+  const chunks = {};
+  chunks[fileHash] = { range: [0, fileSize-1] };
   return {
-    hash: fileHash,
+    chunks: chunks,
     size: fileSize,
     mime: entry.mime
   };
@@ -144,26 +146,28 @@ async function main() {
   fs.mkdirSync(DefaultOutDir, { recursive: true });
   const oldResources = await loadResourceMetadata();
   const resources = await generateFiles();
-  await removeOldResources(oldResources, resources);
+  // await removeOldResources(oldResources, resources);
   await saveResourceMetadata(resources);
 }
 
-function removeOldResources(oldResources, resources) {
-  Object.keys(oldResources).map((key) => {
-    if (!resources[key]) {
-      const hash = oldResources[key].hash;
-      const destFile = path.resolve(DefaultOutDir, hash);
-      deleteFile(path.resolve(DefaultOutDir, key));
-    }
-  });
-}
+// function removeOldResources(oldResources, resources) {
+//   Object.keys(oldResources).map((key) => {
+//     if (!resources[key]) {
+//       const hash = oldResources[key].hash;
+//       const destFile = path.resolve(DefaultOutDir, hash);
+//       deleteFile(path.resolve(DefaultOutDir, key));
+//     }
+//   });
+// }
 
 async function generateFiles() {
   const filesToProcess = {};
   const entries = await loadConfig();
   for (const entry of entries) {
-    const entryPath = path.resolve(BaseDir, entry.path);
+    const entryPath = path.resolve(BaseDir, entry.source);
     const candidates = await globSync(entryPath, { nodir: true });
+    if (candidates.length === 0) { console.error(`No files found for ${entry.source}`); process.exit(-1) }
+
     for (const candidate of candidates) {
       filesToProcess[candidate] = { ...DefaultEntry, ...entry };
     }
@@ -182,7 +186,7 @@ async function saveResourceMetadata(filesToProcess) {
   for (const fileToProcess of Object.keys(filesToProcess)) {
     const entry = filesToProcess[fileToProcess];
     const metadata = await transform(fileToProcess, entry, DefaultOutDir);
-    const key = fileToProcess.replace(BaseDir, '');
+    const key = path.join(entry.path, fileToProcess.split('/').pop());
     resourcesMetadata[key] = metadata;
   }
   fs.writeFileSync(

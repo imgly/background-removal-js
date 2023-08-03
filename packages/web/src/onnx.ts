@@ -30,39 +30,28 @@ function createOnnxRuntime(config: any): Imports {
       ort.env.wasm.wasmPaths = {
         'ort-wasm-simd-threaded.wasm':
           capabilities.simd && capabilities.threads
-            ? URL.createObjectURL(
-                await Resource.load(
-                  '/node_modules/onnxruntime-web/dist/ort-wasm-simd-threaded.wasm',
-                  config
-                )
+            ? await Resource.loadAsUrl(
+                '/onnxruntime-web/ort-wasm-simd-threaded.wasm',
+                config
               )
             : undefined,
         'ort-wasm-simd.wasm':
           capabilities.simd && !capabilities.threads
-            ? URL.createObjectURL(
-                await Resource.load(
-                  '/node_modules/onnxruntime-web/dist/ort-wasm-simd.wasm',
-                  config
-                )
+            ? await Resource.loadAsUrl(
+                'onnxruntime-web/ort-wasm-simd.wasm',
+                config
               )
             : undefined,
         'ort-wasm-threaded.wasm':
           !capabilities.simd && capabilities.threads
-            ? URL.createObjectURL(
-                await Resource.load(
-                  '/node_modules/onnxruntime-web/dist/ort-wasm-threaded.wasm',
-                  config
-                )
+            ? await Resource.loadAsUrl(
+                '/onnxruntime-web/ort-wasm-threaded.wasm',
+                config
               )
             : undefined,
         'ort-wasm.wasm':
           !capabilities.simd && !capabilities.threads
-            ? URL.createObjectURL(
-                await Resource.load(
-                  '/node_modules/onnxruntime-web/dist/ort-wasm.wasm',
-                  config
-                )
-              )
+            ? await Resource.loadAsUrl('/onnxruntime-web/ort-wasm.wasm', config)
             : undefined
       };
 
