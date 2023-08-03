@@ -2,7 +2,8 @@
   "name": "@imgly/background-removal-js",
   "version": "1.0.6",
   "scripts": {
-    "lint:watch": "npx onchange \"**/*\" -- npx prettier --write --ignore-unknown {{changed}}"
+    "lint:watch": "npx onchange \"**/*\" -- npx prettier --write --ignore-unknown {{changed}}",
+    "lint": "npx prettier --write --ignore-unknown ."
   },
   "devDependencies": {
     "glob": "^10.3.3",

@@ -19,18 +19,15 @@ async function initInference(config?: Config) {
 }
 
 async function runInference(
-  imageTensor: NdArray<Float32Array>,
+  imageTensor: NdArray<Uint8Array>,
   config: Config,
   session: any
-): Promise<NdArray<Float32Array>> {
+): Promise<NdArray<Uint8Array>> {
   if (config.progress) config.progress('compute:inference', 0, 1);
   const resolution = 1024;
   const [srcHeight, srcWidth, srcChannels] = imageTensor.shape;
-
   let tensorImage = await tensorResize(imageTensor, resolution, resolution);
-
   const inputTensor = tensorHWCtoBCHW(tensorImage);
-
   const predictionsDict = await runOnnxSession(
     session,
     [['input', inputTensor]],

@@ -9,6 +9,7 @@ import * as utils from './utils';
 import ndarray from 'ndarray';
 import * as codecs from './codecs';
 import { memoize } from 'lodash';
+import { ensureAbsoluteURL } from './url';
 
 type ImageSource = ImageData | ArrayBuffer | Uint8Array | Blob | URL | string;
 
@@ -44,20 +45,14 @@ async function removeBackground(
 
   const imageTensor = ndarray(image.data, [image.height, image.width, 4]);
   const outImageTensor = await runInference(imageTensor, config, session);
-
-  const imageData = new ImageData(
-    outImageTensor.data,
-    outImageTensor.shape[1],
-    outImageTensor.shape[0]
-  );
-  return await utils.imageEncode(imageData);
+  return await utils.imageEncode(outImageTensor);
 }
 
 async function imageSourceToImageData(
   image: string | URL | ArrayBuffer | ImageData | Blob | Uint8Array
 ) {
   if (typeof image === 'string') {
-    image = utils.ensureAbsoluteURL(image);
+    image = ensureAbsoluteURL(image);
     image = new URL(image);
   }
   if (image instanceof URL) {
