@@ -1,11 +1,12 @@
-export { load, loadAsUrl };
+export { loadAsBlob as load, loadAsUrl };
 
 import { Config } from './schema';
 
 async function loadAsUrl(url: string, config: Config) {
-  URL.createObjectURL(await load(url, config));
+  return URL.createObjectURL(await loadAsBlob(url, config));
 }
-async function load(key: string, config: Config) {
+
+async function loadAsBlob(key: string, config: Config) {
   // load resource metadata
   const resourceUrl = new URL('resources.json', config.publicPath);
   const resourceResponse = await fetch(resourceUrl);
@@ -23,16 +24,23 @@ async function load(key: string, config: Config) {
     );
   }
 
-  let url = entry.hash;
-  if (config.publicPath) {
-    url = new URL(url, config.publicPath).toString();
-  }
-  const response = await fetch(url, config.fetchArgs);
+  let urls = Object.keys(entry.chunks);
 
-  const chunks = config.progress
-    ? await fetchChunked(response, entry, config, key)
-    : [await response.blob()];
+  const allChunks = await Promise.all(
+    urls.map(async (url) => {
+      if (config.publicPath) {
+        url = new URL(url, config.publicPath).toString();
+      }
+      const response = await fetch(url, config.fetchArgs);
 
+      const chunks = config.progress
+        ? await fetchChunked(response, entry, config, key)
+        : [await response.blob()];
+      return chunks;
+    })
+  );
+
+  const chunks = allChunks.flat();
   const data = new Blob(chunks, { type: entry.mime });
   if (data.size !== entry.size) {
     throw new Error(

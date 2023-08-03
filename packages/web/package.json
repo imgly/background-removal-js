@@ -38,7 +38,7 @@
     "start": "npm run watch",
     "clean": "npx rimraf dist",
     "test": "true",
-    "resources": "node ./scripts/package-resources.mjs",
+    "resources": "node ../../scripts/package-resources.mjs",
     "build": "npm run clean && npm run resources && parcel build",
     "watch": "npm run clean && npm run resources && parcel watch",
     "publish:public": "npm run build && npm publish --access public",
