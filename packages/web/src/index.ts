@@ -5,38 +5,34 @@ export type { ImageSource, Config };
 // Imports
 import { runInference } from './inference';
 import { Config, validateConfig } from './schema';
-import { createOnnxRuntime } from './onnx';
+import { createOnnxSession, runOnnxSession } from './onnx';
 import * as utils from './utils';
 import * as Resource from './resource';
-import { Imports } from './tensor';
+import ndarray from 'ndarray';
 
 import { memoize } from 'lodash';
 
 type ImageSource = ImageData | ArrayBuffer | Uint8Array | Blob | URL | string;
 
-async function createSession(config: Config, imports: Imports) {
+
+async function initInference(config?: Config) {
+  config = validateConfig(config);
+
   if (config.debug) console.debug('Loading model...');
   const model = config.model;
   const blob = await Resource.load(`/models/${model}`, config);
   const arrayBuffer = await blob.arrayBuffer();
-  const session = await imports.createSession(arrayBuffer);
-  return session;
+  const session = await createOnnxSession(arrayBuffer, config);
+  return { config, session };
 }
 
-async function _init(config?: Config) {
-  config = validateConfig(config);
-  const imports = createOnnxRuntime(config);
-  const session = await createSession(config, imports);
-  return { config, imports, session };
-}
-
-const init = memoize(_init, (config) => JSON.stringify(config));
+const init = memoize(initInference, (config) => JSON.stringify(config));
 
 async function removeBackground(
   image: ImageSource,
   configuration?: Config
 ): Promise<Blob> {
-  const { config, imports, session } = await init(configuration);
+  const { config, session } = await init(configuration);
 
   if (config.debug) {
     config.progress =
@@ -60,7 +56,9 @@ async function removeBackground(
     );
   }
 
-  const imageData = await runInference(image, config, imports, session);
+  const imageTensor = ndarray(image.data, [image.height, image.width, 4]);
+  const outImageTensor = await runInference(imageTensor, config, session);
 
+  const imageData = new ImageData(outImageTensor.data, outImageTensor.shape[1], outImageTensor.shape[0]);
   return await utils.imageEncode(imageData);
 }

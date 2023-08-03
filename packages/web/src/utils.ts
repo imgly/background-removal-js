@@ -1,31 +1,17 @@
 export {
   imageDecode,
   imageEncode,
-  imageBitmapToImageData,
   imageDataResize,
-  imageDataToFloat32Array,
+  tensorHWCtoBCHW,
+  imageBitmapToImageData,
   calculateProportionalSize,
   isAbsoluteURL,
   ensureAbsoluteURL,
   imageSourceToImageData
 };
 
-async function imageDecode(blob: Blob): Promise<ImageData> {
-  const imageBitmap = await createImageBitmap(blob);
-  const imageData = imageBitmapToImageData(imageBitmap);
-  return imageData;
-}
-
-async function imageEncode(
-  imageData: ImageData,
-  quality: number = 0.8,
-  type: string = 'image/png'
-): Promise<Blob> {
-  var canvas = new OffscreenCanvas(imageData.width, imageData.height);
-  var ctx = canvas.getContext('2d')!;
-  ctx.putImageData(imageData, 0, 0);
-  return canvas.convertToBlob({ quality, type });
-}
+import ndarray, { NdArray } from 'ndarray';
+import { imageDecode, imageEncode } from './codecs';
 
 function imageBitmapToImageData(imageBitmap: ImageBitmap): ImageData {
   var canvas = new OffscreenCanvas(imageBitmap.width, imageBitmap.height);
@@ -39,27 +25,34 @@ function imageBitmapToImageData(imageBitmap: ImageBitmap): ImageData {
 }
 
 async function imageDataResize(
-  imageData: ImageData,
+  imageTensor: NdArray<Uint32Array>,
   newWidth: number,
   newHeight: number
-): Promise<ImageData> {
+): Promise<NdArray<Uint32Array>> {
+  const [srcHeight, srcWidth, srcChannels] = imageTensor.shape;
+  const imageData = new ImageData(imageTensor.data, srcWidth, srcHeight);
   const bitmap = await createImageBitmap(imageData, {
     resizeWidth: newWidth,
     resizeHeight: newHeight,
     resizeQuality: 'high',
     premultiplyAlpha: 'premultiply'
   });
-  return imageBitmapToImageData(bitmap);
+  const outImageData = imageBitmapToImageData(bitmap);
+  return ndarray(outImageData.data, [
+    outImageData.height,
+    outImageData.width,
+    4
+  ]);
 }
 
-function imageDataToFloat32Array(
-  image: ImageData,
+function tensorHWCtoBCHW(
+  imageTensor: NdArray<Uint32Array>,
   mean: number[] = [128, 128, 128],
   std: number[] = [256, 256, 256]
-): Float32Array {
-  var imageBufferData = image.data;
-
-  const stride = image.width * image.height;
+): NdArray<Float32Array> {
+  var imageBufferData = imageTensor.data;
+  const [srcHeight, srcWidth, srcChannels] = imageTensor.shape;
+  const stride = srcHeight * srcWidth;
   const float32Data = new Float32Array(3 * stride);
 
   // r_0, r_1, .... g_0,g_1, .... b_0
@@ -70,7 +63,7 @@ function imageDataToFloat32Array(
       (imageBufferData[i + 2] - mean[2]) / std[2];
   }
 
-  return float32Data;
+  return ndarray(float32Data, [1, 3, srcHeight, srcWidth]);
 }
 
 function calculateProportionalSize(
