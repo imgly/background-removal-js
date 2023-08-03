@@ -1,10 +1,10 @@
 export { createOnnxRuntime };
 
-import { simd, threads } from 'wasm-feature-detect';
+import { simd, threads } from './feature-detect';
 import { Tensor, Imports } from './tensor';
 
 import * as ort from 'onnxruntime-web';
-import * as Bundle from './bundle';
+import * as Resource from './resource';
 
 function createOnnxRuntime(config: any): Imports {
   return {
@@ -26,25 +26,44 @@ function createOnnxRuntime(config: any): Imports {
       ort.env.wasm.numThreads = capabilities.numThreads;
       ort.env.wasm.simd = capabilities.simd;
       ort.env.wasm.proxy = config.proxyToWorker;
+
       ort.env.wasm.wasmPaths = {
-        // 'ort-wasm-simd-threaded.jsep.wasm':  URL.createObjectURL(
-        //   await Bundle.load('ort-wasm-simd-threaded.jsep.wasm', config)
-        // ),
-        // 'ort-wasm-simd.jsep.wasm': URL.createObjectURL(
-        //   await Bundle.load('ort-wasm-simd.jsep.wasm', config)
-        // ),
-        'ort-wasm-simd-threaded.wasm': URL.createObjectURL(
-          await Bundle.load('ort-wasm-simd-threaded.wasm', config)
-        ),
-        'ort-wasm-simd.wasm': URL.createObjectURL(
-          await Bundle.load('ort-wasm-simd.wasm', config)
-        ),
-        'ort-wasm-threaded.wasm': URL.createObjectURL(
-          await Bundle.load('ort-wasm-threaded.wasm', config)
-        ),
-        'ort-wasm.wasm': URL.createObjectURL(
-          await Bundle.load('ort-wasm.wasm', config)
-        )
+        'ort-wasm-simd-threaded.wasm':
+          capabilities.simd && capabilities.threads
+            ? URL.createObjectURL(
+                await Resource.load(
+                  '/node_modules/onnxruntime-web/dist/ort-wasm-simd-threaded.wasm',
+                  config
+                )
+              )
+            : undefined,
+        'ort-wasm-simd.wasm':
+          capabilities.simd && !capabilities.threads
+            ? URL.createObjectURL(
+                await Resource.load(
+                  '/node_modules/onnxruntime-web/dist/ort-wasm-simd.wasm',
+                  config
+                )
+              )
+            : undefined,
+        'ort-wasm-threaded.wasm':
+          !capabilities.simd && capabilities.threads
+            ? URL.createObjectURL(
+                await Resource.load(
+                  '/node_modules/onnxruntime-web/dist/ort-wasm-threaded.wasm',
+                  config
+                )
+              )
+            : undefined,
+        'ort-wasm.wasm':
+          !capabilities.simd && !capabilities.threads
+            ? URL.createObjectURL(
+                await Resource.load(
+                  '/node_modules/onnxruntime-web/dist/ort-wasm.wasm',
+                  config
+                )
+              )
+            : undefined
       };
 
       if (config.debug) {
@@ -66,16 +85,6 @@ function createOnnxRuntime(config: any): Imports {
           `Failed to create session: ${e}. Please check if the publicPath is set correctly.`
         );
       });
-
-      // URL.revokeObjectURL(ort.env.wasm.wasmPaths['ort-wasm-simd-threaded.jsep.wasm']!);
-      // URL.revokeObjectURL(ort.env.wasm.wasmPaths['ort-wasm-simd.jsep.wasm']!);
-      URL.revokeObjectURL(
-        ort.env.wasm.wasmPaths['ort-wasm-simd-threaded.wasm']!
-      );
-      URL.revokeObjectURL(ort.env.wasm.wasmPaths['ort-wasm-simd.wasm']!);
-      URL.revokeObjectURL(ort.env.wasm.wasmPaths['ort-wasm-threaded.wasm']!);
-      URL.revokeObjectURL(ort.env.wasm.wasmPaths['ort-wasm.wasm']!);
-
       return session;
     },
     runSession: async (

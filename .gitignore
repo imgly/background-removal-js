@@ -3,3 +3,4 @@ dist
 tmp
 .DS_Store
 .vscode
+.parcel-cache
