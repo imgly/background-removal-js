@@ -1,10 +1,11 @@
 export { imageEncode, imageDecode };
 import { imageBitmapToImageData } from './utils';
-import { NdArray } from 'ndarray';
-async function imageDecode(blob: Blob): Promise<ImageData> {
+import ndarray, { NdArray } from 'ndarray';
+
+async function imageDecode(blob: Blob): Promise<NdArray<Uint8Array>> {
   const imageBitmap = await createImageBitmap(blob);
   const imageData = imageBitmapToImageData(imageBitmap);
-  return imageData;
+  return ndarray(imageData.data, [imageData.height, imageData.width, 4]);
 }
 
 async function imageEncode(
