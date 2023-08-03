@@ -5,9 +5,9 @@ export type { ImageSource, Config };
 // Imports
 import { runInference } from './inference';
 import { Config, validateConfig } from './schema';
-import { createOnnxRuntime } from './ort-web-rt';
+import { createOnnxRuntime } from './onnx';
 import * as utils from './utils';
-import * as Bundle from './bundle';
+import * as Bundle from './resource';
 import { Imports } from './tensor';
 
 import { memoize } from 'lodash';
@@ -17,7 +17,7 @@ type ImageSource = ImageData | ArrayBuffer | Uint8Array | Blob | URL | string;
 async function createSession(config: Config, imports: Imports) {
   if (config.debug) console.debug('Loading model...');
   const model = config.model;
-  const blob = await Bundle.load(model, config);
+  const blob = await Bundle.load(`/bundle/models/${model}`, config);
   const arrayBuffer = await blob.arrayBuffer();
   const session = await imports.createSession(arrayBuffer);
   return session;

@@ -3,12 +3,15 @@ export { ConfigSchema, Config, validateConfig };
 import { z } from 'zod';
 import { ensureAbsoluteURL } from './utils';
 
+import pkg from '../package.json';
+
 const ConfigSchema = z
   .object({
     publicPath: z
       .string()
       .optional()
       .describe('The public path to the wasm files and the onnx model.')
+      .default(`https://unpkg.com/${pkg.name}@${pkg.version}/dist/`)
       .transform((val) => (val ? ensureAbsoluteURL(val) : val)),
     debug: z
       .boolean()
