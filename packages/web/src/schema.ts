@@ -1,7 +1,7 @@
 export { ConfigSchema, Config, validateConfig };
 
 import { z } from 'zod';
-import { ensureAbsoluteURL } from './utils';
+import { ensureAbsoluteURL } from './url';
 
 import pkg from '../package.json';
 

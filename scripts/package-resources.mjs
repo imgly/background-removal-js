@@ -125,7 +125,7 @@ async function transform(fileName, entry) {
   await deleteFile(destFile);
   await copyFile(fileName, destFile);
   const chunks = {};
-  chunks[fileHash] = { range: [0, fileSize-1] };
+  chunks[fileHash] = { range: [0, fileSize - 1] };
   return {
     chunks: chunks,
     size: fileSize,
@@ -166,7 +166,10 @@ async function generateFiles() {
   for (const entry of entries) {
     const entryPath = path.resolve(BaseDir, entry.source);
     const candidates = await globSync(entryPath, { nodir: true });
-    if (candidates.length === 0) { console.error(`No files found for ${entry.source}`); process.exit(-1) }
+    if (candidates.length === 0) {
+      console.error(`No files found for ${entry.source}`);
+      process.exit(-1);
+    }
 
     for (const candidate of candidates) {
       filesToProcess[candidate] = { ...DefaultEntry, ...entry };
