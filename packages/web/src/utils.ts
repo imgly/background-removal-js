@@ -1,13 +1,12 @@
 export {
   imageDecode,
   imageEncode,
-  imageDataResize,
+  tensorResize,
   tensorHWCtoBCHW,
   imageBitmapToImageData,
   calculateProportionalSize,
   isAbsoluteURL,
-  ensureAbsoluteURL,
-  imageSourceToImageData
+  ensureAbsoluteURL
 };
 
 import ndarray, { NdArray } from 'ndarray';
@@ -16,19 +15,42 @@ import { imageDecode, imageEncode } from './codecs';
 function imageBitmapToImageData(imageBitmap: ImageBitmap): ImageData {
   var canvas = new OffscreenCanvas(imageBitmap.width, imageBitmap.height);
   var ctx = canvas.getContext('2d')!;
-
-  // Draw the ImageBitmap onto the canvas
   ctx.drawImage(imageBitmap, 0, 0);
-
-  // Retrieve the ImageData from the canvas
   return ctx.getImageData(0, 0, canvas.width, canvas.height);
 }
 
-async function imageDataResize(
-  imageTensor: NdArray<Uint32Array>,
+async function imageResize(
+  imageData: NdArray<Uint8Array>,
   newWidth: number,
   newHeight: number
-): Promise<NdArray<Uint32Array>> {
+): Promise<NdArray<Uint8Array>> {
+  const [srcHeight, srcWidth, srcChannels] = imageData.shape;
+  if (srcChannels !== 4) throw new Error('Only RGBA images are supported');
+  const dstLength = newWidth * newHeight * srcChannels;
+  const newData = new Uint8ClampedArray(dstLength);
+  const xRatio = srcWidth / newWidth;
+  const yRatio = srcHeight / newHeight;
+
+  for (let y = 0; y < newHeight; y++) {
+    for (let x = 0; x < newWidth; x++) {
+      const srcX = Math.floor(x * xRatio);
+      const srcY = Math.floor(y * yRatio);
+      const srcIndex = (srcY * srcWidth + srcX) * srcChannels;
+      const dstIndex = (y * newWidth + x) * srcChannels;
+      for (let i = 0; i < srcChannels; i++) {
+        newData[dstIndex + i] = imageData.data[srcIndex + i];
+      }
+    }
+  }
+
+  return ndarray(new Uint8Array(newData), [newHeight, newWidth, srcChannels]);
+}
+
+async function tensorResize(
+  imageTensor: NdArray<Uint8Array>,
+  newWidth: number,
+  newHeight: number
+): Promise<NdArray<Uint8Array>> {
   const [srcHeight, srcWidth, srcChannels] = imageTensor.shape;
   const imageData = new ImageData(imageTensor.data, srcWidth, srcHeight);
   const bitmap = await createImageBitmap(imageData, {
@@ -91,25 +113,4 @@ function ensureAbsoluteURL(url: string): string {
   } else {
     return new URL(url, window.location.href).href;
   }
-}
-
-async function imageSourceToImageData(
-  image: string | URL | ArrayBuffer | ImageData | Blob | Uint8Array
-) {
-  if (typeof image === 'string') {
-    image = ensureAbsoluteURL(image);
-    image = new URL(image);
-  }
-  if (image instanceof URL) {
-    const response = await fetch(image, {});
-    image = await response.blob();
-  }
-  if (image instanceof ArrayBuffer || ArrayBuffer.isView(image)) {
-    image = new Blob([image]);
-  }
-  if (image instanceof Blob) {
-    image = await imageDecode(image);
-  }
-
-  return image as ImageData;
 }

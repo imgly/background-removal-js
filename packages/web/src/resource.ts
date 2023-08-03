@@ -1,4 +1,4 @@
-export { loadAsBlob as load, loadAsUrl };
+export { loadAsBlob, loadAsUrl };
 
 import { Config } from './schema';
 
