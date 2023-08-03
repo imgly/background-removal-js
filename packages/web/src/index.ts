@@ -6,7 +6,7 @@ export type { ImageSource, Config };
 import { initInference, runInference } from './inference';
 import { Config } from './schema';
 import * as utils from './utils';
-import ndarray from 'ndarray';
+import { NdArray } from 'ndarray';
 import * as codecs from './codecs';
 import { memoize } from 'lodash';
 import { ensureAbsoluteURL } from './url';
@@ -37,20 +37,19 @@ async function removeBackground(
 
   image = await imageSourceToImageData(image);
 
-  if (!(image instanceof ImageData)) {
-    throw new Error(
-      'Image not an ImageData | ArrayBuffer | Uint8Array | Blob | URL | string'
-    );
-  }
+  // if (!(image instanceof NdArray<Uint8Array>)) {
+  //   throw new Error(
+  //     'Image not an ImageData | ArrayBuffer | Uint8Array | Blob | URL | string'
+  //   );
+  // }
 
-  const imageTensor = ndarray(image.data, [image.height, image.width, 4]);
-  const outImageTensor = await runInference(imageTensor, config, session);
+  const outImageTensor = await runInference(image, config, session);
   return await utils.imageEncode(outImageTensor);
 }
 
 async function imageSourceToImageData(
   image: string | URL | ArrayBuffer | ImageData | Blob | Uint8Array
-) {
+): Promise<NdArray<Uint8Array>> {
   if (typeof image === 'string') {
     image = ensureAbsoluteURL(image);
     image = new URL(image);
@@ -66,5 +65,5 @@ async function imageSourceToImageData(
     image = await codecs.imageDecode(image);
   }
 
-  return image as ImageData;
+  return image as NdArray<Uint8Array>;
 }
