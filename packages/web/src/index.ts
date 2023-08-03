@@ -3,28 +3,14 @@ export default removeBackground;
 export type { ImageSource, Config };
 
 // Imports
-import { runInference } from './inference';
-import { Config, validateConfig } from './schema';
-import { createOnnxSession, runOnnxSession } from './onnx';
+import { initInference, runInference } from './inference';
+import { Config } from './schema';
 import * as utils from './utils';
-import * as Resource from './resource';
 import ndarray from 'ndarray';
-
+import * as codecs from './codecs';
 import { memoize } from 'lodash';
 
 type ImageSource = ImageData | ArrayBuffer | Uint8Array | Blob | URL | string;
-
-
-async function initInference(config?: Config) {
-  config = validateConfig(config);
-
-  if (config.debug) console.debug('Loading model...');
-  const model = config.model;
-  const blob = await Resource.load(`/models/${model}`, config);
-  const arrayBuffer = await blob.arrayBuffer();
-  const session = await createOnnxSession(arrayBuffer, config);
-  return { config, session };
-}
 
 const init = memoize(initInference, (config) => JSON.stringify(config));
 
@@ -48,7 +34,7 @@ async function removeBackground(
     }
   }
 
-  image = await utils.imageSourceToImageData(image);
+  image = await imageSourceToImageData(image);
 
   if (!(image instanceof ImageData)) {
     throw new Error(
@@ -59,6 +45,31 @@ async function removeBackground(
   const imageTensor = ndarray(image.data, [image.height, image.width, 4]);
   const outImageTensor = await runInference(imageTensor, config, session);
 
-  const imageData = new ImageData(outImageTensor.data, outImageTensor.shape[1], outImageTensor.shape[0]);
+  const imageData = new ImageData(
+    outImageTensor.data,
+    outImageTensor.shape[1],
+    outImageTensor.shape[0]
+  );
   return await utils.imageEncode(imageData);
+}
+
+async function imageSourceToImageData(
+  image: string | URL | ArrayBuffer | ImageData | Blob | Uint8Array
+) {
+  if (typeof image === 'string') {
+    image = utils.ensureAbsoluteURL(image);
+    image = new URL(image);
+  }
+  if (image instanceof URL) {
+    const response = await fetch(image, {});
+    image = await response.blob();
+  }
+  if (image instanceof ArrayBuffer || ArrayBuffer.isView(image)) {
+    image = new Blob([image]);
+  }
+  if (image instanceof Blob) {
+    image = await codecs.imageDecode(image);
+  }
+
+  return image as ImageData;
 }

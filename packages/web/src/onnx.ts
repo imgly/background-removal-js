@@ -2,7 +2,7 @@ export { createOnnxSession, runOnnxSession };
 
 import ndarray, { NdArray } from 'ndarray';
 import * as ort from 'onnxruntime-web';
-import * as Resource from './resource';
+import { loadAsUrl } from './resource';
 import { simd, threads } from './feature-detect';
 import { Config } from './schema';
 
@@ -27,25 +27,22 @@ async function createOnnxSession(model: any, config: Config) {
   ort.env.wasm.wasmPaths = {
     'ort-wasm-simd-threaded.wasm':
       capabilities.simd && capabilities.threads
-        ? await Resource.loadAsUrl(
+        ? await loadAsUrl(
             '/onnxruntime-web/ort-wasm-simd-threaded.wasm',
             config
           )
         : undefined,
     'ort-wasm-simd.wasm':
       capabilities.simd && !capabilities.threads
-        ? await Resource.loadAsUrl('onnxruntime-web/ort-wasm-simd.wasm', config)
+        ? await loadAsUrl('onnxruntime-web/ort-wasm-simd.wasm', config)
         : undefined,
     'ort-wasm-threaded.wasm':
       !capabilities.simd && capabilities.threads
-        ? await Resource.loadAsUrl(
-            '/onnxruntime-web/ort-wasm-threaded.wasm',
-            config
-          )
+        ? await loadAsUrl('/onnxruntime-web/ort-wasm-threaded.wasm', config)
         : undefined,
     'ort-wasm.wasm':
       !capabilities.simd && !capabilities.threads
-        ? await Resource.loadAsUrl('/onnxruntime-web/ort-wasm.wasm', config)
+        ? await loadAsUrl('/onnxruntime-web/ort-wasm.wasm', config)
         : undefined
   };
 

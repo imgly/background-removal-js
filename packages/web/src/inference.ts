@@ -1,10 +1,24 @@
-import { imageDataResize, tensorHWCtoBCHW } from './utils';
-import { runOnnxSession } from './onnx';
-import { calculateProportionalSize } from './utils';
-import { Config } from './schema';
-import ndarray, { NdArray } from 'ndarray';
+export { initInference, runInference };
 
-export async function runInference(
+import { tensorResize, tensorHWCtoBCHW } from './utils';
+import { createOnnxSession, runOnnxSession } from './onnx';
+import { calculateProportionalSize } from './utils';
+import { Config, validateConfig } from './schema';
+import ndarray, { NdArray } from 'ndarray';
+import { loadAsBlob } from './resource';
+
+async function initInference(config?: Config) {
+  config = validateConfig(config);
+
+  if (config.debug) console.debug('Loading model...');
+  const model = config.model;
+  const blob = await loadAsBlob(`/models/${model}`, config);
+  const arrayBuffer = await blob.arrayBuffer();
+  const session = await createOnnxSession(arrayBuffer, config);
+  return { config, session };
+}
+
+async function runInference(
   imageTensor: NdArray<Float32Array>,
   config: Config,
   session: any
@@ -13,7 +27,7 @@ export async function runInference(
   const resolution = 1024;
   const [srcHeight, srcWidth, srcChannels] = imageTensor.shape;
 
-  let tensorImage = await imageDataResize(imageTensor, resolution, resolution);
+  let tensorImage = await tensorResize(imageTensor, resolution, resolution);
 
   const inputTensor = tensorHWCtoBCHW(tensorImage);
 
@@ -41,7 +55,7 @@ export async function runInference(
   const dst_width = Math.min(width, srcWidth);
   const dst_height = Math.min(height, srcHeight);
 
-  tensorImage = await imageDataResize(tensorImage, dst_width, dst_height);
+  tensorImage = await tensorResize(tensorImage, dst_width, dst_height);
   if (config.progress) config.progress('compute:inference', 1, 1);
   return ndarray(tensorImage.data, [dst_height, dst_width, 4]);
 }
