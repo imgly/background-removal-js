@@ -1,6 +1,6 @@
 // Exports
 export default removeBackground;
-export type { ImageSource, Config };
+export type { ImageSource, Config, removeBackground };
 
 // Imports
 import { initInference, runInference } from './inference';
@@ -11,7 +11,7 @@ import * as codecs from './codecs';
 import { memoize } from 'lodash';
 import { ensureAbsoluteURI } from './url';
 
-type ImageSource = ImageData | ArrayBuffer | Uint8Array | Blob | URL | string;
+type ImageSource = ArrayBuffer | Uint8Array | Blob | URL | string;
 
 const init = memoize(initInference, (config) => JSON.stringify(config));
 
@@ -28,11 +28,7 @@ async function removeBackground(
         console.debug(`Downloading ${key}: ${current} of ${total}`);
       });
 
-    if (!crossOriginIsolated) {
-      console.debug(
-        'Cross-Origin-Isolated is not enabled. Performance will be degraded. Please see  https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/SharedArrayBuffer.'
-      );
-    }
+    
   }
 
   image = await imageSourceToImageData(image, config);
@@ -42,12 +38,10 @@ async function removeBackground(
 }
 
 async function imageSourceToImageData(
-  image: ImageSource,
-  config: Config
+  image: ImageSource, config: Config
 ): Promise<NdArray<Uint8Array>> {
   if (typeof image === 'string') {
     image = ensureAbsoluteURI(image, config.publicPath);
-    image = new URL(image);
   }
   if (image instanceof URL) {
     const response = await fetch(image, {});
