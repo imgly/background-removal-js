@@ -2,11 +2,10 @@ export { createOnnxSession, runOnnxSession };
 
 import ndarray, { NdArray } from 'ndarray';
 import * as ort from 'onnxruntime-node';
-import { loadAsUrl } from './resource';
+// import * as ort from 'onnxruntime-node-gpu';
 import { Config } from './schema';
 
 async function createOnnxSession(model: any, config: Config) {
-
   if (config.debug) {
     ort.env.debug = true;
     ort.env.logLevel = 'verbose';
@@ -14,10 +13,8 @@ async function createOnnxSession(model: any, config: Config) {
   }
 
   const ort_config: ort.InferenceSession.SessionOptions = {
-    // executionProviders: ['wasm'],
     graphOptimizationLevel: 'all',
-    executionMode: 'parallel',
-    enableCpuMemArena: true
+    executionMode: 'parallel'
   };
 
   const session = await ort.InferenceSession.create(model, ort_config).catch(

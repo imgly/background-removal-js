@@ -1,4 +1,4 @@
-# Background Removal in the Browser
+# Background Removal in NodeJs
 
 <p align="center">
   <img src="https://img.ly/static/background-removal-js-logo.png?utm_source=github&utm_medium=project&utm_campaign=bg-removal" width="100" height="100" alt="" />
@@ -13,7 +13,7 @@ Explore an [interactive demo](https://img.ly/showcases/cesdk/web/background-remo
 
 ## Overview
 
-`@imgly/background-removal` is a powerful npm package that allows developers to seamlessly remove the background from images directly in the browser. With its unique features and capabilities, this package offers an innovative and cost-effective solution for background removal tasks without compromising data privacy.
+`@imgly/background-removal-node` is a powerful npm package that allows developers to seamlessly remove the background from images in NodeJs. With its unique features and capabilities, this package offers an innovative and cost-effective solution for background removal tasks without compromising data privacy.
 
 The key features of `@imgly/background-removal` are:
 

@@ -1,8 +1,11 @@
 {
   "scripts": {
-    "lint:watch": "npx onchange \"**/*\" -- npx prettier --write --ignore-unknown {{changed}}",
+    "build:all": "npm run build --workspaces --if-present",
     "lint": "npx prettier --write --ignore-unknown ."
   },
+  "workspaces": [
+    "packages/*"
+  ],
   "devDependencies": {
     "glob": "^10.3.3",
     "onchange": "^7.1.0"

@@ -1,6 +1,5 @@
 export { loadAsBlob, loadAsUrl };
 
-
 import { Config } from './schema';
 import { ensureAbsoluteURI } from './url';
 import { readFile } from 'fs/promises';
@@ -9,16 +8,21 @@ async function loadAsUrl(url: string, config: Config) {
   return URL.createObjectURL(await loadAsBlob(url, config));
 }
 
-
-async function loadFromURI(uri: URL, config = { headers: { 'Content-Type': 'application/octet-stream' } }) {
+async function loadFromURI(
+  uri: URL,
+  config = { headers: { 'Content-Type': 'application/octet-stream' } }
+) {
   switch (uri.protocol) {
-    case 'http:': return await fetch(uri);
-    case 'https:': return await fetch(uri);
+    case 'http:':
+      return await fetch(uri);
+    case 'https:':
+      return await fetch(uri);
     case 'file:': {
-      const buffer = await readFile(uri.pathname)
+      const buffer = await readFile(uri.pathname);
       return new Response(buffer, { status: 200, headers: config.headers });
     }
-    default: throw new Error(`Unsupported protocol: ${uri.protocol}`);
+    default:
+      throw new Error(`Unsupported protocol: ${uri.protocol}`);
   }
 }
 async function loadAsBlob(key: string, config: Config) {
@@ -45,8 +49,10 @@ async function loadAsBlob(key: string, config: Config) {
 
   const allChunks = await Promise.all(
     paths.map(async (path) => {
-      const url = ensureAbsoluteURI(path, config.publicPath)
-      const response = await loadFromURI(url, { headers: { 'Content-Type': entry.mime } });
+      const url = ensureAbsoluteURI(path, config.publicPath);
+      const response = await loadFromURI(url, {
+        headers: { 'Content-Type': entry.mime }
+      });
 
       const chunks = config.progress
         ? await fetchChunked(response, entry, config, key)
