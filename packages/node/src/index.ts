@@ -27,8 +27,6 @@ async function removeBackground(
       ((key, current, total) => {
         console.debug(`Downloading ${key}: ${current} of ${total}`);
       });
-
-    
   }
 
   image = await imageSourceToImageData(image, config);
@@ -38,7 +36,8 @@ async function removeBackground(
 }
 
 async function imageSourceToImageData(
-  image: ImageSource, config: Config
+  image: ImageSource,
+  config: Config
 ): Promise<NdArray<Uint8Array>> {
   if (typeof image === 'string') {
     image = ensureAbsoluteURI(image, config.publicPath);

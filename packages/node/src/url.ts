@@ -1,8 +1,4 @@
-export {
-  isAbsoluteURI,
-  ensureAbsoluteURI
-};
-
+export { isAbsoluteURI, ensureAbsoluteURI };
 
 function isAbsoluteURI(url: string): boolean {
   const regExp = new RegExp('^(?:[a-z+]+:)?//', 'i');
@@ -15,6 +11,4 @@ function ensureAbsoluteURI(url: string, baseUrl: string): URL {
   } else {
     return new URL(url, baseUrl);
   }
-} 
-
-
+}
