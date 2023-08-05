@@ -1,4 +1,4 @@
-export { isAbsoluteURI, ensureAbsoluteURI };
+export { ensureAbsoluteURI };
 
 function isAbsoluteURI(url: string): boolean {
   const regExp = new RegExp('^(?:[a-z+]+:)?//', 'i');

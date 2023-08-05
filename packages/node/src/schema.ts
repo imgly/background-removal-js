@@ -3,17 +3,25 @@ import { z } from 'zod';
 import path from 'node:path';
 import pkg from '../package.json';
 
+function isURI(s: string) {
+  try {
+    new URL(s);
+    return true;
+  } catch (err) {
+    return false;
+  }
+}
+
 const ConfigSchema = z
   .object({
     publicPath: z
       .string()
       .optional()
       .describe('The public path to the wasm files and the onnx model.')
-      .default(
-        `file://${path.resolve(
-          `node_modules/${pkg.name}@${pkg.version}/dist/`
-        )}/`
-      ),
+      .default(`file://${path.resolve(`node_modules/${pkg.name}/dist/`)}/`)
+      .refine((val) => isURI(val), {
+        message: 'String must be a valid uri'
+      }),
     debug: z
       .boolean()
       .default(false)

@@ -27,9 +27,17 @@
   "source": "./src/index.ts",
   "main": "./dist/index.cjs",
   "bin": {
-    "imgly-remove-bg": "./bin/cli.js"
+    "cli": "./bin/cli.mjs"
   },
   "types": "./dist/index.d.ts",
+  "exports": {
+    ".": [
+      {
+        "require": "./dist/index.cjs"
+      },
+      "./dist/index.cjs"
+    ]
+  },
   "files": [
     "LICENSE.md",
     "README.md",
@@ -50,7 +58,6 @@
     "lodash": "^4.17.21",
     "ndarray": "^1.0.19",
     "onnxruntime-node": "^1.15.1",
-    "onnxruntime-node-gpu": "^1.14.0",
     "sharp": "^0.32.4",
     "zod": "^3.21.4"
   },

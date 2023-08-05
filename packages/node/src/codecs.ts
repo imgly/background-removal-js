@@ -18,9 +18,7 @@ async function imageDecode(blob: Blob): Promise<NdArray<Uint8Array>> {
   const array = ndarray(outBuffer, [height!, width!, channels!]);
   await sharp(array.data, {
     raw: { width: width!, height: height!, channels: channels! }
-  })
-    .toFormat('png')
-    .toFile('test.png');
+  });
   return array;
 }
 
