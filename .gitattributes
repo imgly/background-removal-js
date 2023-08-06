@@ -1,1 +1,18 @@
-bundle/models/* filter=lfs diff=lfs merge=lfs -binary
+bundle/**/* filter=lfs diff=lfs merge=lfs -binary
+**/*.onnx filter=lfs diff=lfs --binary
+**/*.ort filter=lfs diff=lfs --binary
+**/*.{jpeg,jpg} filter=lfs diff=lfs --binary
+**/*.png filter=lfs diff=lfs --binary
+**/*.webp filter=lfs diff=lfs --binary
+**/*.avif filter=lfs diff=lfs --binary
+**/*.heic filter=lfs diff=lfs --binary
+**/*.heif filter=lfs diff=lfs --binary
+**/*.pdf filter=lfs diff=lfs --binary
+**/*.psd filter=lfs diff=lfs --binary
+**/*.mp4 filter=lfs diff=lfs --binary
+**/*.mov filter=lfs diff=lfs --binary
+**/*.m4v filter=lfs diff=lfs --binary
+**/*.mp3 filter=lfs diff=lfs --binary
+**/*.wav filter=lfs diff=lfs --binary
+**/*.aif filter=lfs diff=lfs --binary
+**/*.aiff filter=lfs diff=lfs --binary

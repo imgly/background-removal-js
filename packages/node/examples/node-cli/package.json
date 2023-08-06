@@ -1,12 +1,8 @@
 {
-  "name": "cli",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "author": "Daniel Hauschildt",
-  "license": "ISC",
+  "name": "examples-node-cli",  
+  "private": true,
+  "main": "index.mjs",
   "dependencies": {
-    "@imgly/background-removal-node": "file:../..",
-    "deno": "^0.1.1"
+    "@imgly/background-removal-node": "file:../.."
   }
 }
