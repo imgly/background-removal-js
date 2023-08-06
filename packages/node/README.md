@@ -4,18 +4,18 @@
   <img src="https://img.ly/static/background-removal-js-logo.png?utm_source=github&utm_medium=project&utm_campaign=bg-removal" width="100" height="100" alt="" />
 </p>
 
-Remove backgrounds from images directly in the browser environment with ease and no additional costs or privacy concerns.
+Remove backgrounds from images in NodeJs environment with ease and no additional costs or privacy concerns.
 Explore an [interactive demo](https://img.ly/showcases/cesdk/web/background-removal/web?utm_source=github&utm_medium=project&utm_campaign=bg-removal).
 
 ## News
 
-- **`June 28th, 2023`:** We released the code of Background Removal JS.
+- **`August 6th, 2023`:** We released the code of Background Removal NodeJS.
 
 ## Overview
 
 `@imgly/background-removal-node` is a powerful npm package that allows developers to seamlessly remove the background from images in NodeJs. With its unique features and capabilities, this package offers an innovative and cost-effective solution for background removal tasks without compromising data privacy.
 
-The key features of `@imgly/background-removal` are:
+The key features of `@imgly/background-removal-node` are:
 
 - **In-Browser Background Removal**: Our one-of-a-kind solution performs the entire background removal process directly in the user's browser, eliminating the need for additional server costs. By leveraging the computing power of the local device, users can enjoy a fast and efficient background removal process.
 
@@ -23,7 +23,7 @@ The key features of `@imgly/background-removal` are:
 
 - **Seamless Integration with IMG.LY's CE.SDK**: `@imgly/background-removal` provides seamless integration with [IMG.LY's CE.SDK](https://img.ly/products/creative-sdk?utm_source=github&utm_medium=project&utm_campaign=bg-removal), allowing developers to easily incorporate powerful in-browser image matting and background removal capabilities into their projects.
 
-The Neural Network ([ONNX model](https://onnx.ai/)) and WASM files used by `@imgly/background-removal` are hosted on [UNPKG](https://www.unpkg.com/), making it readily available for download to all users of the library. See the section Custom Asset Serving if you want to host data on your own servers.
+The Neural Network ([ONNX model](https://onnx.ai/)) are hosted on [UNPKG](https://www.unpkg.com/), making it readily available for download to all users of the library. See the section Custom Asset Serving if you want to host data on your own servers.
 
 <p align="center">
 <img src="https://img.ly/showcases/cesdk/web/s/case-thumbnail/background-removal/background-removal-0.png?utm_source=github&utm_medium=project&utm_campaign=bg-removal" alt="background removal js showcase" />
