@@ -1,7 +1,8 @@
 # Background Removal in NodeJs
 
 <p align="center">
-  <img src="https://img.ly/static/background-removal-js-logo.png?utm_source=github&utm_medium=project&utm_campaign=bg-removal" width="100" height="100" alt="" />
+<img src="https://img.ly/showcases/cesdk/web/s/case-thumbnail/background-removal/background-removal-0.png?utm_source=github&utm_medium=project&utm_campaign=bg-removal" alt="background removal js showcase" />
+
 </p>
 
 Remove backgrounds from images in NodeJs environment with ease and no additional costs or privacy concerns.
@@ -17,39 +18,30 @@ Explore an [interactive demo](https://img.ly/showcases/cesdk/web/background-remo
 
 The key features of `@imgly/background-removal-node` are:
 
-- **In-Browser Background Removal**: Our one-of-a-kind solution performs the entire background removal process directly in the user's browser, eliminating the need for additional server costs. By leveraging the computing power of the local device, users can enjoy a fast and efficient background removal process.
-
-- **Data Protection**: As `@imgly/background-removal` runs entirely in the browser, users can have peace of mind knowing that their images and sensitive information remain secure within their own devices. With no data transfers to external servers, data privacy concerns are effectively mitigated.
-
 - **Seamless Integration with IMG.LY's CE.SDK**: `@imgly/background-removal` provides seamless integration with [IMG.LY's CE.SDK](https://img.ly/products/creative-sdk?utm_source=github&utm_medium=project&utm_campaign=bg-removal), allowing developers to easily incorporate powerful in-browser image matting and background removal capabilities into their projects.
 
 The Neural Network ([ONNX model](https://onnx.ai/)) are hosted on [UNPKG](https://www.unpkg.com/), making it readily available for download to all users of the library. See the section Custom Asset Serving if you want to host data on your own servers.
 
-<p align="center">
-<img src="https://img.ly/showcases/cesdk/web/s/case-thumbnail/background-removal/background-removal-0.png?utm_source=github&utm_medium=project&utm_campaign=bg-removal" alt="background removal js showcase" />
-
-</p>
-
 ## Installation
 
-You can install `@imgly/background-removal` via npm or yarn. Use the following commands to install the package:
+You can install `@imgly/background-removal-node` via npm or yarn. Use the following commands to install the package:
 
 ### NPM
 
 ```shell
-npm install @imgly/background-removal
+npm install @imgly/background-removal-node
 ```
 
 ## Usage
 
 ```typescript
-import imglyRemoveBackground from "@imgly/background-removal"
+import {removeBackground} from "@imgly/background-removal";
+// const {removeBackground} = require("@imgly/background-removal");
 
 let image_src: ImageData | ArrayBuffer | Uint8Array | Blob | URL | string = ...;
 
-imglyRemoveBackground(image_src).then((blob: Blob) => {
+removeBackground(image_src).then((blob: Blob) => {
   // The result is a blob encoded as PNG. It can be converted to an URL to be used as HTMLImage.src
-  const url = URL.createObjectURL(blob);
 })
 ```
 
@@ -61,7 +53,7 @@ The library does not need any configuration to get started. However, there are o
 
 ```typescript
 type Config = {
-  publicPath: string; // The public path used for model and wasm files
+  publicPath: string; // The public path used for model a
   debug: bool; // enable or disable useful console.log outputs
   proxyToWorker: bool; // Whether to proxy the calculations to a web worker. (Default true)
   model: 'small' | 'medium'; // The model to use. (Default "medium")
@@ -87,26 +79,16 @@ let config: Config = {
 };
 ```
 
-### Performance
-
-The performance is largely dependent on the feature set available. Most prominently, ensure that `SharedArrayBuffer` is available [MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/SharedArrayBuffer). Due to the security requirements of `SharedArrayBuffer` two headers need to be set to cross-origin isolate your site:
-
-```typescript
-'Cross-Origin-Opener-Policy': 'same-origin',
-'Cross-Origin-Embedder-Policy': 'require-corp'
-```
-
 ### Custom Asset Serving
 
 Currently, the wasm and onnx neural networks are served via unpkg. For production use, we advise you to host them yourself. Therefore, copy all .wasm and .onnx files to your public path `$PUBLIC_PATH` and reconfigure the library.
 
 ```shell
-cp node_modules/@imgly/background-removal/dist/*.wasm $PUBLIC_PATH
-cp node_modules/@imgly/background-removal/dist/*.onnx $PUBLIC_PATH
+cp node_modules/@imgly/background-removal/dist/*.* $PUBLIC_PATH
 ```
 
 ```typescript
-import imglyRemoveBackground, {Config} from "@imgly/background-removal"
+import { removeBackground, Config} from "@imgly/background-removal"
 
 const public_path = "https://example.com/assets/" ; // the path assets are served from
 
@@ -116,7 +98,7 @@ let config: Config =  {
 
 let image_src: ImageData | ArrayBuffer | Uint8Array | Blob | URL | string = ...;
 
-imglyRemoveBackground(image_src, config).then((blob: Blob) => {
+removeBackground(image_src, config).then((blob: Blob) => {
   // result is a blob encoded as PNG.
   // It can be converted to an URL to be used as HTMLImage.src
   const url = URL.createObjectURL(blob);
@@ -157,13 +139,13 @@ let config: Config = {
 
 - _Web-based graphic design tools_ that aim to simplify the creative process with in-browser background removal.
 
-Whether you are a professional developer or a hobbyist, `@imgly/background-removal` empowers you to deliver impressive applications and services with ease.
+Whether you are a professional developer or a hobbyist, `@imgly/background-removal-node` empowers you to deliver impressive applications and services with ease.
 
 ## License
 
-The software is free for use under the GPL License. Please contact [support@img.ly](mailto:support@img.ly?subject=Background-Removal%20License) for questions about other licensing options.
+The software is free for use under the GPL License. Please contact [support@img.ly](mailto:support@img.ly?subject=Background-Removal-Node%20License) for questions about other licensing options.
 
 ## Authors & Contributors
 
 This library is made by IMG.LY shipping the world's premier SDKs for building creative applications.
-Start your trial of the [CreativeEditor SDK](https://img.ly/products/creative-sdk?utm_source=github&utm_medium=project&utm_campaign=bg-removal), [PhotoEditor SDK](https://img.ly/products/photo-sdk?utm_source=github&utm_medium=project&utm_campaign=bg-removal) & [VideoEditor SDK](https://img.ly/products/video-sdk?utm_source=github&utm_medium=project&utm_campaign=bg-removal).
+Start your trial of the [CreativeEditor SDK](https://img.ly/products/creative-sdk?utm_source=github&utm_medium=project&utm_campaign=bg-removal-node), [PhotoEditor SDK](https://img.ly/products/photo-sdk?utm_source=github&utm_medium=project&utm_campaign=bg-removal-node) & [VideoEditor SDK](https://img.ly/products/video-sdk?utm_source=github&utm_medium=project&utm_campaign=bg-removal-node).

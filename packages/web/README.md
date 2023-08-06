@@ -1,7 +1,7 @@
 # Background Removal in the Browser
 
 <p align="center">
-  <img src="https://img.ly/static/background-removal-js-logo.png?utm_source=github&utm_medium=project&utm_campaign=bg-removal" width="100" height="100" alt="" />
+<img src="https://img.ly/showcases/cesdk/web/s/case-thumbnail/background-removal/background-removal-0.png?utm_source=github&utm_medium=project&utm_campaign=bg-removal" alt="background removal js showcase" />
 </p>
 
 Remove backgrounds from images directly in the browser environment with ease and no additional costs or privacy concerns.
@@ -25,10 +25,6 @@ The key features of `@imgly/background-removal` are:
 
 The Neural Network ([ONNX model](https://onnx.ai/)) and WASM files used by `@imgly/background-removal` are hosted on [UNPKG](https://www.unpkg.com/), making it readily available for download to all users of the library. See the section Custom Asset Serving if you want to host data on your own servers.
 
-<p align="center">
-<img src="https://img.ly/showcases/cesdk/web/s/case-thumbnail/background-removal/background-removal-0.png?utm_source=github&utm_medium=project&utm_campaign=bg-removal" alt="background removal js showcase" />
-
-</p>
 
 ## Installation
 
