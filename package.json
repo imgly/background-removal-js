@@ -1,11 +1,8 @@
 {
+  "version": "1.1.0-alpha",
   "scripts": {
-    "build:all": "npm run build --workspaces --if-present",
     "lint": "npx prettier --write --ignore-unknown ."
   },
-  "workspaces": [
-    "packages/*"
-  ],
   "devDependencies": {
     "glob": "^10.3.3",
     "onchange": "^7.1.0"

@@ -1,6 +1,6 @@
 {
   "name": "@imgly/background-removal",
-  "version": "1.1.0",
+  "version": "1.1.0-alpha",
   "description": "Background Removal in the Browser",
   "keywords": [
     "background-removal",
@@ -55,6 +55,7 @@
     "@parcel/resolver-default": "^2.9.3",
     "@parcel/transformer-typescript-types": "^2.9.3",
     "@types/lodash": "^4.14.195",
+    "glob": "^10.3.3",
     "@types/node": "^20.3.1",
     "assert": "^2.0.0",
     "parcel": "^2.9.3",

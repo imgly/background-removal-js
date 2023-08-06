@@ -1,0 +1,9 @@
+{
+  "name": "examples-node-cli",
+  "private": true,
+  "main": "index.mjs",
+  "dependencies": {
+    "@imgly/background-removal-node": "file:../node"
+  },
+  "version": "1.1.0-alpha"
+}

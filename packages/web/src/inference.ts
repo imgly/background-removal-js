@@ -4,8 +4,9 @@ import { tensorResize, tensorHWCtoBCHW } from './utils';
 import { createOnnxSession, runOnnxSession } from './onnx';
 import { calculateProportionalSize } from './utils';
 import { Config, validateConfig } from './schema';
-import ndarray, { NdArray } from 'ndarray';
+
 import { loadAsBlob } from './resource';
+import { ndarray, NdArray } from './deps';
 
 async function initInference(config?: Config) {
   config = validateConfig(config);

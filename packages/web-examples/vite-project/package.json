@@ -1,7 +1,7 @@
 {
   "name": "vite-project",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.1.0-alpha",
   "type": "module",
   "scripts": {
     "start": "npm run dev",
@@ -10,7 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@imgly/background-removal": "file:../..",
+    "@imgly/background-removal": "file:../../web",
     "vue": "^3.2.47"
   },
   "devDependencies": {

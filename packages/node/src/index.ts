@@ -1,6 +1,7 @@
 // Exports
 export default removeBackground;
-export type { ImageSource, Config, removeBackground };
+export type { ImageSource, Config };
+export { removeBackground };
 
 // Imports
 import { initInference, runInference } from './inference';
