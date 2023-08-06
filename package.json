@@ -1,7 +1,8 @@
 {
-  "version": "1.1.0-alpha",
+  "version": "1.1.0",
   "scripts": {
-    "lint": "npx prettier --write --ignore-unknown ."
+    "lint": "npx prettier --write --ignore-unknown .",
+    "version": "node ./scripts/package-version.mjs"
   },
   "devDependencies": {
     "glob": "^10.3.3",

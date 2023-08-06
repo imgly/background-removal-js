@@ -6,7 +6,7 @@ import { calculateProportionalSize } from './utils';
 import { Config, validateConfig } from './schema';
 
 import { loadAsBlob } from './resource';
-import ndarray, { NdArray } from 'ndarray'
+import ndarray, { NdArray } from 'ndarray';
 
 async function initInference(config?: Config) {
   config = validateConfig(config);

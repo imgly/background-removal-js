@@ -1,3 +1,4 @@
+export default main;
 import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -144,21 +145,10 @@ async function loadConfig() {
 
 async function main() {
   fs.mkdirSync(DefaultOutDir, { recursive: true });
-  const oldResources = await loadResourceMetadata();
   const resources = await generateFiles();
-  // await removeOldResources(oldResources, resources);
+
   await saveResourceMetadata(resources);
 }
-
-// function removeOldResources(oldResources, resources) {
-//   Object.keys(oldResources).map((key) => {
-//     if (!resources[key]) {
-//       const hash = oldResources[key].hash;
-//       const destFile = path.resolve(DefaultOutDir, hash);
-//       deleteFile(path.resolve(DefaultOutDir, key));
-//     }
-//   });
-// }
 
 async function generateFiles() {
   const filesToProcess = {};
