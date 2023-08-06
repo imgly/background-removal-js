@@ -51,7 +51,7 @@ function App() {
     setImageUrl(randomImage);
 
     const imageBlob = await removeBackground(randomImage, {
-      publicPath: '/static/js/',
+      publicPath: `${window.location.href}/static/js/`,
       // debug: true,
       progress: (key, current, total) => {
         const [type, subtype] = key.split(':');
