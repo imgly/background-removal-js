@@ -1,0 +1,2 @@
+- [ ] Provide typescript bindings
+- [x] Provide access to filesystem for nodejs version

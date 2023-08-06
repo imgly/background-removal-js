@@ -11,6 +11,7 @@ import { NdArray } from 'ndarray';
 import * as codecs from './codecs';
 import { memoize } from 'lodash';
 import { ensureAbsoluteURI } from './url';
+import { loadFromURI } from './resource';
 
 type ImageSource = ArrayBuffer | Uint8Array | Blob | URL | string;
 
@@ -41,11 +42,10 @@ async function imageSourceToImageData(
   config: Config
 ): Promise<NdArray<Uint8Array>> {
   if (typeof image === 'string') {
-    image = ensureAbsoluteURI(image, config.publicPath);
+    image = ensureAbsoluteURI(image, `file://${process.cwd()}/`);
   }
   if (image instanceof URL) {
-    const response = await fetch(image, {});
-    image = await response.blob();
+    image = await (await loadFromURI(image)).blob()
   }
   if (image instanceof ArrayBuffer || ArrayBuffer.isView(image)) {
     image = new Blob([image]);

@@ -1,4 +1,4 @@
-export { loadAsBlob, loadAsUrl };
+export { loadAsBlob, loadAsUrl, loadFromURI };
 
 import { Config } from './schema';
 import { ensureAbsoluteURI } from './url';
