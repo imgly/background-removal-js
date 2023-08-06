@@ -2,3 +2,6 @@
 **/dist
 **/tmp
 build
+**/package-lock.json
+.vscode/
+**/public/
