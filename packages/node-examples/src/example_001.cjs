@@ -1,4 +1,5 @@
 const { removeBackground } = require('@imgly/background-removal-node');
+const fs = require('fs');
 
 const images = [
   'files/photo-1686002359940-6a51b0d64f68.jpeg',
@@ -8,8 +9,16 @@ const images = [
 
 async function run() {
   const randomImage = images[Math.floor(Math.random() * images.length)];
-  console.log("Random image: " + randomImage)
-  await removeBackground(randomImage, { debug: false });
+  console.log('Random image: ' + randomImage);
+  const blob = await removeBackground(randomImage, { debug: false });
+  const buffer = await blob.arrayBuffer();
+  try {
+    await fs.promises.mkdir('tmp', { recursive: true });
+    await fs.promises.writeFile('tmp/output.png', Buffer.from(buffer));
+    console.log('Image saved to tmp/output.png');
+  } catch (error) {
+    console.error(error);
+  }
 }
 
 run();
