@@ -1,18 +1,18 @@
-bundle/**/* filter=lfs diff=lfs merge=lfs -binary
-**/*.onnx filter=lfs diff=lfs merge=lfs --binary
-**/*.ort filter=lfs diff=lfs merge=lfs --binary
-**/*.{jpeg,jpg} filter=lfs diff=lfs merge=lfs --binary
-**/*.png filter=lfs diff=lfs merge=lfs --binary
-**/*.webp filter=lfs diff=lfs merge=lfs --binary
-**/*.avif filter=lfs diff=lfs merge=lfs --binary
-**/*.heic filter=lfs diff=lfs merge=lfs --binary
-**/*.heif filter=lfs diff=lfs merge=lfs --binary
-**/*.pdf filter=lfs diff=lfs merge=lfs --binary
-**/*.psd filter=lfs diff=lfs merge=lfs --binary
-**/*.mp4 filter=lfs diff=lfs merge=lfs --binary
-**/*.mov filter=lfs diff=lfs merge=lfs --binary
-**/*.m4v filter=lfs diff=lfs merge=lfs --binary
-**/*.mp3 filter=lfs diff=lfs merge=lfs --binary
-**/*.wav filter=lfs diff=lfs merge=lfs --binary
-**/*.aif filter=lfs diff=lfs merge=lfs --binary
-**/*.aiff filter=lfs diff=lfs merge=lfs --binary
+bundle/**/* filter=lfs diff=lfs merge=binary
+**/*.onnx filter=lfs diff=lfs merge=binary
+**/*.ort filter=lfs diff=lfs merge=binary
+**/*.{jpeg,jpg} filter=lfs diff=lfs merge=binary
+**/*.png filter=lfs diff=lfs merge=binary
+**/*.webp filter=lfs diff=lfs merge=binary
+**/*.avif filter=lfs diff=lfs merge=binary
+**/*.heic filter=lfs diff=lfs merge=binary
+**/*.heif filter=lfs diff=lfs merge=binary
+**/*.pdf filter=lfs diff=lfs merge=binary
+**/*.psd filter=lfs diff=lfs merge=binary
+**/*.mp4 filter=lfs diff=lfs merge=binary
+**/*.mov filter=lfs diff=lfs merge=binary
+**/*.m4v filter=lfs diff=lfs merge=binary
+**/*.mp3 filter=lfs diff=lfs merge=binary
+**/*.wav filter=lfs diff=lfs merge=binary
+**/*.aif filter=lfs diff=lfs merge=binary
+**/*.aiff filter=lfs diff=lfs merge=binary
