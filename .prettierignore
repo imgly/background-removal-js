@@ -1,4 +1,7 @@
-node_modules
-dist
-tmp
+**/node_modules
+**/dist
+**/tmp
 build
+**/package-lock.json
+.vscode/
+**/public/

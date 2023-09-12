@@ -8,8 +8,7 @@ Remove backgrounds from images directly in the browser environment with ease and
 Explore an [interactive demo](https://img.ly/showcases/cesdk/web/background-removal/web?utm_source=github&utm_medium=project&utm_campaign=bg-removal).
 
 ## News
-- **`September 12th, 2023`:** We released the code of Background Removal for NodeJs (see `packages/node`).
-- **`June 28th, 2023`:** We released the code of Background Removal for Web (see `packages/web`).
+
 - **`June 28th, 2023`:** We released the code of Background Removal JS.
 
 ## Overview
