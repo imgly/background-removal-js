@@ -1,0 +1,10 @@
+{
+  "name": "e2e",
+  "private": true,
+  "scripts": {},
+  "devDependencies": {
+    "@imgly/background-removal-node": "file:../node",
+    "jest": "^29.6.2"
+  },
+  "version": "1.1.0"
+}
