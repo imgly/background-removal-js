@@ -50,7 +50,7 @@ function App() {
     resetTimer();
     setImageUrl(randomImage);
 
-    const imageBlob = await removeBackground(randomImage, {
+    const imageBlob = await removeBackground(2, {
       publicPath: `${window.location.href}/static/js/`,
       // debug: true,
       progress: (key, current, total) => {

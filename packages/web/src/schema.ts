@@ -1,7 +1,6 @@
-export { ConfigSchema, Config, validateConfig };
+export { ApiFunctionSchrema, type Config };
 
 import { z } from 'zod';
-import { ensureAbsoluteURI } from './url';
 
 import pkg from '../package.json';
 
@@ -34,10 +33,9 @@ const ConfigSchema = z
   })
   .default({});
 
+
+const ImageSourceSchema = z.instanceof(ImageData).or(z.instanceof(ArrayBuffer)).or(z.instanceof(Uint8Array)).or(z.instanceof(Blob)).or(z.instanceof(URL)).or(z.string())
+const ApiFunctionSchrema = z.function().args(ImageSourceSchema, ConfigSchema).returns(z.promise(z.instanceof(Blob)));
+
 type Config = z.infer<typeof ConfigSchema>;
 
-function validateConfig(config?: Config): Config {
-  const result = ConfigSchema.parse(config ?? {});
-  if (result.debug) console.log('Config:', result);
-  return result;
-}

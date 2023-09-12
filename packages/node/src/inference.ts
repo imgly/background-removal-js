@@ -3,12 +3,11 @@ export { initInference, runInference };
 import { tensorResize, tensorHWCtoBCHW } from './utils';
 import { createOnnxSession, runOnnxSession } from './onnx';
 import { calculateProportionalSize } from './utils';
-import { Config, validateConfig } from './schema';
+import { Config } from './schema';
 import ndarray, { NdArray } from 'ndarray';
 import { loadAsBlob } from './resource';
 
-async function initInference(config?: Config) {
-  config = validateConfig(config);
+async function initInference(config: Config) {
 
   if (config.debug) console.debug('Loading model...');
   const model = config.model;

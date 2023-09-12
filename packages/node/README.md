@@ -10,7 +10,7 @@ Explore an [interactive demo](https://img.ly/showcases/cesdk/web/background-remo
 
 ## News
 
-- **`August 6th, 2023`:** We released the code of Background Removal NodeJS.
+- **`September 12th, 2023`:** We released the code of Background Removal NodeJS.
 
 ## Overview
 
@@ -35,7 +35,7 @@ npm install @imgly/background-removal-node
 ## Usage
 
 ```typescript
-import {removeBackground} from "@imgly/background-removal";
+import { removeBackground } from "@imgly/background-removal";
 // const {removeBackground} = require("@imgly/background-removal");
 
 let image_src: ImageData | ArrayBuffer | Uint8Array | Blob | URL | string = ...;
@@ -84,13 +84,13 @@ let config: Config = {
 Currently, the wasm and onnx neural networks are served via unpkg. For production use, we advise you to host them yourself. Therefore, copy all .wasm and .onnx files to your public path `$PUBLIC_PATH` and reconfigure the library.
 
 ```shell
-cp node_modules/@imgly/background-removal/dist/*.* $PUBLIC_PATH
+cp node_modules/@imgly/background-removal-node/dist/*.* $PUBLIC_PATH
 ```
 
 ```typescript
 import { removeBackground, Config} from "@imgly/background-removal"
 
-const public_path = "https://example.com/assets/" ; // the path assets are served from
+const public_path = "file:/PATH_TO_ASSETS" ; // the path assets are served from
 
 let config: Config =  {
   publicPath: public_path, // path to the wasm files
@@ -100,8 +100,6 @@ let image_src: ImageData | ArrayBuffer | Uint8Array | Blob | URL | string = ...;
 
 removeBackground(image_src, config).then((blob: Blob) => {
   // result is a blob encoded as PNG.
-  // It can be converted to an URL to be used as HTMLImage.src
-  const url = URL.createObjectURL(blob);
 })
 ```
 
@@ -131,7 +129,7 @@ let config: Config = {
 
 ## Who is it for?
 
-`@imgly/background-removal` is ideal for developers and projects that require efficient and cost-effective background removal directly in the browser. It caters to a wide range of use cases, including but not limited to:
+`@imgly/background-removal-node` is ideal for developers and projects that require efficient and cost-effective background removal directly in the NodeJs. It caters to a wide range of use cases, including but not limited to:
 
 - _E-commerce applications_ that need to remove backgrounds from product images in real time.
 

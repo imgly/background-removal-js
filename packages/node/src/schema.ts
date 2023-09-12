@@ -20,16 +20,12 @@ const ConfigSchema = z
       .describe('The public path to the wasm files and the onnx model.')
       .default(`file://${path.resolve(`node_modules/${pkg.name}/dist/`)}/`)
       .refine((val) => isURI(val), {
-        message: 'String must be a valid uri'
+        message: 'String must be a valid uri ("file://" or "http(s)://"'
       }),
     debug: z
       .boolean()
       .default(false)
       .describe('Whether to enable debug logging.'),
-    proxyToWorker: z
-      .boolean()
-      .default(true)
-      .describe('Whether to proxy inference to a web worker.'),
     fetchArgs: z
       .object({})
       .default({})
@@ -40,7 +36,7 @@ const ConfigSchema = z
       .returns(z.undefined())
       .describe('Progress callback.')
       .optional(),
-    model: z.enum(['small', 'medium', 'large']).default('medium')
+    model: z.enum(['small', 'medium']).default('medium')
   })
   .default({});
 
