@@ -3,10 +3,10 @@ export { configs };
 import * as esbuild from 'esbuild';
 import dts from 'npm-dts';
 
-new dts.Generator({
+const typings = new dts.Generator({
   entry: 'src/index.ts',
   output: 'dist/index.d.ts'
-}).generate();
+}, true, true);
 
 const configs = [
   {
@@ -30,3 +30,4 @@ const configs = [
 ];
 
 await configs.map(async (config) => await esbuild.build(config));
+await typings.generate();
