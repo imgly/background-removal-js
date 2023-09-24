@@ -1,5 +1,5 @@
 {
-  "version": "1.1.0",
+  "version": "1.1.1",
   "scripts": {
     "lint": "npx prettier --write --ignore-unknown .",
     "version": "node ./scripts/package-version.mjs"
