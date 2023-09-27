@@ -22,7 +22,7 @@
   "bugs": {
     "email": "support@img.ly"
   },
-  "homepage": "https://img.ly/showcases/cesdk/web/background-removal/node",
+  "homepage": "https://img.ly/showcases/cesdk/web/background-removal",
   "source": "./src/index.ts",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
