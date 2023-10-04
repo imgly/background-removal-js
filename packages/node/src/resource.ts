@@ -18,7 +18,7 @@ async function loadFromURI(
     case 'https:':
       return await fetch(uri);
     case 'file:': {
-      const buffer = await readFile(uri.pathname);
+      const buffer = await readFile(uri);
       return new Response(buffer, { status: 200, headers: config.headers });
     }
     default:
