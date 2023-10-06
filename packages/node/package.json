@@ -1,6 +1,6 @@
 {
   "name": "@imgly/background-removal-node",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Background Removal in NodeJS",
   "keywords": [
     "background-removal",
@@ -26,7 +26,14 @@
   "source": "./src/index.ts",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
-  "types": "./dist/types.d.ts",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "require": "./dist/index.cjs",
+      "import": "./dist/index.mjs",
+      "types": "./dist/index.d.ts"
+    }
+  },
   "files": [
     "LICENSE.md",
     "README.md",
