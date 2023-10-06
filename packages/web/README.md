@@ -25,7 +25,6 @@ The key features of `@imgly/background-removal` are:
 
 The Neural Network ([ONNX model](https://onnx.ai/)) and WASM files used by `@imgly/background-removal` are hosted on [UNPKG](https://www.unpkg.com/), making it readily available for download to all users of the library. See the section Custom Asset Serving if you want to host data on your own servers.
 
-
 ## Installation
 
 You can install `@imgly/background-removal` via npm or yarn. Use the following commands to install the package:

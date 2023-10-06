@@ -2,11 +2,14 @@ export { configs };
 import * as esbuild from 'esbuild';
 import dts from 'npm-dts';
 
-const typings = new dts.Generator({
-  entry: 'src/index.ts',
-  output: 'dist/index.d.ts'
-}, true, true);
-
+const typings = new dts.Generator(
+  {
+    entry: 'src/index.ts',
+    output: 'dist/index.d.ts'
+  },
+  true,
+  true
+);
 
 const configs = [
   {

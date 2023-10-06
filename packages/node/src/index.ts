@@ -45,7 +45,7 @@ async function imageSourceToImageData(
     image = ensureAbsoluteURI(image, `file://${process.cwd()}/`);
   }
   if (image instanceof URL) {
-    image = await (await loadFromURI(image)).blob()
+    image = await (await loadFromURI(image)).blob();
   }
   if (image instanceof ArrayBuffer || ArrayBuffer.isView(image)) {
     image = new Blob([image]);

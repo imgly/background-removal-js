@@ -7,7 +7,7 @@ enum Platform {
   Deno,
   Electron,
   ReactNative
-}
+};
 
 const isBrowser = typeof window !== 'undefined';
 const isNode =
