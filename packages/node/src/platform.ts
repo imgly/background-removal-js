@@ -6,20 +6,24 @@ enum Platform {
   Browser,
   Deno,
   Electron,
-  ReactNative
+  ReactNative,
+  Bun
 };
 
-const isBrowser = typeof window !== 'undefined';
+const isBrowser = typeof window !== 'undefined' && typeof Deno === 'undefined';
 const isNode =
-  typeof process !== 'undefined' && process.versions && process.versions.node;
+  typeof process !== 'undefined' &&
+  typeof Bun === 'undefined' &&
+  process.versions &&
+  Boolean(process.versions.node);
 const isDeno = typeof Deno !== 'undefined';
 const isElectron =
   typeof window !== 'undefined' &&
-  window.process &&
+  typeof window.process !== 'undefined' &&
   window.process.type === 'renderer';
 const isReactNative =
   typeof navigator !== 'undefined' && navigator.product === 'ReactNative';
-const isBun = typeof window !== 'undefined' && window.__BUN__;
+const isBun = typeof Bun !== 'undefined' && typeof Bun.version === 'string';
 
 const platform = (() => {
   if (isBrowser) return Platform.Browser;
@@ -30,3 +34,4 @@ const platform = (() => {
   if (isBun) return Platform.Bun;
   return Platform.Unknown;
 })();
+
