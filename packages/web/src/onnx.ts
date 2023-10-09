@@ -34,7 +34,7 @@ async function createOnnxSession(model: any, config: Config) {
         : undefined,
     'ort-wasm-simd.wasm':
       capabilities.simd && !capabilities.threads
-        ? await loadAsUrl('onnxruntime-web/ort-wasm-simd.wasm', config)
+        ? await loadAsUrl('/onnxruntime-web/ort-wasm-simd.wasm', config)
         : undefined,
     'ort-wasm-threaded.wasm':
       !capabilities.simd && capabilities.threads

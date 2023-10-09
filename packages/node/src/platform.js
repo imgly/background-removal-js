@@ -1,4 +1,4 @@
-export { platform, Platform };
+export { platform, Platform }
 
 enum Platform {
   Unknown,
