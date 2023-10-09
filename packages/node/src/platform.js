@@ -1,6 +1,6 @@
 export { platform, Platform }
 
-enum Platform {
+const Platform = {
   Unknown,
   Node,
   Browser,
