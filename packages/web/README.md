@@ -96,8 +96,7 @@ The performance is largely dependent on the feature set available. Most prominen
 Currently, the wasm and onnx neural networks are served via unpkg. For production use, we advise you to host them yourself. Therefore, copy all .wasm and .onnx files to your public path `$PUBLIC_PATH` and reconfigure the library.
 
 ```shell
-cp node_modules/@imgly/background-removal/dist/*.wasm $PUBLIC_PATH
-cp node_modules/@imgly/background-removal/dist/*.onnx $PUBLIC_PATH
+cp node_modules/@imgly/background-removal/dist/* $PUBLIC_PATH
 ```
 
 ```typescript

@@ -83,7 +83,7 @@ let config: Config = {
 Currently, the wasm and onnx neural networks are served via unpkg. For production use, we advise you to host them yourself. Therefore, copy all .wasm and .onnx files to your public path `$PUBLIC_PATH` and reconfigure the library.
 
 ```shell
-cp node_modules/@imgly/background-removal-node/dist/*.* $PUBLIC_PATH
+cp node_modules/@imgly/background-removal-node/dist/* $PUBLIC_PATH
 ```
 
 ```typescript
