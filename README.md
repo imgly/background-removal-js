@@ -44,7 +44,7 @@ Note: On the first run the wasm and onnx model files are fetched. This might, de
   );
   ```
 
-  Read more about running the background removal inside the browser here: [https://github.com/imgly/background-removal-js/blob/main/packages/web/README.md](README.md)
+  Read more about running the background removal inside the browser here: [Browser Package README.md](https://github.com/imgly/background-removal-js/blob/main/packages/web/README.md)
 
 ### Node
 
@@ -74,7 +74,7 @@ Note: On the first run the wasm and onnx model files are fetched. This might, de
   );
   ```
 
-  Read more about running the background removal using NodeJS here: [https://github.com/imgly/background-removal-js/blob/main/packages/node/README.md](README.md)
+  Read more about running the background removal using NodeJS here: [NodeJS Package README.md](https://github.com/imgly/background-removal-js/blob/main/packages/node/README.md)
 
 ## Who is it for?
 
