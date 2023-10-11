@@ -37,15 +37,23 @@ npm install @imgly/background-removal
 
 ## Usage
 
-```typescript
-import imglyRemoveBackground from "@imgly/background-removal"
-
-let image_src: ImageData | ArrayBuffer | Uint8Array | Blob | URL | string = ...;
-
-imglyRemoveBackground(image_src).then((blob: Blob) => {
-  // The result is a blob encoded as PNG. It can be converted to an URL to be used as HTMLImage.src
-  const url = URL.createObjectURL(blob);
-})
+```js
+async function demoRemoveBackground(url) {
+  console.log('Starting background removal');
+  const imageBlob = await removeBackground(url, {
+    progress: (key, current, total) => {
+      const [type, subtype] = key.split(':');
+      console.log(
+        `${type} ${subtype} ${((current / total) * 100).toFixed(0)}%`
+      );
+    }
+  });
+  const newUrl = URL.createObjectURL(imageBlob);
+  console.log('Image with background removed accessible at: ' + newUrl);
+}
+demoRemoveBackground(
+  'https://images.unsplash.com/photo-1686002359940-6a51b0d64f68?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1024&q=80'
+);
 ```
 
 Note: On the first run the wasm and onnx model files are fetched. This might, depending on the bandwidth, take time. Therefore, the first run takes proportionally longer than each consecutive run. Also, all files are cached by the browser and an additional model cache.

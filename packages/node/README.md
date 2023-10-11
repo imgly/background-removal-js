@@ -34,15 +34,27 @@ npm install @imgly/background-removal-node
 
 ## Usage
 
-```typescript
-import {removeBackground} from "@imgly/background-removal-node";
-// const {removeBackground} = require("@imgly/background-removal-node");
+```js
+const { removeBackground } = require('@imgly/background-removal-node');
+const fs = require('fs');
 
-let image_src: ImageData | ArrayBuffer | Uint8Array | Blob | URL | string = ...;
+async function demoRemoveBackground(imageUrl) {
+  console.log('Removing background from: ' + imageUrl);
+  const blob = await removeBackground(imageUrl, { debug: false });
+  const buffer = await blob.arrayBuffer();
+  try {
+    await fs.promises.mkdir('tmp', { recursive: true });
+    await fs.promises.writeFile('tmp/output.png', Buffer.from(buffer));
+    console.log('Image saved to tmp/output.png');
+  } catch (error) {
+    console.error(error);
+  }
+}
 
-removeBackground(image_src).then((blob: Blob) => {
-  // The result is a blob encoded as PNG. It can be converted to an URL to be used as HTMLImage.src
-})
+demoRemoveBackground(
+  'https://images.unsplash.com/photo-1686002359940-6a51b0d64f68?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1024&q=80'
+  // "files/photo-1686002359940-6a51b0d64f68.jpeg",
+);
 ```
 
 Note: On the first run the wasm and onnx model files are fetched. This might, depending on the bandwidth, take time. Therefore, the first run takes proportionally longer than each consecutive run. Also, all files are cached by the browser and an additional model cache.
