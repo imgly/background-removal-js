@@ -1,6 +1,6 @@
 {
   "name": "@imgly/background-removal",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "description": "Background Removal in the Browser",
   "keywords": [
     "background-removal",
@@ -51,7 +51,7 @@
     "lint": "npx prettier --write ."
   },
   "dependencies": {
-    "onnxruntime-web": "^1.15.1"
+    "onnxruntime-web": "^1.16.0"
   },
   "devDependencies": {
     "@types/lodash": "^4.14.195",
