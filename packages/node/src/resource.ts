@@ -3,6 +3,7 @@ export { loadAsBlob, loadAsUrl, loadFromURI };
 import { Config } from './schema';
 import { ensureAbsoluteURI } from './url';
 import { readFile } from 'fs/promises';
+import { fileURLToPath } from 'url';
 
 async function loadAsUrl(url: string, config: Config) {
   return URL.createObjectURL(await loadAsBlob(url, config));
@@ -18,7 +19,7 @@ async function loadFromURI(
     case 'https:':
       return await fetch(uri);
     case 'file:': {
-      const buffer = await readFile(uri);
+      const buffer = await readFile(fileURLToPath(uri));
       return new Response(buffer, { status: 200, headers: config.headers });
     }
     default:
