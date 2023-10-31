@@ -1,7 +1,7 @@
 # Background Removal in the Browser & Node.js
 
 <p align="center">
-<img src="https://img.ly/showcases/cesdk/web/s/case-thumbnail/background-removal/background-removal-0.png?utm_source=github&utm_medium=project&utm_campaign=bg-removal" alt="background removal js showcase" />
+<img src="https://storage.googleapis.com/imgly-static-assets/static/blog/github-releases/background-removal-free-plugin-app.jpg" alt="background removal js showcase" />
 
 </p>
 
