@@ -54,7 +54,7 @@ async function demoRemoveBackground(url) {
   console.log('Image with background removed accessible at: ' + newUrl);
 }
 demoRemoveBackground(
-  'https://images.unsplash.com/photo-1686002359940-6a51b0d64f68?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1024&q=80'
+  'https://cdn.img.ly/assets/demo/v1/ly.img.image/thumbnails/sample_14.jpg'
 );
 ```
 

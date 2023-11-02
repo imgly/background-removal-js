@@ -36,15 +36,15 @@ npm install @imgly/background-removal-node
 
 ```js
 const { removeBackground } = require('@imgly/background-removal-node');
-const fs = require('fs');
+const fs = require('fs/promises');
 
 async function demoRemoveBackground(imageUrl) {
   console.log('Removing background from: ' + imageUrl);
   const blob = await removeBackground(imageUrl, { debug: false });
   const buffer = await blob.arrayBuffer();
   try {
-    await fs.promises.mkdir('tmp', { recursive: true });
-    await fs.promises.writeFile('tmp/output.png', Buffer.from(buffer));
+    await fs.mkdir('tmp', { recursive: true });
+    await fs.writeFile('tmp/output.png', Buffer.from(buffer));
     console.log('Image saved to tmp/output.png');
   } catch (error) {
     console.error(error);
@@ -52,7 +52,7 @@ async function demoRemoveBackground(imageUrl) {
 }
 
 demoRemoveBackground(
-  'https://images.unsplash.com/photo-1686002359940-6a51b0d64f68?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1024&q=80'
+  'https://cdn.img.ly/assets/demo/v1/ly.img.image/thumbnails/sample_14.jpg'
   // "files/photo-1686002359940-6a51b0d64f68.jpeg",
 );
 ```

@@ -25,28 +25,28 @@ Note: On the first run the wasm and onnx model files are fetched. This might, de
 - Run `npm i @imgly/background-removal` to install the package.
 - Run the following code:
 
-  ```js
-  import removeBackground from '@imgly/background-removal';
+```js
+import removeBackground from '@imgly/background-removal';
 
-  async function demoRemoveBackground(url) {
-    console.log('Starting background removal');
-    const imageBlob = await removeBackground(url, {
-      progress: (key, current, total) => {
-        const [type, subtype] = key.split(':');
-        console.log(
-          `${type} ${subtype} ${((current / total) * 100).toFixed(0)}%`
-        );
-      }
-    });
-    const newUrl = URL.createObjectURL(imageBlob);
-    console.log('Image with background removed accessible at: ' + newUrl);
-  }
-  demoRemoveBackground(
-    'https://images.unsplash.com/photo-1686002359940-6a51b0d64f68?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1024&q=80'
-  );
-  ```
+async function demoRemoveBackground(url) {
+  console.log('Starting background removal');
+  const imageBlob = await removeBackground(url, {
+    progress: (key, current, total) => {
+      const [type, subtype] = key.split(':');
+      console.log(
+        `${type} ${subtype} ${((current / total) * 100).toFixed(0)}%`
+      );
+    }
+  });
+  const newUrl = URL.createObjectURL(imageBlob);
+  console.log('Image with background removed accessible at: ' + newUrl);
+}
+demoRemoveBackground(
+  'https://cdn.img.ly/assets/demo/v1/ly.img.image/thumbnails/sample_14.jpg'
+);
+```
 
-  Read more about running the background removal inside the browser here: [Browser Package README.md](https://github.com/imgly/background-removal-js/blob/main/packages/web/README.md)
+Read more about running the background removal inside the browser here: [Browser Package README.md](https://github.com/imgly/background-removal-js/blob/main/packages/web/README.md)
 
 ### Node
 
@@ -55,15 +55,15 @@ Note: On the first run the wasm and onnx model files are fetched. This might, de
 
   ```js
   const { removeBackground } = require('@imgly/background-removal-node');
-  const fs = require('fs');
+  const fs = require('fs/promises');
 
   async function demoRemoveBackground(imageUrl) {
     console.log('Removing background from: ' + imageUrl);
     const blob = await removeBackground(imageUrl, { debug: false });
     const buffer = await blob.arrayBuffer();
     try {
-      await fs.promises.mkdir('tmp', { recursive: true });
-      await fs.promises.writeFile('tmp/output.png', Buffer.from(buffer));
+      await fs.mkdir('tmp', { recursive: true });
+      await fs.writeFile('tmp/output.png', Buffer.from(buffer));
       console.log('Image saved to tmp/output.png');
     } catch (error) {
       console.error(error);
@@ -71,7 +71,7 @@ Note: On the first run the wasm and onnx model files are fetched. This might, de
   }
 
   demoRemoveBackground(
-    'https://images.unsplash.com/photo-1686002359940-6a51b0d64f68?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1024&q=80'
+    'https://cdn.img.ly/assets/demo/v1/ly.img.image/thumbnails/sample_14.jpg'
     // "files/photo-1686002359940-6a51b0d64f68.jpeg",
   );
   ```
