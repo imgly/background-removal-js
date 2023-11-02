@@ -26,6 +26,8 @@ Note: On the first run the wasm and onnx model files are fetched. This might, de
 - Run the following code:
 
   ```js
+  import removeBackground from '@imgly/background-removal';
+
   async function demoRemoveBackground(url) {
     console.log('Starting background removal');
     const imageBlob = await removeBackground(url, {

@@ -38,6 +38,8 @@ npm install @imgly/background-removal
 ## Usage
 
 ```js
+import removeBackground from '@imgly/background-removal';
+
 async function demoRemoveBackground(url) {
   console.log('Starting background removal');
   const imageBlob = await removeBackground(url, {
