@@ -70,6 +70,20 @@ The onnx model is shipped in various sizes and needs.
 - small (~40 MB) is the smallest model and is in most cases working fine but sometimes shows some artifacts. It's a quantized model.
 - medium (~80MB) is the default model.
 
+### Preloading Assets
+
+Per default, assets are downloaded on demand. You might enforce downloading all assets at once at any time by preloading them:
+
+```typescript
+import removeBackground, { preload, Config } from '@imgly/background-removal';
+
+const config: Configuration = ...;
+preload(config).then(() => {
+  console.log("Asset preloading succeeded")
+})
+
+```
+
 ### Download Progress Monitoring
 
 On the first run, the necessary data will be fetched and stored in the browser cache. Since the download might take some time, you have the option to tap into the download progress.
@@ -96,8 +110,7 @@ The performance is largely dependent on the feature set available. Most prominen
 Currently, the wasm and onnx neural networks are served via unpkg. For production use, we advise you to host them yourself. Therefore, copy all .wasm and .onnx files to your public path `$PUBLIC_PATH` and reconfigure the library.
 
 ```shell
-cp node_modules/@imgly/background-removal/dist/*.wasm $PUBLIC_PATH
-cp node_modules/@imgly/background-removal/dist/*.onnx $PUBLIC_PATH
+cp node_modules/@imgly/background-removal/dist/* $PUBLIC_PATH
 ```
 
 ```typescript
@@ -139,6 +152,8 @@ let config: Config = {
   }
 };
 ```
+
+### Fetch Args
 
 `fetchArgs` are passed as second parameters to the fetch function as described in [MDN](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch).
 
