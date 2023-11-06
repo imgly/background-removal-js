@@ -30,7 +30,11 @@ async function removeBackground(
   image = await imageSourceToImageData(image, config);
 
   const outImageTensor = await runInference(image, config, session);
-  return await utils.imageEncode(outImageTensor);
+  return await utils.imageEncode(
+    outImageTensor,
+    config.output.quality,
+    config.output.format
+  );
 }
 
 async function imageSourceToImageData(

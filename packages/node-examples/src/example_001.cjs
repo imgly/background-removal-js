@@ -10,12 +10,31 @@ const images = [
 async function run() {
   const randomImage = images[Math.floor(Math.random() * images.length)];
   console.log('Random image: ' + randomImage);
-  const blob = await removeBackground(randomImage, { debug: false });
+  const config = {
+    debug: false,
+    // publicPath:  ...
+    progress: (key, current, total) => {
+      const [type, subtype] = key.split(':');
+      console.log(
+        `${type} ${subtype} ${((current / total) * 100).toFixed(0)}%`
+      );
+    },
+    output: {
+      quality: 0.8,
+      type: 'foreground',
+      format: 'image/png' //image/jpeg, image/webp
+    }
+  };
+
+  const blob = await removeBackground(randomImage, config);
+
   const buffer = await blob.arrayBuffer();
   try {
+    const format = config.output.format.split('/').pop();
+    const outFile = `tmp/output.${format}`;
     await fs.promises.mkdir('tmp', { recursive: true });
-    await fs.promises.writeFile('tmp/output.png', Buffer.from(buffer));
-    console.log('Image saved to tmp/output.png');
+    await fs.promises.writeFile(outFile, Buffer.from(buffer));
+    console.log(`Image saved to ${outFile}`);
   } catch (error) {
     console.error(error);
   }

@@ -1,4 +1,4 @@
-# Background Removal in NodeJs
+\*\*\*\*# Background Removal in NodeJs
 
 <p align="center">
 <img src="https://img.ly/showcases/cesdk/web/s/case-thumbnail/background-removal/background-removal-0.png?utm_source=github&utm_medium=project&utm_campaign=bg-removal" alt="background removal js showcase" />
@@ -10,13 +10,15 @@ Explore an [interactive demo](https://img.ly/showcases/cesdk/web/background-remo
 
 ## News
 
+- **`November 6th, 2023`:** Added support `foreground`, `background` and `mask` export type
+- **`November 6th, 2023`:** Added support for `webp` and `jpeg` export formats.
 - **`September 12th, 2023`:** We released the code of Background Removal NodeJS.
 
 ## Overview
 
-`@imgly/background-removal-node-node` is a powerful npm package that allows developers to seamlessly remove the background from images in NodeJs. With its unique features and capabilities, this package offers an innovative and cost-effective solution for background removal tasks without compromising data privacy.
+`@imgly/background-removal-node` is a powerful npm package that allows developers to seamlessly remove the background from images in NodeJs. With its unique features and capabilities, this package offers an innovative and cost-effective solution for background removal tasks without compromising data privacy.
 
-The key features of `@imgly/background-removal-node-node` are:
+The key features of `@imgly/background-removal-node` are:
 
 - **Seamless Integration with IMG.LY's CE.SDK**: `@imgly/background-removal-node` provides seamless integration with [IMG.LY's CE.SDK](https://img.ly/products/creative-sdk?utm_source=github&utm_medium=project&utm_campaign=bg-removal), allowing developers to easily incorporate powerful NodeJS image matting and background removal capabilities into their projects.
 
@@ -56,6 +58,11 @@ type Config = {
   publicPath: string; // The public path used for model a
   debug: bool; // enable or disable useful console.log outputs
   model: 'small' | 'medium'; // The model to use. (Default "medium")
+  output: {
+    type: 'image/png' | 'image/jpeg' | 'image/webp'; // The output type. (Default "image/png")
+    quality: number; // The quality. (Default: 0.8)
+    content: 'image' | 'alpha';
+  };
 };
 ```
 

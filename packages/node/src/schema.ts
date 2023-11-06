@@ -31,7 +31,7 @@ const ConfigSchema = z
       .default(true)
       .describe('Whether to proxy inference to a web worker.'),
     fetchArgs: z
-      .object({})
+      .any({})
       .default({})
       .describe('Arguments to pass to fetch when loading the model.'),
     progress: z
@@ -40,7 +40,16 @@ const ConfigSchema = z
       .returns(z.undefined())
       .describe('Progress callback.')
       .optional(),
-    model: z.enum(['small', 'medium', 'large']).default('medium')
+    model: z.enum(['small', 'medium', 'large']).default('medium'),
+    output: z
+      .object({
+        format: z
+          .enum(['image/png', 'image/jpeg', 'image/webp'])
+          .default('image/png'),
+        quality: z.number().default(0.8),
+        type: z.enum(['foreground', 'background', 'mask']).default('foreground')
+      })
+      .default({})
   })
   .default({});
 

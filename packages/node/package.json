@@ -1,6 +1,6 @@
 {
   "name": "@imgly/background-removal-node",
-  "version": "1.1.5",
+  "version": "1.2.0",
   "description": "Background Removal in NodeJS",
   "keywords": [
     "background-removal",
@@ -52,14 +52,14 @@
   },
   "dependencies": {
     "onnxruntime-node": "^1.15.1",
-    "sharp": "^0.32.4"
-  },
-  "devDependencies": {
+    "sharp": "^0.32.4",
     "@types/lodash": "^4.14.195",
     "@types/node": "^20.3.1",
     "lodash": "^4.17.21",
     "ndarray": "^1.0.19",
-    "zod": "^3.21.4",
+    "zod": "^3.21.4"
+  },
+  "devDependencies": {
     "assert": "^2.0.0",
     "esbuild": "^0.18.18",
     "npm-dts": "^1.3.12",

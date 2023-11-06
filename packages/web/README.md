@@ -9,7 +9,9 @@ Explore an [interactive demo](https://img.ly/showcases/cesdk/web/background-remo
 
 ## News
 
-- **`June 28th, 2023`:** We released the code of Background Removal JS.
+- **`November 6th, 2023`:** Added support `foreground`, `background` and `mask` export type
+- **`November 6th, 2023`:** Added support for `webp` and `jpeg` export formats.
+- **`June 28th, 2023`:** We released the code of Background Removal JS for Web.
 
 ## Overview
 
@@ -60,6 +62,11 @@ type Config = {
   debug: bool; // enable or disable useful console.log outputs
   proxyToWorker: bool; // Whether to proxy the calculations to a web worker. (Default true)
   model: 'small' | 'medium'; // The model to use. (Default "medium")
+  output: {
+    type: 'image/png' | 'image/jpeg' | 'image/webp'; // The output type. (Default "image/png")
+    quality: number; // The quality. (Default: 0.8)
+    content: 'image' | 'alpha';
+  };
 };
 ```
 

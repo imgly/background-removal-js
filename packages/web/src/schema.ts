@@ -30,7 +30,16 @@ const ConfigSchema = z
       .returns(z.undefined())
       .describe('Progress callback.')
       .optional(),
-    model: z.enum(['small', 'medium']).default('medium')
+    model: z.enum(['small', 'medium']).default('medium'),
+    output: z
+      .object({
+        format: z
+          .enum(['image/png', 'image/jpeg', 'image/webp'])
+          .default('image/png'),
+        quality: z.number().default(0.8),
+        type: z.enum(['foreground', 'background', 'mask']).default('foreground')
+      })
+      .default({})
   })
   .default({});
 

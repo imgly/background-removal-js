@@ -20,12 +20,18 @@ export default {
     const publicPath = new URL(import.meta.url);
     publicPath.pathname = '/js/';
     const config = {
+      debug: false,
       publicPath: publicPath.href,
       progress: (key, current, total) => {
         const [type, subtype] = key.split(':');
         caption.value = `${type} ${subtype} ${((current / total) * 100).toFixed(
           0
         )}%`;
+      },
+      output: {
+        quality: 0.8,
+        type: 'foreground',
+        format: 'image/png'
       }
     };
 

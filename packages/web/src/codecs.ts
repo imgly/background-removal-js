@@ -11,7 +11,7 @@ async function imageDecode(blob: Blob): Promise<NdArray<Uint8Array>> {
 async function imageEncode(
   imageTensor: NdArray<Uint8Array>,
   quality: number = 0.8,
-  type: string = 'image/png'
+  format: string = 'image/png'
 ): Promise<Blob> {
   const [height, width, channels] = imageTensor.shape;
   const imageData = new ImageData(
@@ -22,5 +22,5 @@ async function imageEncode(
   var canvas = new OffscreenCanvas(imageData.width, imageData.height);
   var ctx = canvas.getContext('2d')!;
   ctx.putImageData(imageData, 0, 0);
-  return canvas.convertToBlob({ quality, type });
+  return canvas.convertToBlob({ quality, type: format });
 }
