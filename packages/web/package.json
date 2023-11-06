@@ -51,14 +51,14 @@
     "lint": "npx prettier --write ."
   },
   "dependencies": {
-    "onnxruntime-web": "^1.16.0"
-  },
-  "devDependencies": {
+    "onnxruntime-web": "^1.16.0",
     "@types/lodash": "^4.14.195",
     "@types/node": "^20.3.1",
     "lodash": "^4.17.21",
     "ndarray": "^1.0.19",
-    "zod": "^3.21.4",
+    "zod": "^3.21.4"
+  },
+  "devDependencies": {
     "assert": "^2.0.0",
     "esbuild": "^0.18.18",
     "glob": "^10.3.3",

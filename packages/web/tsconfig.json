@@ -2,6 +2,7 @@
   "compilerOptions": {
     "lib": ["DOM", "ES2015"],
     "resolveJsonModule": true,
+    // "declarationMap": true,
     "esModuleInterop": true,
     "emitDeclarationOnly": true,
     "declaration": true
