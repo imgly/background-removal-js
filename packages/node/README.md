@@ -59,9 +59,9 @@ type Config = {
   debug: bool; // enable or disable useful console.log outputs
   model: 'small' | 'medium'; // The model to use. (Default "medium")
   output: {
-    type: 'image/png' | 'image/jpeg' | 'image/webp'; // The output type. (Default "image/png")
+    format: 'image/png' | 'image/jpeg' | 'image/webp'; // The output format. (Default "image/png")
     quality: number; // The quality. (Default: 0.8)
-    content: 'image' | 'alpha';
+    type: 'foreground' | 'background' | 'mask'; // The output type. (Default "foreground")
   };
 };
 ```

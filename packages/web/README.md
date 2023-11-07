@@ -63,9 +63,9 @@ type Config = {
   proxyToWorker: bool; // Whether to proxy the calculations to a web worker. (Default true)
   model: 'small' | 'medium'; // The model to use. (Default "medium")
   output: {
-    type: 'image/png' | 'image/jpeg' | 'image/webp'; // The output type. (Default "image/png")
+    format: 'image/png' | 'image/jpeg' | 'image/webp'; // The output format. (Default "image/png")
     quality: number; // The quality. (Default: 0.8)
-    content: 'image' | 'alpha';
+    type: 'foreground' | 'background' | 'mask'; // The output type. (Default "foreground")
   };
 };
 ```
@@ -166,7 +166,7 @@ let config: Config = {
 
 ## Who is it for?
 
-`@imgly/background-removal` is ideal for developers and projects that require efficient and cost-effective background removal directly in the browser. It caters to a wide range of use cases, including but not limited to:
+`@imgly/background-removal` is ideal for developers and projects that require efficient and cost-effective background removal directly in sthe browser. It caters to a wide range of use cases, including but not limited to:
 
 - _E-commerce applications_ that need to remove backgrounds from product images in real time.
 
