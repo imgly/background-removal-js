@@ -1,5 +1,5 @@
 {
-  "version": "1.1.5",
+  "version": "1.2.0",
   "preview": true,
   "scripts": {
     "lint": "npx prettier --write --ignore-unknown .",

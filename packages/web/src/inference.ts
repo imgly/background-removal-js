@@ -37,10 +37,30 @@ async function runInference(
 
   const stride = resolution * resolution;
 
-  for (let i = 0; i < 4 * stride; i += 4) {
-    let idx = i / 4;
-    let alpha = predictionsDict[0].data[idx];
-    tensorImage.data[i + 3] = alpha * 255;
+  if (config.output.type === 'mask') {
+    // clear the image data
+    tensorImage = ndarray(new Uint8Array(4 * stride), [
+      resolution,
+      resolution,
+      4
+    ]);
+    for (let i = 0; i < 4 * stride; i += 4) {
+      let idx = i / 4;
+      let alpha = predictionsDict[0].data[idx];
+      tensorImage.data[i + 3] = alpha * 255;
+    }
+  } else if (config.output.type === 'foreground') {
+    for (let i = 0; i < 4 * stride; i += 4) {
+      let idx = i / 4;
+      let alpha = predictionsDict[0].data[idx];
+      tensorImage.data[i + 3] = alpha * 255;
+    }
+  } else if (config.output.type === 'background') {
+    for (let i = 0; i < 4 * stride; i += 4) {
+      let idx = i / 4;
+      let alpha = predictionsDict[0].data[idx];
+      tensorImage.data[i + 3] = (1.0 - alpha) * 255;
+    }
   }
 
   const [width, height] = calculateProportionalSize(

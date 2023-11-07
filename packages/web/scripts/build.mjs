@@ -2,6 +2,9 @@ export { configs };
 
 import * as esbuild from 'esbuild';
 import dts from 'npm-dts';
+import pkg from '../package.json' assert { type: 'json' };
+
+const dependencies = Object.keys(pkg.dependencies);
 
 const typings = new dts.Generator(
   {
@@ -18,7 +21,7 @@ const configs = [
     bundle: true,
     sourcemap: true,
     platform: 'browser',
-    external: ['onnxruntime-web'],
+    external: dependencies,
     format: 'cjs',
     outfile: 'dist/index.cjs'
   },
@@ -26,7 +29,7 @@ const configs = [
     entryPoints: ['src/index.ts'],
     bundle: true,
     sourcemap: true,
-    external: ['onnxruntime-web'],
+    external: dependencies,
     platform: 'browser',
     format: 'esm',
     outfile: 'dist/index.mjs'

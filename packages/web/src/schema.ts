@@ -21,7 +21,7 @@ const ConfigSchema = z
       .default(true)
       .describe('Whether to proxy inference to a web worker.'),
     fetchArgs: z
-      .object({})
+      .any()
       .default({})
       .describe('Arguments to pass to fetch when loading the model.'),
     progress: z
@@ -30,14 +30,36 @@ const ConfigSchema = z
       .returns(z.undefined())
       .describe('Progress callback.')
       .optional(),
-    model: z.enum(['small', 'medium']).default('medium')
+    model: z.enum(['small', 'medium']).default('medium'),
+    output: z
+      .object({
+        format: z
+          .enum(['image/png', 'image/jpeg', 'image/webp'])
+          .default('image/png'),
+        quality: z.number().default(0.8),
+        type: z.enum(['foreground', 'background', 'mask']).default('foreground')
+      })
+      .default({})
   })
   .default({});
 
 type Config = z.infer<typeof ConfigSchema>;
 
-function validateConfig(config?: Config): Config {
-  const result = ConfigSchema.parse(config ?? {});
-  if (result.debug) console.log('Config:', result);
-  return result;
+function validateConfig(configuration?: Config): Config {
+  const config = ConfigSchema.parse(configuration ?? {});
+  if (config.debug) console.log('Config:', config);
+  if (config.debug && !config.progress) {
+    config.progress =
+      config.progress ??
+      ((key, current, total) => {
+        console.debug(`Downloading ${key}: ${current} of ${total}`);
+      });
+
+    if (!crossOriginIsolated) {
+      console.debug(
+        'Cross-Origin-Isolated is not enabled. Performance will be degraded. Please see  https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/SharedArrayBuffer.'
+      );
+    }
+  }
+  return config;
 }

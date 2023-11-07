@@ -1,6 +1,6 @@
 <script>
 import { ref, watch, onMounted, onUnmounted } from 'vue';
-import removeBackground from '@imgly/background-removal';
+import removeBackground, { preload } from '@imgly/background-removal';
 
 export default {
   name: 'App',
@@ -16,6 +16,24 @@ export default {
     const startDate = ref(Date.now());
     const caption = ref('Click me to remove background');
     let interval = null;
+
+    const publicPath = new URL(import.meta.url);
+    publicPath.pathname = '/js/';
+    const config = {
+      debug: false,
+      publicPath: publicPath.href,
+      progress: (key, current, total) => {
+        const [type, subtype] = key.split(':');
+        caption.value = `${type} ${subtype} ${((current / total) * 100).toFixed(
+          0
+        )}%`;
+      },
+      output: {
+        quality: 0.8,
+        type: 'foreground',
+        format: 'image/png'
+      }
+    };
 
     const calculateSecondsBetweenDates = (startDate, endDate) => {
       const milliseconds = endDate - startDate;
@@ -39,7 +57,11 @@ export default {
       }
     );
 
-    onMounted(() => {
+    onMounted(async () => {
+      // Optional Preload all assets
+      // await preload(config).then(() => {
+      //   console.log('Asset preloading succeeded');
+      // });
       if (isRunning.value) {
         interval = setInterval(() => {
           seconds.value = calculateSecondsBetweenDates(
@@ -68,19 +90,8 @@ export default {
       isRunning.value = true;
       resetTimer();
 
-      const publicPath = new URL(import.meta.url);
-      publicPath.pathname = '/js/';
       imageUrl.value = randomImage;
-      const imageBlob = await removeBackground(randomImage, {
-        publicPath: publicPath.href,
-        progress: (key, current, total) => {
-          const [type, subtype] = key.split(':');
-          caption.value = `${type} ${subtype} ${(
-            (current / total) *
-            100
-          ).toFixed(0)}%`;
-        }
-      });
+      const imageBlob = await removeBackground(randomImage, config);
       const url = URL.createObjectURL(imageBlob);
       imageUrl.value = url;
       isRunning.value = false;

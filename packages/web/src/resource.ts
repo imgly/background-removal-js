@@ -1,8 +1,27 @@
-export { loadAsBlob, loadAsUrl };
+export { loadAsBlob, loadAsUrl, preload };
 
 import { Config } from './schema';
 
-async function loadAsUrl(url: string, config: Config) {
+async function preload(config: Config): Promise<void> {
+  // load resource metadata
+  const resourceUrl = new URL('resources.json', config.publicPath);
+  const resourceResponse = await fetch(resourceUrl);
+  if (!resourceResponse.ok) {
+    throw new Error(
+      `Resource metadata not found. Ensure that the config.publicPath is configured correctly.`
+    );
+  }
+  const resourceMap = await resourceResponse.json();
+  const keys = Object.keys(resourceMap);
+
+  await Promise.all(
+    keys.map(async (key) => {
+      return loadAsBlob(key, config);
+    })
+  );
+}
+
+async function loadAsUrl(url: string, config: Config): Promise<string> {
   return URL.createObjectURL(await loadAsBlob(url, config));
 }
 

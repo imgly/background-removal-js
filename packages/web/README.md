@@ -9,7 +9,9 @@ Explore an [interactive demo](https://img.ly/showcases/cesdk/web/background-remo
 
 ## News
 
-- **`June 28th, 2023`:** We released the code of Background Removal JS.
+- **`November 6th, 2023`:** Added support `foreground`, `background` and `mask` export type
+- **`November 6th, 2023`:** Added support for `webp` and `jpeg` export formats.
+- **`June 28th, 2023`:** We released the code of Background Removal JS for Web.
 
 ## Overview
 
@@ -60,6 +62,11 @@ type Config = {
   debug: bool; // enable or disable useful console.log outputs
   proxyToWorker: bool; // Whether to proxy the calculations to a web worker. (Default true)
   model: 'small' | 'medium'; // The model to use. (Default "medium")
+  output: {
+    format: 'image/png' | 'image/jpeg' | 'image/webp'; // The output format. (Default "image/png")
+    quality: number; // The quality. (Default: 0.8)
+    type: 'foreground' | 'background' | 'mask'; // The output type. (Default "foreground")
+  };
 };
 ```
 
@@ -69,6 +76,20 @@ The onnx model is shipped in various sizes and needs.
 
 - small (~40 MB) is the smallest model and is in most cases working fine but sometimes shows some artifacts. It's a quantized model.
 - medium (~80MB) is the default model.
+
+### Preloading Assets
+
+Per default, assets are downloaded on demand. You might enforce downloading all assets at once at any time by preloading them:
+
+```typescript
+import removeBackground, { preload, Config } from '@imgly/background-removal';
+
+const config: Configuration = ...;
+preload(config).then(() => {
+  console.log("Asset preloading succeeded")
+})
+
+```
 
 ### Download Progress Monitoring
 
@@ -138,6 +159,8 @@ let config: Config = {
   }
 };
 ```
+
+### Fetch Args
 
 `fetchArgs` are passed as second parameters to the fetch function as described in [MDN](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch).
 
