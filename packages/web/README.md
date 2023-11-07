@@ -166,7 +166,7 @@ let config: Config = {
 
 ## Who is it for?
 
-`@imgly/background-removal` is ideal for developers and projects that require efficient and cost-effective background removal directly in sthe browser. It caters to a wide range of use cases, including but not limited to:
+`@imgly/background-removal` is ideal for developers and projects that require efficient and cost-effective background removal directly in the browser. It caters to a wide range of use cases, including but not limited to:
 
 - _E-commerce applications_ that need to remove backgrounds from product images in real time.
 
