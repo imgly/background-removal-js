@@ -1,4 +1,4 @@
-\*\*\*\*# Background Removal in NodeJs
+# Background Removal in NodeJs
 
 <p align="center">
 <img src="https://img.ly/showcases/cesdk/web/s/case-thumbnail/background-removal/background-removal-0.png?utm_source=github&utm_medium=project&utm_campaign=bg-removal" alt="background removal js showcase" />
