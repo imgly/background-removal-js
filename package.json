@@ -9,5 +9,8 @@
   "devDependencies": {
     "glob": "^10.3.3",
     "onchange": "^7.1.0"
+  },
+  "dependencies": {
+    "yaml": "^2.3.4"
   }
 }

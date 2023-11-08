@@ -38,6 +38,7 @@
   "files": [
     "LICENSE.md",
     "README.md",
+    "CHANGELOG.md",
     "dist/"
   ],
   "scripts": {
@@ -51,11 +52,12 @@
     "lint": "npx prettier --write ."
   },
   "dependencies": {
-    "onnxruntime-web": "^1.16.0",
     "@types/lodash": "^4.14.195",
     "@types/node": "^20.3.1",
     "lodash": "^4.17.21",
     "ndarray": "^1.0.19",
+    "onnxruntime-web": "^1.16.0",
+    "yaml": "^2.3.4",
     "zod": "^3.21.4"
   },
   "devDependencies": {
