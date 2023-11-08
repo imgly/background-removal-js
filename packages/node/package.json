@@ -37,6 +37,7 @@
   "files": [
     "LICENSE.md",
     "README.md",
+    "CHANGELOG.md",
     "dist/",
     "bin/"
   ],
@@ -45,6 +46,8 @@
     "clean": "npx rimraf dist",
     "test": "true",
     "resources": "node ../../scripts/package-resources.mjs",
+    "changelog:create": "node ../../scripts/changelog/create.mjs",
+    "changelog:generate": "node ../../scripts/changelog/generate.mjs",
     "build": "npm run clean && npm run resources && node scripts/build.mjs",
     "watch": "npm run clean && npm run resources && node scripts/watch.mjs",
     "publish": "npm run build && npm publish --access public",

@@ -1,0 +1,6 @@
+---
+type: Added
+description: Support `foreground`, `background` and `mask` export type.
+---
+type: Added
+description: Added support for `webp` and `jpeg` export formats.
