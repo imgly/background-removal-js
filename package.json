@@ -8,9 +8,8 @@
   },
   "devDependencies": {
     "glob": "^10.3.3",
+    "yaml": "^2.3.4",
+    "moment": "^2.29.4",
     "onchange": "^7.1.0"
-  },
-  "dependencies": {
-    "yaml": "^2.3.4"
   }
 }

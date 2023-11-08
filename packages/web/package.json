@@ -46,8 +46,10 @@
     "clean": "npx rimraf dist",
     "test": "true",
     "resources": "node ../../scripts/package-resources.mjs",
-    "build": "npm run clean && npm run resources && node scripts/build.mjs",
-    "watch": "npm run clean && npm run resources && node scripts/watch.mjs",
+    "changelog:create": "node ../../scripts/changelog/create.mjs",
+    "changelog:update": "node ../../scripts/changelog/update.mjs",
+    "build": "npm run clean && npm run resources && npm run changelog:update && node scripts/build.mjs",
+    "watch": "npm run clean && npm run resources && npm run changelog:update && node scripts/watch.mjs",
     "publish": "npm run build && npm publish --access public",
     "lint": "npx prettier --write ."
   },
