@@ -31,7 +31,10 @@ export default {
       output: {
         quality: 0.8,
         type: 'foreground',
-        format: 'image/png'
+        // format: 'image/png'
+        // format: 'image/jpeg'
+        format: 'image/webp'
+        //format: 'image/x-rgba8'
       }
     };
 
@@ -92,6 +95,7 @@ export default {
 
       imageUrl.value = randomImage;
       const imageBlob = await removeBackground(randomImage, config);
+      console.log(imageBlob);
       const url = URL.createObjectURL(imageBlob);
       imageUrl.value = url;
       isRunning.value = false;

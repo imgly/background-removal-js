@@ -34,7 +34,7 @@ const ConfigSchema = z
     output: z
       .object({
         format: z
-          .enum(['image/png', 'image/jpeg', 'image/webp'])
+          .enum(['image/png', 'image/jpeg', 'image/webp', 'image/x-rgba8'])
           .default('image/png'),
         quality: z.number().default(0.8),
         type: z.enum(['foreground', 'background', 'mask']).default('foreground')

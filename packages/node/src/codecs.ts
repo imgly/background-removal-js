@@ -23,18 +23,27 @@ async function imageDecode(blob: Blob): Promise<NdArray<Uint8Array>> {
 }
 
 async function imageEncode(
-  imageData: NdArray<Uint8Array>,
+  imageTensor: NdArray<Uint8Array>,
   quality: number = 0.8,
   type: string = 'image/png'
 ): Promise<Blob> {
-  const [height, width, channels] = imageData.shape;
+  const [height, width, channels] = imageTensor.shape;
   if (channels !== 4) throw new Error('Only 4-channel images are supported');
-  const image = sharp(imageData.data, { raw: { height, width, channels } });
+  const image = sharp(imageTensor.data, { raw: { height, width, channels } });
   type Keys = keyof FormatEnum;
-  const format = type.split('/').pop()! as Keys;
 
-  const buffer = await image
-    .toFormat(format, { quality: quality * 100 })
-    .toBuffer();
-  return new Blob([buffer], { type: type });
+  switch (type) {
+    case 'image/x-rgba8':
+      return new Blob([imageTensor.data], { type: 'image/x-rgba8' });
+    case `image/png`:
+    case `image/jpeg`:
+    case `image/webp`:
+      const format = type.split('/').pop()! as Keys;
+      const buffer = await image
+        .toFormat(format, { quality: quality * 100 })
+        .toBuffer();
+      return new Blob([buffer], { type: type });
+    default:
+      throw new Error(`Invalid format: ${format}`);
+  }
 }

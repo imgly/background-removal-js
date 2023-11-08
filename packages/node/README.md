@@ -10,6 +10,7 @@ Explore an [interactive demo](https://img.ly/showcases/cesdk/web/background-remo
 
 ## News
 
+- **`November 8th, 2023`:** Added support for raw `rgba8` export formats.
 - **`November 6th, 2023`:** Added support `foreground`, `background` and `mask` export type
 - **`November 6th, 2023`:** Added support for `webp` and `jpeg` export formats.
 - **`September 12th, 2023`:** We released the code of Background Removal NodeJS.
@@ -59,7 +60,7 @@ type Config = {
   debug: bool; // enable or disable useful console.log outputs
   model: 'small' | 'medium'; // The model to use. (Default "medium")
   output: {
-    format: 'image/png' | 'image/jpeg' | 'image/webp'; // The output format. (Default "image/png")
+    format: 'image/png' | 'image/jpeg' | 'image/webp' | 'image/x-rgba8'; // The output format. (Default "image/png")
     quality: number; // The quality. (Default: 0.8)
     type: 'foreground' | 'background' | 'mask'; // The output type. (Default "foreground")
   };

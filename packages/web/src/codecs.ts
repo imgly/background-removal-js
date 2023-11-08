@@ -14,13 +14,23 @@ async function imageEncode(
   format: string = 'image/png'
 ): Promise<Blob> {
   const [height, width, channels] = imageTensor.shape;
-  const imageData = new ImageData(
-    new Uint8ClampedArray(imageTensor.data),
-    width,
-    height
-  );
-  var canvas = new OffscreenCanvas(imageData.width, imageData.height);
-  var ctx = canvas.getContext('2d')!;
-  ctx.putImageData(imageData, 0, 0);
-  return canvas.convertToBlob({ quality, type: format });
+
+  switch (format) {
+    case 'image/x-rgba8':
+      return new Blob([imageTensor.data], { type: 'image/x-rgba8' });
+    case `image/png`:
+    case `image/jpeg`:
+    case `image/webp`:
+      const imageData = new ImageData(
+        new Uint8ClampedArray(imageTensor.data),
+        width,
+        height
+      );
+      var canvas = new OffscreenCanvas(imageData.width, imageData.height);
+      var ctx = canvas.getContext('2d')!;
+      ctx.putImageData(imageData, 0, 0);
+      return canvas.convertToBlob({ quality, type: format });
+    default:
+      throw new Error(`Invalid format: ${format}`);
+  }
 }
