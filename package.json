@@ -4,6 +4,7 @@
   "scripts": {
     "build": "cd packages/web/ && npm run build && cd - && cd packages/node/ && npm run build",
     "lint": "npx prettier --write --ignore-unknown .",
+    "changelog:generate": "cd packages/web && npm run changelog:generate && cd - && cd packages/node && npm run changelog:generate",
     "version": "node ./scripts/package-version.mjs"
   },
   "devDependencies": {
