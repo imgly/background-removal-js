@@ -9,6 +9,7 @@ Explore an [interactive demo](https://img.ly/showcases/cesdk/web/background-remo
 
 ## News
 
+- **`November 8th, 2023`:** Added support for raw `rgba8` export formats.
 - **`November 6th, 2023`:** Added support `foreground`, `background` and `mask` export type
 - **`November 6th, 2023`:** Added support for `webp` and `jpeg` export formats.
 - **`June 28th, 2023`:** We released the code of Background Removal JS for Web.

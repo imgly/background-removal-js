@@ -1,7 +1,8 @@
 {
-  "version": "1.2.0",
+  "version": "1.2.1",
   "preview": true,
   "scripts": {
+    "build": "cd packages/web/ && npm run build && cd - && cd packages/node/ && npm run build",
     "lint": "npx prettier --write --ignore-unknown .",
     "version": "node ./scripts/package-version.mjs"
   },
