@@ -70,7 +70,7 @@ const changelogItems = parseChangelogItems(entries);
 outStream.write(`# Changelog\n\n`);
 
 changelogItems['Infos']?.forEach((info) => {
-  outStream.write(`${info}\n\n`);
+  outStream.write(`${info}\n`);
 });
 
 const versionSorter = (a, b) => {

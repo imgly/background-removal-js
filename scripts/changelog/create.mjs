@@ -8,7 +8,7 @@ const scriptDir = path.dirname(process.argv[1]);
 const templatePath = path.resolve(scriptDir, 'template.yml');
 const changeLogDir = path.resolve('./changelog', `${version}`);
 
-const name = process.argv[2];
+const name = process.argv[2].replace(/(\W+)/gi, '_');
 if (!name) {
   console.error('Please provide a name for your changelog entry');
   process.exit();
@@ -19,7 +19,6 @@ const dateFormat = 'YYYYDDMMHHmmss';
 const date = Date.now();
 const prefix = moment(date).format(dateFormat);
 const filename = `${prefix}-${name}.yaml`;
-
 // do it
 const outFilePath = path.resolve(changeLogDir, filename);
 fs.mkdirSync(changeLogDir, { recursive: true });
