@@ -14,6 +14,8 @@ Explore an [interactive demo](https://img.ly/showcases/cesdk/web/background-remo
 - **`November 6th, 2023`:** Added support for `webp` and `jpeg` export formats.
 - **`June 28th, 2023`:** We released the code of Background Removal JS for Web.
 
+For more detail information please refer to the [CHANGELOG](./CHANGELOG.md).
+
 ## Overview
 
 `@imgly/background-removal` is a powerful npm package that allows developers to seamlessly remove the background from images directly in the browser. With its unique features and capabilities, this package offers an innovative and cost-effective solution for background removal tasks without compromising data privacy.

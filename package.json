@@ -4,10 +4,13 @@
   "scripts": {
     "build": "cd packages/web/ && npm run build && cd - && cd packages/node/ && npm run build",
     "lint": "npx prettier --write --ignore-unknown .",
+    "changelog:generate": "cd packages/web && npm run changelog:generate && cd - && cd packages/node && npm run changelog:generate",
     "version": "node ./scripts/package-version.mjs"
   },
   "devDependencies": {
     "glob": "^10.3.3",
+    "yaml": "^2.3.4",
+    "moment": "^2.29.4",
     "onchange": "^7.1.0"
   }
 }

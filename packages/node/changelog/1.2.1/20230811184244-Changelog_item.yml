@@ -1,0 +1,8 @@
+---
+type: Added
+description: |
+  `CHANGELOG.md` for an better overview of the changes.
+---
+type: Added
+description: |
+  support for raw `rgba8` export formats.
