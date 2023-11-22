@@ -9,12 +9,13 @@ import { Config } from './schema';
 import * as utils from './utils';
 import { NdArray } from 'ndarray';
 import * as codecs from './codecs';
-import { memoize } from 'lodash';
+import lodash from 'lodash';
 import { ensureAbsoluteURI } from './url';
 import { loadFromURI } from './resource';
 
 type ImageSource = ArrayBuffer | Uint8Array | Blob | URL | string;
 
+const { memoize } = lodash;
 const init = memoize(initInference, (config) => JSON.stringify(config));
 
 async function removeBackground(
