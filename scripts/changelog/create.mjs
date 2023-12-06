@@ -8,7 +8,7 @@ const scriptDir = path.dirname(process.argv[1]);
 const templatePath = path.resolve(scriptDir, 'template.yml');
 const changeLogDir = path.resolve('./changelog', `${version}`);
 
-const name = process.argv[2].replace(/(\W+)/gi, '_');
+const name = process.argv[2]?.replace(/(\W+)/gi, '_');
 if (!name) {
   console.error('Please provide a name for your changelog entry');
   process.exit();

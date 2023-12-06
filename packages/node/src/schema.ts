@@ -37,7 +37,7 @@ const ConfigSchema = z
     progress: z
       .function()
       .args(z.string(), z.number(), z.number())
-      .returns(z.undefined())
+      .returns(z.void())
       .describe('Progress callback.')
       .optional(),
     model: z.enum(['small', 'medium', 'large']).default('medium'),

@@ -1,0 +1,8 @@
+---
+type: Changed
+# type: Changed
+# type: Removed
+# type: Security
+# private: true
+description: |
+  Changed the return value type of the progress callback from undefined to void
