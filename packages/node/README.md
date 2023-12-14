@@ -58,7 +58,7 @@ The library does not need any configuration to get started. However, there are o
 
 ```typescript
 type Config = {
-  publicPath: string; // The public path used for model a
+  publicPath: string; // The public path used for model and wasm files. Default: 'https://unpkg.com/${PACKAGE_NAME}@${PACKAGE_VERSION}/dist/'
   debug: bool; // enable or disable useful console.log outputs
   model: 'small' | 'medium'; // The model to use. (Default "medium")
   output: {
