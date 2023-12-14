@@ -11,7 +11,7 @@ const ConfigSchema = z
       .string()
       .optional()
       .describe('The public path to the wasm files and the onnx model.')
-      .default(`https://unpkg.com/${pkg.name}@${pkg.version}/dist/`),
+      .default('https://unpkg.com/${PACKAGE_NAME}@${PACKAGE_VERSION}/dist/'),
     debug: z
       .boolean()
       .default(false)
