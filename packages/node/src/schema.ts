@@ -19,6 +19,11 @@ const ConfigSchema = z
       .optional()
       .describe('The public path to the wasm files and the onnx model.')
       .default(`file://${path.resolve(`node_modules/${pkg.name}/dist/`)}/`)
+      .transform((val) => {
+        return val
+          .replace('${PACKAGE_NAME}', pkg.name)
+          .replace('${PACKAGE_VERSION}', pkg.version);
+      })
       .refine((val) => isURI(val), {
         message: 'String must be a valid uri'
       }),

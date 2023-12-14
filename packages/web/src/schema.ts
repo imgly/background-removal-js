@@ -1,8 +1,6 @@
-export { ConfigSchema, Config, validateConfig };
+export { Config, ConfigSchema, validateConfig };
 
 import { z } from 'zod';
-import { ensureAbsoluteURI } from './url';
-
 import pkg from '../package.json';
 
 const ConfigSchema = z
@@ -11,7 +9,12 @@ const ConfigSchema = z
       .string()
       .optional()
       .describe('The public path to the wasm files and the onnx model.')
-      .default('https://unpkg.com/${PACKAGE_NAME}@${PACKAGE_VERSION}/dist/'),
+      .default('https://unpkg.com/${PACKAGE_NAME}@${PACKAGE_VERSION}/dist/')
+      .transform((val) => {
+        return val
+          .replace('${PACKAGE_NAME}', pkg.name)
+          .replace('${PACKAGE_VERSION}', pkg.version);
+      }),
     debug: z
       .boolean()
       .default(false)
