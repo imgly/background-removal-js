@@ -1,7 +1,7 @@
 export {
   imageDecode,
   imageEncode,
-  tensorResize,
+  tensorResizeBilinear,
   tensorHWCtoBCHW,
   imageBitmapToImageData,
   calculateProportionalSize,
@@ -23,11 +23,11 @@ function imageBitmapToImageData(imageBitmap: ImageBitmap): ImageData {
   return ctx.getImageData(0, 0, canvas.width, canvas.height);
 }
 
-async function tensorResize(
+function tensorResizeBilinear(
   imageTensor: NdArray<Uint8Array>,
   newWidth: number,
   newHeight: number
-): Promise<NdArray<Uint8Array>> {
+): NdArray<Uint8Array> {
   const [srcHeight, srcWidth, srcChannels] = imageTensor.shape;
   // Calculate the scaling factors
   const scaleX = srcWidth / newWidth;
@@ -73,7 +73,7 @@ async function tensorResize(
 }
 
 function tensorHWCtoBCHW(
-  imageTensor: NdArray<Uint32Array>,
+  imageTensor: NdArray<Uint8Array>,
   mean: number[] = [128, 128, 128],
   std: number[] = [256, 256, 256]
 ): NdArray<Float32Array> {

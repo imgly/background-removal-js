@@ -1,21 +1,25 @@
 export { initInference, runInference };
 
 import pkg from '../package.json';
-import { tensorResize, tensorHWCtoBCHW } from './utils';
+import { tensorResizeBilinear, tensorHWCtoBCHW } from './utils';
 import { createOnnxSession, runOnnxSession } from './onnx';
-import { calculateProportionalSize } from './utils';
 import { Config, validateConfig } from './schema';
 
 import { loadAsBlob } from './resource';
 import ndarray, { NdArray } from 'ndarray';
 
+function convertFloat32ToUint8(
+  float32Array: NdArray<Float32Array>
+): NdArray<Uint8Array> {
+  const uint8Array = new Uint8Array(float32Array.data.length);
+  for (let i = 0; i < float32Array.data.length; i++) {
+    uint8Array[i] = float32Array.data[i] * 255;
+  }
+  return ndarray(uint8Array, float32Array.shape);
+}
+
 async function initInference(config?: Config) {
   config = validateConfig(config);
-
-  // replace ${PACKAGE_NAME and ${PACKAGE_VERSION} in the path
-  config.publicPath = config.publicPath
-    .replace('${PACKAGE_NAME}', pkg.name)
-    .replace('${PACKAGE_VERSION}', pkg.version);
 
   if (config.debug) console.debug('Loading model...');
   const model = config.model;
@@ -33,53 +37,21 @@ async function runInference(
   if (config.progress) config.progress('compute:inference', 0, 1);
   const resolution = 1024;
   const [srcHeight, srcWidth, srcChannels] = imageTensor.shape;
-  let tensorImage = await tensorResize(imageTensor, resolution, resolution);
-  const inputTensor = tensorHWCtoBCHW(tensorImage);
+
+  let tensorImage = tensorResizeBilinear(imageTensor, resolution, resolution);
+  const inputTensor = tensorHWCtoBCHW(tensorImage); // this converts also from float to rgba
+
+  // run
   const predictionsDict = await runOnnxSession(
     session,
     [['input', inputTensor]],
     ['output']
   );
 
-  const stride = resolution * resolution;
+  let alphamask = ndarray(predictionsDict[0].data, [resolution, resolution, 1]);
+  alphamask = convertFloat32ToUint8(alphamask);
+  alphamask = tensorResizeBilinear(alphamask, srcWidth, srcHeight);
 
-  if (config.output.type === 'mask') {
-    // clear the image data
-    tensorImage = ndarray(new Uint8Array(4 * stride), [
-      resolution,
-      resolution,
-      4
-    ]);
-    for (let i = 0; i < 4 * stride; i += 4) {
-      let idx = i / 4;
-      let alpha = predictionsDict[0].data[idx];
-      tensorImage.data[i + 3] = alpha * 255;
-    }
-  } else if (config.output.type === 'foreground') {
-    for (let i = 0; i < 4 * stride; i += 4) {
-      let idx = i / 4;
-      let alpha = predictionsDict[0].data[idx];
-      tensorImage.data[i + 3] = alpha * 255;
-    }
-  } else if (config.output.type === 'background') {
-    for (let i = 0; i < 4 * stride; i += 4) {
-      let idx = i / 4;
-      let alpha = predictionsDict[0].data[idx];
-      tensorImage.data[i + 3] = (1.0 - alpha) * 255;
-    }
-  }
-
-  const [width, height] = calculateProportionalSize(
-    srcWidth,
-    srcHeight,
-    resolution,
-    resolution
-  );
-
-  const dst_width = Math.min(width, srcWidth);
-  const dst_height = Math.min(height, srcHeight);
-
-  tensorImage = await tensorResize(tensorImage, dst_width, dst_height);
   if (config.progress) config.progress('compute:inference', 1, 1);
-  return ndarray(tensorImage.data, [dst_height, dst_width, 4]);
+  return alphamask;
 }
