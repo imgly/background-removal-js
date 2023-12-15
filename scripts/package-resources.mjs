@@ -9,8 +9,7 @@ import { globSync } from 'glob';
 const BaseDir = path.resolve('.');
 const DefaultOutDir = path.resolve('./dist');
 const DefaultEntry = {
-  mime: 'application/octet-stream',
-  transform: calculateSHA256
+  mime: 'application/octet-stream'
 };
 
 async function calculateSHA256(filePath) {
@@ -118,15 +117,30 @@ function isFunction(variable) {
   return typeof variable === 'function';
 }
 
+const ChunkSize = 4 * 1024 * 1024; // 4 MB chunks
 async function transform(fileName, entry) {
-  // console.log(entry)
-  const fileHash = await entry.transform(fileName);
+  const buffer = Buffer.alloc(ChunkSize);
+
   const fileSize = await sizeFile(fileName);
-  const destFile = path.resolve(DefaultOutDir, fileHash);
-  await deleteFile(destFile);
-  await copyFile(fileName, destFile);
-  const chunks = {};
-  chunks[fileHash] = { range: [0, fileSize - 1] };
+  const fileHandle = fs.openSync(fileName);
+  const chunks = [];
+  for (let offset = 0; offset < fileSize; offset += ChunkSize) {
+    const bytesRead = fs.readSync(fileHandle, buffer, 0, ChunkSize, offset);
+    // console.log(offset, ChunkSize, bytesRead, fileSize, offset + bytesRead - 1)
+    const data = buffer.slice(0, bytesRead);
+    const hash = crypto.createHash('sha256');
+    hash.update(data);
+    const chunkHash = hash.digest('hex');
+    const url = chunkHash;
+    const destFile = path.resolve(DefaultOutDir, chunkHash);
+    fs.writeFileSync(destFile, data);
+    chunks.push({
+      hash: chunkHash,
+      offset: offset,
+      size: bytesRead
+    });
+  }
+
   return {
     chunks: chunks,
     size: fileSize,

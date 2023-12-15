@@ -43,53 +43,38 @@ async function loadAsBlob(key: string, config: Config) {
     );
   }
 
-  let urls = Object.keys(entry.chunks);
+  const chunks = entry.chunks; // list of entries
 
-  const allChunks = await Promise.all(
-    urls.map(async (url) => {
-      if (config.publicPath) {
-        url = new URL(url, config.publicPath).toString();
-      }
-      const response = await fetch(url, config.fetchArgs);
+  let downloadedSize = 0;
+  const responses = chunks.map(async (chunk) => {
+    const url = config.publicPath
+      ? new URL(chunk.hash, config.publicPath).toString()
+      : chunk.hash;
+    const response = await fetch(url, config.fetchArgs);
+    const blob = await response.blob();
 
-      const chunks = config.progress
-        ? await fetchChunked(response, entry, config, key)
-        : [await response.blob()];
-      return chunks;
-    })
-  );
+    if (chunk.size !== blob.size) {
+      throw new Error(
+        `Failed to fetch ${key} with size ${chunk.size} but got ${blob.size}`
+      );
+    }
 
-  const chunks = allChunks.flat();
-  const data = new Blob(chunks, { type: entry.mime });
+    if (config.progress) {
+      downloadedSize += chunk.size;
+      config.progress(`fetch:${key}`, downloadedSize, entry.size);
+    }
+    return blob;
+  });
+
+  // we could create a new buffer here and use the chunk entries and combine the file instead
+
+  const allChunkData = await Promise.all(responses);
+
+  const data = new Blob(allChunkData, { type: entry.mime });
   if (data.size !== entry.size) {
     throw new Error(
       `Failed to fetch ${key} with size ${entry.size} but got ${data.size}`
     );
   }
   return data;
-}
-
-async function fetchChunked(
-  response: Response,
-  entry: any,
-  config: Config,
-  key: string
-) {
-  const reader = response.body!.getReader();
-  // let contentLength = Number(response.headers.get('Content-Length'));
-  const contentLength = entry.size ?? 0;
-  let receivedLength = 0;
-
-  let chunks: Uint8Array[] = [];
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) {
-      break;
-    }
-    chunks.push(value);
-    receivedLength += value.length;
-    if (config.progress)
-      config.progress(`fetch:${key}`, receivedLength, contentLength);
-  }
-  return chunks;
 }

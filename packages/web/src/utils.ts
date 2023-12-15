@@ -4,11 +4,17 @@ export {
   tensorResize,
   tensorHWCtoBCHW,
   imageBitmapToImageData,
-  calculateProportionalSize
+  calculateProportionalSize,
+  imageSourceToImageData,
+  ImageSource
 };
 
 import ndarray, { NdArray } from 'ndarray';
 import { imageDecode, imageEncode } from './codecs';
+import { ensureAbsoluteURI } from './url';
+import { Config } from './schema';
+
+type ImageSource = ImageData | ArrayBuffer | Uint8Array | Blob | URL | string;
 
 function imageBitmapToImageData(imageBitmap: ImageBitmap): ImageData {
   var canvas = new OffscreenCanvas(imageBitmap.width, imageBitmap.height);
@@ -66,27 +72,6 @@ async function tensorResize(
   return resizedImageData;
 }
 
-// async function tensorResize(
-//   imageTensor: NdArray<Uint8Array>,
-//   newWidth: number,
-//   newHeight: number
-// ): Promise<NdArray<Uint8Array>> {
-//   const [srcHeight, srcWidth, srcChannels] = imageTensor.shape;
-//   const imageData = new ImageData(imageTensor.data, srcWidth, srcHeight);
-//   const bitmap = await createImageBitmap(imageData, {
-//     resizeWidth: newWidth,
-//     resizeHeight: newHeight,
-//     resizeQuality: 'high',
-//     premultiplyAlpha: 'premultiply'
-//   });
-//   const outImageData = imageBitmapToImageData(bitmap);
-//   return ndarray(outImageData.data, [
-//     outImageData.height,
-//     outImageData.width,
-//     4
-//   ]);
-// }
-
 function tensorHWCtoBCHW(
   imageTensor: NdArray<Uint32Array>,
   mean: number[] = [128, 128, 128],
@@ -120,4 +105,26 @@ function calculateProportionalSize(
   const newWidth = Math.floor(originalWidth * scalingFactor);
   const newHeight = Math.floor(originalHeight * scalingFactor);
   return [newWidth, newHeight];
+}
+
+async function imageSourceToImageData(
+  image: ImageSource,
+  config: Config
+): Promise<NdArray<Uint8Array>> {
+  if (typeof image === 'string') {
+    image = ensureAbsoluteURI(image, config.publicPath);
+    image = new URL(image);
+  }
+  if (image instanceof URL) {
+    const response = await fetch(image, {});
+    image = await response.blob();
+  }
+  if (image instanceof ArrayBuffer || ArrayBuffer.isView(image)) {
+    image = new Blob([image]);
+  }
+  if (image instanceof Blob) {
+    image = await imageDecode(image);
+  }
+
+  return image as NdArray<Uint8Array>;
 }

@@ -1,6 +1,7 @@
 export { Config, ConfigSchema, validateConfig };
 
 import { z } from 'zod';
+
 import pkg from '../package.json';
 
 const ConfigSchema = z
