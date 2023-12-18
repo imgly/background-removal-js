@@ -1,5 +1,6 @@
 export { initInference, runInference };
 
+import pkg from '../package.json';
 import { tensorResize, tensorHWCtoBCHW } from './utils';
 import { createOnnxSession, runOnnxSession } from './onnx';
 import { calculateProportionalSize } from './utils';
@@ -10,6 +11,11 @@ import ndarray, { NdArray } from 'ndarray';
 
 async function initInference(config?: Config) {
   config = validateConfig(config);
+
+  // replace ${PACKAGE_NAME and ${PACKAGE_VERSION} in the path
+  config.publicPath = config.publicPath
+    .replace('${PACKAGE_NAME}', pkg.name)
+    .replace('${PACKAGE_VERSION}', pkg.version);
 
   if (config.debug) console.debug('Loading model...');
   const model = config.model;

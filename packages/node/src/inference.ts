@@ -6,9 +6,14 @@ import { calculateProportionalSize } from './utils';
 import { Config, validateConfig } from './schema';
 import ndarray, { NdArray } from 'ndarray';
 import { loadAsBlob } from './resource';
+import pkg from '../package.json';
 
 async function initInference(config?: Config) {
   config = validateConfig(config);
+  // replace ${PACKAGE_NAME and ${PACKAGE_VERSION} in the path
+  config.publicPath = config.publicPath
+    .replace('${PACKAGE_NAME}', pkg.name)
+    .replace('${PACKAGE_VERSION}', pkg.version);
 
   if (config.debug) console.debug('Loading model...');
   const model = config.model;
