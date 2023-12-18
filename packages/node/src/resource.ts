@@ -26,12 +26,14 @@ async function loadFromURI(
       throw new Error(`Unsupported protocol: ${uri.protocol}`);
   }
 }
+
 async function loadAsBlob(key: string, config: Config) {
   // load resource metadata
 
   const resourceUri = ensureAbsoluteURI('./resources.json', config.publicPath);
 
   const resourceResponse = await loadFromURI(resourceUri);
+
   if (!resourceResponse.ok) {
     throw new Error(
       `Resource metadata not found. Ensure that the config.publicPath is configured correctly.`
@@ -46,53 +48,39 @@ async function loadAsBlob(key: string, config: Config) {
     );
   }
 
-  let paths = Object.keys(entry.chunks);
+  const chunks = entry.chunks; // list of entries
 
-  const allChunks = await Promise.all(
-    paths.map(async (path) => {
-      const url = ensureAbsoluteURI(path, config.publicPath);
-      const response = await loadFromURI(url, {
-        headers: { 'Content-Type': entry.mime }
-      });
+  let downloadedSize = 0;
+  const responses = chunks.map(async (chunk) => {
+    const url = ensureAbsoluteURI(chunk.hash, config.publicPath);
 
-      const chunks = config.progress
-        ? await fetchChunked(response, entry, config, key)
-        : [await response.blob()];
-      return chunks;
-    })
-  );
+    const response = await loadFromURI(url, {
+      headers: { 'Content-Type': entry.mime }
+    });
+    const blob = await response.blob();
 
-  const chunks = allChunks.flat();
-  const data = new Blob(chunks, { type: entry.mime });
+    if (chunk.size !== blob.size) {
+      throw new Error(
+        `Failed to fetch ${key} with size ${chunk.size} but got ${blob.size}`
+      );
+    }
+
+    if (config.progress) {
+      downloadedSize += chunk.size;
+      config.progress(`fetch:${key}`, downloadedSize, entry.size);
+    }
+    return blob;
+  });
+
+  // we could create a new buffer here and use the chunk entries and combine the file instead
+
+  const allChunkData = await Promise.all(responses);
+
+  const data = new Blob(allChunkData, { type: entry.mime });
   if (data.size !== entry.size) {
     throw new Error(
       `Failed to fetch ${key} with size ${entry.size} but got ${data.size}`
     );
   }
   return data;
-}
-
-async function fetchChunked(
-  response: Response,
-  entry: any,
-  config: Config,
-  key: string
-) {
-  const reader = response.body!.getReader();
-  // let contentLength = Number(response.headers.get('Content-Length'));
-  const contentLength = entry.size ?? 0;
-  let receivedLength = 0;
-
-  let chunks: Uint8Array[] = [];
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) {
-      break;
-    }
-    chunks.push(value);
-    receivedLength += value.length;
-    if (config.progress)
-      config.progress(`fetch:${key}`, receivedLength, contentLength);
-  }
-  return chunks;
 }
