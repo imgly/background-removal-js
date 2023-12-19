@@ -41,17 +41,17 @@ async function tensorResize(
   // Perform interpolation to fill the resized NdArray
   for (let y = 0; y < newHeight; y++) {
     for (let x = 0; x < newWidth; x++) {
+      const srcX = x * scaleX;
+      const srcY = y * scaleY;
+      const x1 = Math.max(Math.floor(srcX), 0);
+      const x2 = Math.min(Math.ceil(srcX), srcWidth - 1);
+      const y1 = Math.max(Math.floor(srcY), 0);
+      const y2 = Math.min(Math.ceil(srcY), srcHeight - 1);
+
+      const dx = srcX - x1;
+      const dy = srcY - y1;
+
       for (let c = 0; c < srcChannels; c++) {
-        const srcX = x * scaleX;
-        const srcY = y * scaleY;
-        const x1 = Math.floor(srcX);
-        const x2 = Math.ceil(srcX);
-        const y1 = Math.floor(srcY);
-        const y2 = Math.ceil(srcY);
-
-        const dx = srcX - x1;
-        const dy = srcY - y1;
-
         const p1 = imageTensor.get(y1, x1, c);
         const p2 = imageTensor.get(y1, x2, c);
         const p3 = imageTensor.get(y2, x1, c);
