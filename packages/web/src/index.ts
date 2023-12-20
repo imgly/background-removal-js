@@ -1,16 +1,14 @@
-// Exports
 export default removeBackground;
-export type { ImageSource, Config };
-export { removeBackground, removeForeground, segmentForeground, preload };
+export { preload, removeBackground, removeForeground, segmentForeground };
+export type { Config, ImageSource };
 
-// Imports
+import { memoize } from 'lodash';
+import ndarray from 'ndarray';
 import { initInference, runInference } from './inference';
+import { preload as preloadResources } from './resource';
 import { Config, validateConfig } from './schema';
 import * as utils from './utils';
 import { ImageSource } from './utils';
-import { memoize } from 'lodash';
-import ndarray from 'ndarray';
-import { preload as preloadResources } from './resource';
 
 const init = memoize(initInference, (config) => JSON.stringify(config));
 

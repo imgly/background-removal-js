@@ -1,12 +1,13 @@
 export {
   imageDecode,
   imageEncode,
-  tensorResize,
+  tensorResizeBilinear,
   tensorHWCtoBCHW,
   imageBitmapToImageData,
   calculateProportionalSize,
   imageSourceToImageData,
-  ImageSource
+  ImageSource,
+  convertFloat32ToUint8
 };
 
 import { Config } from './schema';
@@ -14,10 +15,8 @@ import * as codecs from './codecs';
 import { ensureAbsoluteURI } from './url';
 import { loadFromURI } from './resource';
 
-
 import ndarray, { NdArray } from 'ndarray';
 import { imageDecode, imageEncode } from './codecs';
-
 
 type ImageSource = ArrayBuffer | Uint8Array | Blob | URL | string;
 
@@ -28,11 +27,11 @@ function imageBitmapToImageData(imageBitmap: ImageBitmap): ImageData {
   return ctx.getImageData(0, 0, canvas.width, canvas.height);
 }
 
-async function tensorResize(
+function tensorResizeBilinear(
   imageTensor: NdArray<Uint8Array>,
   newWidth: number,
   newHeight: number
-): Promise<NdArray<Uint8Array>> {
+): NdArray<Uint8Array> {
   const [srcHeight, srcWidth, srcChannels] = imageTensor.shape;
   // Calculate the scaling factors
   const scaleX = srcWidth / newWidth;
@@ -77,27 +76,6 @@ async function tensorResize(
   return resizedImageData;
 }
 
-// async function tensorResize(
-//   imageTensor: NdArray<Uint8Array>,
-//   newWidth: number,
-//   newHeight: number
-// ): Promise<NdArray<Uint8Array>> {
-//   const [srcHeight, srcWidth, srcChannels] = imageTensor.shape;
-//   const imageData = new ImageData(imageTensor.data, srcWidth, srcHeight);
-//   const bitmap = await createImageBitmap(imageData, {
-//     resizeWidth: newWidth,
-//     resizeHeight: newHeight,
-//     resizeQuality: 'high',
-//     premultiplyAlpha: 'premultiply'
-//   });
-//   const outImageData = imageBitmapToImageData(bitmap);
-//   return ndarray(outImageData.data, [
-//     outImageData.height,
-//     outImageData.width,
-//     4
-//   ]);
-// }
-
 function tensorHWCtoBCHW(
   imageTensor: NdArray<Uint32Array>,
   mean: number[] = [128, 128, 128],
@@ -133,10 +111,9 @@ function calculateProportionalSize(
   return [newWidth, newHeight];
 }
 
-
 async function imageSourceToImageData(
   image: ImageSource,
-  config: Config
+  _: Config
 ): Promise<NdArray<Uint8Array>> {
   if (typeof image === 'string') {
     image = ensureAbsoluteURI(image, `file://${process.cwd()}/`);
@@ -152,4 +129,14 @@ async function imageSourceToImageData(
   }
 
   return image as NdArray<Uint8Array>;
+}
+
+function convertFloat32ToUint8(
+  float32Array: NdArray<Float32Array>
+): NdArray<Uint8Array> {
+  const uint8Array = new Uint8Array(float32Array.data.length);
+  for (let i = 0; i < float32Array.data.length; i++) {
+    uint8Array[i] = float32Array.data[i] * 255;
+  }
+  return ndarray(uint8Array, float32Array.shape);
 }

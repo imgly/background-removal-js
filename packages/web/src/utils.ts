@@ -128,3 +128,12 @@ async function imageSourceToImageData(
 
   return image as NdArray<Uint8Array>;
 }
+export function convertFloat32ToUint8(
+  float32Array: NdArray<Float32Array>
+): NdArray<Uint8Array> {
+  const uint8Array = new Uint8Array(float32Array.data.length);
+  for (let i = 0; i < float32Array.data.length; i++) {
+    uint8Array[i] = float32Array.data[i] * 255;
+  }
+  return ndarray(uint8Array, float32Array.shape);
+}

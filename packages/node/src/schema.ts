@@ -49,10 +49,15 @@ const ConfigSchema = z
     output: z
       .object({
         format: z
-          .enum(['image/png', 'image/jpeg', 'image/webp', 'image/x-rgba8'])
+          .enum([
+            'image/png',
+            'image/jpeg',
+            'image/webp',
+            'image/x-rgba8',
+            'image/x-alpha8'
+          ])
           .default('image/png'),
-        quality: z.number().default(0.8),
-        type: z.enum(['foreground', 'background', 'mask']).default('foreground')
+        quality: z.number().default(0.8)
       })
       .default({})
   })
@@ -60,8 +65,15 @@ const ConfigSchema = z
 
 type Config = z.infer<typeof ConfigSchema>;
 
-function validateConfig(config?: Config): Config {
-  const result = ConfigSchema.parse(config ?? {});
-  if (result.debug) console.log('Config:', result);
-  return result;
+function validateConfig(configuration?: Config): Config {
+  const config = ConfigSchema.parse(configuration ?? {});
+  if (config.debug) console.log('Config:', config);
+  if (config.debug && !config.progress) {
+    config.progress =
+      config.progress ??
+      ((key, current, total) => {
+        console.debug(`Downloading ${key}: ${current} of ${total}`);
+      });
+  }
+  return config;
 }

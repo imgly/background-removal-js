@@ -1,22 +1,12 @@
 export { initInference, runInference };
 
-import pkg from '../package.json';
 import { tensorResizeBilinear, tensorHWCtoBCHW } from './utils';
 import { createOnnxSession, runOnnxSession } from './onnx';
 import { Config, validateConfig } from './schema';
 
 import { loadAsBlob } from './resource';
 import ndarray, { NdArray } from 'ndarray';
-
-function convertFloat32ToUint8(
-  float32Array: NdArray<Float32Array>
-): NdArray<Uint8Array> {
-  const uint8Array = new Uint8Array(float32Array.data.length);
-  for (let i = 0; i < float32Array.data.length; i++) {
-    uint8Array[i] = float32Array.data[i] * 255;
-  }
-  return ndarray(uint8Array, float32Array.shape);
-}
+import { convertFloat32ToUint8 } from './utils';
 
 async function initInference(config?: Config) {
   config = validateConfig(config);
