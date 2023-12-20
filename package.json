@@ -3,11 +3,13 @@
   "preview": true,
   "scripts": {
     "build": "cd packages/web/ && npm run build && cd - && cd packages/node/ && npm run build",
-    "publish": "cd packages/web/ && npm run publish && cd - && cd packages/node/ && npm run publish",
+    "publish:web": "cd packages/web/ && npm run publish",
+    "publish:node": "cd packages/node/ && npm run publish",
     "lint": "npx prettier --write --ignore-unknown .",
     "changelog:generate": "cd packages/web && npm run changelog:generate && cd - && cd packages/node && npm run changelog:generate",
     "version": "node ./scripts/package-version.mjs",
-    "deploy-assets": "node -r dotenv/config ./scripts/deploy-assets.mjs"
+    "deploy-assets": "node -r dotenv/config ./scripts/deploy-assets.mjs",
+    "tag": "git tag $npm_package_version & git push origin $npm_package_version"
   },
   "devDependencies": {
     "dotenv": "^16.3.1",
