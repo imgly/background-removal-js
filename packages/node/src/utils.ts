@@ -4,11 +4,22 @@ export {
   tensorResize,
   tensorHWCtoBCHW,
   imageBitmapToImageData,
-  calculateProportionalSize
+  calculateProportionalSize,
+  imageSourceToImageData,
+  ImageSource
 };
+
+import { Config } from './schema';
+import * as codecs from './codecs';
+import { ensureAbsoluteURI } from './url';
+import { loadFromURI } from './resource';
+
 
 import ndarray, { NdArray } from 'ndarray';
 import { imageDecode, imageEncode } from './codecs';
+
+
+type ImageSource = ArrayBuffer | Uint8Array | Blob | URL | string;
 
 function imageBitmapToImageData(imageBitmap: ImageBitmap): ImageData {
   var canvas = new OffscreenCanvas(imageBitmap.width, imageBitmap.height);
@@ -120,4 +131,25 @@ function calculateProportionalSize(
   const newWidth = Math.floor(originalWidth * scalingFactor);
   const newHeight = Math.floor(originalHeight * scalingFactor);
   return [newWidth, newHeight];
+}
+
+
+async function imageSourceToImageData(
+  image: ImageSource,
+  config: Config
+): Promise<NdArray<Uint8Array>> {
+  if (typeof image === 'string') {
+    image = ensureAbsoluteURI(image, `file://${process.cwd()}/`);
+  }
+  if (image instanceof URL) {
+    image = await (await loadFromURI(image)).blob();
+  }
+  if (image instanceof ArrayBuffer || ArrayBuffer.isView(image)) {
+    image = new Blob([image]);
+  }
+  if (image instanceof Blob) {
+    image = await codecs.imageDecode(image);
+  }
+
+  return image as NdArray<Uint8Array>;
 }
