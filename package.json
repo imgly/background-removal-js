@@ -1,5 +1,5 @@
 {
-  "version": "next",
+  "version": "1.3.0",
   "preview": true,
   "scripts": {
     "build": "cd packages/web/ && npm run build && cd - && cd packages/node/ && npm run build",
