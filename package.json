@@ -3,6 +3,7 @@
   "preview": true,
   "scripts": {
     "build": "cd packages/web/ && npm run build && cd - && cd packages/node/ && npm run build",
+    "publish": "cd packages/web/ && npm run publish && cd - && cd packages/node/ && npm run publish",
     "lint": "npx prettier --write --ignore-unknown .",
     "changelog:generate": "cd packages/web && npm run changelog:generate && cd - && cd packages/node && npm run changelog:generate",
     "version": "node ./scripts/package-version.mjs",
