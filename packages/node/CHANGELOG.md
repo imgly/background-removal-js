@@ -4,11 +4,33 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0]
+
+### Added
+
+- Resources are now chunked to 4MB for better caching performance and download restart.
+
+- Seperate functions for `removeBackground`, `removeForeground`, and `segmentForeground`. Later will extract the mask only.
+
+- Config option to export 'x-alpha8' format to get receive single channel alpha mask.
+
+### Removed
+
+- Configuration options to specify if background, foreground or mask is exported.
+
+### Changed
+
+- Changed the return value type of the progress callback from undefined to void
+
+- Output is now in the original image size. Mask is upscaled and applied to the original image.
+
 ## [1.2.1]
 
 ### Added
 
 - `CHANGELOG.md` for an better overview of the changes.
+
+- support for raw `rgba8` export formats.
 
 ## [1.2.0]
 
