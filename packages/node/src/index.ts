@@ -5,7 +5,7 @@ export type { Config, ImageSource };
 import lodash from 'lodash';
 import ndarray from 'ndarray';
 import { initInference, runInference } from './inference';
-import { Config } from './schema';
+import { Config } from './config';
 import * as utils from './utils';
 import { ImageSource } from './utils';
 

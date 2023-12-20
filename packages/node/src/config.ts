@@ -41,7 +41,13 @@ const ConfigSchema = z
       .describe('Arguments to pass to fetch when loading the model.'),
     progress: z
       .function()
-      .args(z.string(), z.number(), z.number())
+      .args(
+        z.object({
+          key: z.string(),
+          current: z.number(),
+          total: z.number()
+        })
+      )
       .returns(z.void())
       .describe('Progress callback.')
       .optional(),

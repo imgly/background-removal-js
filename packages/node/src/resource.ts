@@ -1,6 +1,6 @@
 export { loadAsBlob, loadAsUrl, loadFromURI };
 
-import { Config } from './schema';
+import { Config } from './config';
 import { ensureAbsoluteURI } from './url';
 import { readFile } from 'fs/promises';
 import { fileURLToPath } from 'url';

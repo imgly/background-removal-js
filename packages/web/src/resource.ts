@@ -1,6 +1,6 @@
 export { loadAsBlob, loadAsUrl, preload };
 
-import { Config } from './schema';
+import { Config } from './config';
 
 async function preload(config: Config): Promise<void> {
   // load resource metadata
