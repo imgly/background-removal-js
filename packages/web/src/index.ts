@@ -6,7 +6,7 @@ import { memoize } from 'lodash';
 import ndarray from 'ndarray';
 import { initInference, runInference } from './inference';
 import { preload as preloadResources } from './resource';
-import { Config, validateConfig } from './config';
+import { Config, validateConfig } from './schema';
 import * as utils from './utils';
 import { ImageSource } from './utils';
 

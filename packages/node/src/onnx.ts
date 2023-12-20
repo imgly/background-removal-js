@@ -3,7 +3,7 @@ export { createOnnxSession, runOnnxSession };
 import ndarray, { NdArray } from 'ndarray';
 import * as ort from 'onnxruntime-node';
 // import * as ort from 'onnxruntime-node-gpu';
-import { Config } from './config';
+import { Config } from './schema';
 
 async function createOnnxSession(model: any, config: Config) {
   if (config.debug) {

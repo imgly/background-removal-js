@@ -10,7 +10,7 @@ export {
   convertFloat32ToUint8
 };
 
-import { Config } from './config';
+import { Config } from './schema';
 import * as codecs from './codecs';
 import { ensureAbsoluteURI } from './url';
 import { loadFromURI } from './resource';

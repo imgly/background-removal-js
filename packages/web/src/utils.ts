@@ -12,7 +12,7 @@ export {
 import ndarray, { NdArray } from 'ndarray';
 import { imageDecode, imageEncode } from './codecs';
 import { ensureAbsoluteURI } from './url';
-import { Config } from './config';
+import { Config } from './schema';
 
 type ImageSource = ImageData | ArrayBuffer | Uint8Array | Blob | URL | string;
 

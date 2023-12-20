@@ -4,7 +4,7 @@ import ndarray, { NdArray } from 'ndarray';
 import * as ort from 'onnxruntime-web';
 import { loadAsUrl } from './resource';
 import { simd, threads } from './feature-detect';
-import { Config } from './config';
+import { Config } from './schema';
 
 async function createOnnxSession(model: any, config: Config) {
   const capabilities = {

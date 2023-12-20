@@ -2,7 +2,7 @@ export { initInference, runInference };
 
 import { tensorResizeBilinear, tensorHWCtoBCHW } from './utils';
 import { createOnnxSession, runOnnxSession } from './onnx';
-import { Config, validateConfig } from './config';
+import { Config, validateConfig } from './schema';
 
 import { loadAsBlob } from './resource';
 import ndarray, { NdArray } from 'ndarray';
