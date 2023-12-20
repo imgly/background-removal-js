@@ -10,7 +10,7 @@ const typings = new dts.Generator(
     entry: 'src/index.ts',
     output: 'dist/index.d.ts'
   },
-  true,
+  false,
   true
 );
 

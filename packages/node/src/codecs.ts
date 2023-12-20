@@ -33,6 +33,8 @@ async function imageEncode(
   type Keys = keyof FormatEnum;
 
   switch (type) {
+    case 'image/x-r8':
+      return new Blob([imageTensor.data], { type: 'image/x-alpha8' });
     case 'image/x-rgba8':
       return new Blob([imageTensor.data], { type: 'image/x-rgba8' });
     case `image/png`:

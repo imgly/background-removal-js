@@ -1,4 +1,7 @@
-const { removeBackground } = require('@imgly/background-removal-node');
+const {
+  removeBackground,
+  segmentForeground
+} = require('@imgly/background-removal-node');
 const fs = require('fs');
 
 const images = [
@@ -25,8 +28,8 @@ async function run() {
       format: 'image/png' //image/jpeg, image/webp
     }
   };
-
   const blob = await removeBackground(randomImage, config);
+  // const blob = await segmentForeground(randomImage, config);
 
   const buffer = await blob.arrayBuffer();
   try {
