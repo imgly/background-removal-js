@@ -1,0 +1,29 @@
+---
+type: Changed
+# type: Removed
+# type: Security
+# private: true
+description: |
+  Output is now in the original image size. Mask is upscaled and applied to the original image.
+---
+type: Added
+# type: Removed
+# type: Security
+# private: true
+description: |
+  Seperate functions for `removeBackground`, `removeForeground`, and `segmentForeground`. Later will extract the mask only.
+
+---
+type: Removed
+# type: Removed
+# type: Security
+# private: true
+description: |
+  Configuration options to specify if background, foreground or mask is exported.
+---
+type: Added
+# type: Removed
+# type: Security
+# private: true
+description: |
+  Config option to export 'x-alpha8' format to get receive single channel alpha mask.
