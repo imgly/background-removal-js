@@ -1,9 +1,17 @@
+#!/usr/bin/env node
+
 /**
  * https://keepachangelog.com/en/1.1.0/
  * Idea is simple we have a directory of yaml files. The subdirectory defines the version name.
  */
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { dirname } from 'node:path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
 import yaml from 'yaml';
 
 const types = ['Infos', 'Added', 'Fixed', 'Removed', 'Changed', 'Security'];
