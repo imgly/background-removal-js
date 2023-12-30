@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Rails filename convention from migrations
+
 import moment from 'moment';
 import ejs from 'ejs';
 import meow from 'meow';
@@ -8,8 +8,16 @@ import esMain from 'es-main';
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { dirname } from 'node:path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const AllowedTypes = ['Added', 'Changed', 'Removed', 'Security'];
+
+const scriptName = process.argv[1].split(path.sep).pop();
+
 
 const flags = {
   message: {
@@ -40,12 +48,35 @@ const flags = {
   }
 };
 
+const examples = [
+  { prompt: `name` },
+  { prompt: `name --message "Message"` },
+  { prompt: `name --type "Added"` },
+  { prompt: `name --help` },
+  { prompt: `name --version` }
+]
+
+
+function parseStringToArgs(str) {
+  return str.match(/(?:[^\s"]+|"[^"]*")+/g);
+}
+
+
+
+function parseExample(prompt) {
+  const args = parseStringToArgs(prompt)
+  const parser = meow("", {
+    argv: args,
+    importMeta: import.meta,
+    flags
+  });
+
+
+}
 function parsePrompt(prompt, flags) {
   // how do I parse the prompt
   const inputArgs =
-    prompt instanceof Array ? prompt : prompt.match(/(?:[^\s"]+|"[^"]*")+/g);
-
-  const scriptName = inputArgs[1].split(path.sep).pop();
+    (prompt instanceof Array) ? prompt : parseStringToArgs(prompt);
 
   const flagText = (str) => chalk.yellow(str);
   const exampleText = (str) => chalk.white(str);
@@ -80,9 +111,9 @@ function parsePrompt(prompt, flags) {
     for (const [key, value] of Object.entries(flags)) {
       const { type, shortFlag, description, default: defaultValue } = value;
 
-      const valueStr = type === 'string' ? '=<key>' : '';
+      const valueStr = type === 'string' ? `=<${key}>` : '';
 
-      const flagStr = `[${flagText(`--${key} | -${shortFlag}${valueStr}`)}]`;
+      const flagStr = `[${flagText(`--${key}${valueStr} | -${shortFlag}${valueStr}`)}]`;
       lines.push(flagStr);
     }
     return lines.join(' ');
@@ -124,7 +155,6 @@ function main(argv) {
   try {
     const cli = parsePrompt(argv, flags);
 
-
     if (cli.flags.help) {
       cli.showHelp();
       process.exit();
@@ -136,8 +166,7 @@ function main(argv) {
 
     const version = 'Unreleased';
     const type = cli.flags.type;
-    const scriptDir = path.dirname(process.argv[1]);
-    const templatePath = path.resolve(scriptDir, 'template.yml.ejs');
+    const templatePath = path.resolve(__dirname, 'template.yml.ejs');
     const changeLogDir = path.resolve('./changelog', `${version}`);
 
     const input = cli.input.join(' ');

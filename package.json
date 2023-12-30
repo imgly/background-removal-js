@@ -7,6 +7,12 @@
   ],
   "preview": true,
   "private": true,
+  "bin": {
+    "changelog-create": "./scripts/changelog/changelog-create.mjs",
+    "changelog-generate": "./scripts/changelog/changelog-generate.mjs"
+  },
+  "files": [
+  ],
   "scripts": {
     "watch:packages": "concurrently \"npm run watch --prefix packages/web\" \"npm run watch --prefix packages/node\"",
     "version": "node ./scripts/package-version.mjs",
