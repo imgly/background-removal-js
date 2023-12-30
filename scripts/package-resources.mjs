@@ -126,8 +126,8 @@ async function transform(fileName, entry) {
   const chunks = [];
   for (let offset = 0; offset < fileSize; offset += ChunkSize) {
     const bytesRead = fs.readSync(fileHandle, buffer, 0, ChunkSize, offset);
-    // console.log(offset, ChunkSize, bytesRead, fileSize, offset + bytesRead - 1)
-    const data = buffer.slice(0, bytesRead);
+
+    const data = buffer.subarray(0, bytesRead);
     const hash = crypto.createHash('sha256');
     hash.update(data);
     const chunkHash = hash.digest('hex');
@@ -136,8 +136,7 @@ async function transform(fileName, entry) {
     fs.writeFileSync(destFile, data);
     chunks.push({
       hash: chunkHash,
-      offset: offset,
-      size: bytesRead
+      offsets: [offset, offset + bytesRead]
     });
   }
 
@@ -154,7 +153,7 @@ async function loadConfig() {
     const entries = resources.default;
     return entries;
   }
-  return { files };
+  return [];
 }
 
 async function main() {
