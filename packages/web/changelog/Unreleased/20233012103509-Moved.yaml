@@ -1,0 +1,8 @@
+---
+type: Added
+# type: Changed
+# type: Removed
+# type: Security
+# private: true
+description: |
+  Moved all data into it's own package. Therefore, reducing the main package size for the general case.

@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@imgly/background-removal": "file:../../web",
+    "@imgly/background-removal-data": "file:../../web-data",
     "vue": "^3.2.47"
   },
   "devDependencies": {

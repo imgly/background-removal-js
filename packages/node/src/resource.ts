@@ -53,20 +53,20 @@ async function loadAsBlob(key: string, config: Config) {
   let downloadedSize = 0;
   const responses = chunks.map(async (chunk) => {
     const url = ensureAbsoluteURI(chunk.hash, config.publicPath);
-
+    const chunkSize = chunk.offsets[1] - chunk.offsets[0];
     const response = await loadFromURI(url, {
       headers: { 'Content-Type': entry.mime }
     });
     const blob = await response.blob();
 
-    if (chunk.size !== blob.size) {
+    if (chunkSize !== blob.size) {
       throw new Error(
-        `Failed to fetch ${key} with size ${chunk.size} but got ${blob.size}`
+        `Failed to fetch ${key} with size ${chunkSize} but got ${blob.size}`
       );
     }
 
     if (config.progress) {
-      downloadedSize += chunk.size;
+      downloadedSize += chunkSize;
       config.progress(`fetch:${key}`, downloadedSize, entry.size);
     }
     return blob;
