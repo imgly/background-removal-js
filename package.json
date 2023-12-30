@@ -1,5 +1,5 @@
 {
-  "version": "next",
+  "version": "0.0.0-next",
   "preview": true,
   "scripts": {
     "build": "cd packages/web/ && npm run build && cd - && cd packages/node/ && npm run build",
@@ -17,5 +17,9 @@
     "moment": "^2.29.4",
     "onchange": "^7.1.0",
     "yaml": "^2.3.4"
+  },
+  "dependencies": {
+    "ejs": "^3.1.9",
+    "meow": "^13.0.0"
   }
 }

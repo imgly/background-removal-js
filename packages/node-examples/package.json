@@ -8,5 +8,5 @@
   "dependencies": {
     "@imgly/background-removal-node": "file:../node"
   },
-  "version": "next"
+  "version": "0.0.0-next"
 }
