@@ -1,5 +1,5 @@
 export { imageEncode, imageDecode, MimeType };
-import { imageBitmapToImageData } from './utils';
+import { imageBitmapToImageData, createCanvas } from './utils';
 import ndarray, { NdArray } from 'ndarray';
 
 async function imageDecode(blob: Blob): Promise<NdArray<Uint8Array>> {
@@ -52,7 +52,7 @@ async function imageEncode(
         width,
         height
       );
-      var canvas = new OffscreenCanvas(imageData.width, imageData.height);
+      var canvas = createCanvas(imageData.width, imageData.height);
       var ctx = canvas.getContext('2d')!;
       ctx.putImageData(imageData, 0, 0);
       return canvas.convertToBlob({ quality, type: format });
