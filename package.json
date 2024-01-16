@@ -1,12 +1,20 @@
 {
-  "version": "next",
+  "version": "0.0.0-next",
+  "name": "workspace",
+  "workspaces": [
+    "packages/web",
+    "packages/node"
+  ],
   "preview": true,
+  "private": true,
+  "bin": {
+    "changelog-create": "./scripts/changelog/changelog-create.mjs",
+    "changelog-generate": "./scripts/changelog/changelog-generate.mjs"
+  },
+  "files": [
+  ],
   "scripts": {
-    "build": "cd packages/web/ && npm run build && cd - && cd packages/node/ && npm run build",
-    "publish:web": "cd packages/web/ && npm run publish",
-    "publish:node": "cd packages/node/ && npm run publish",
-    "lint": "npx prettier --write --ignore-unknown .",
-    "changelog:generate": "cd packages/web && npm run changelog:generate && cd - && cd packages/node && npm run changelog:generate",
+    "watch:packages": "concurrently \"npm run watch --prefix packages/web\" \"npm run watch --prefix packages/node\"",
     "version": "node ./scripts/package-version.mjs",
     "deploy-assets": "node -r dotenv/config ./scripts/deploy-assets.mjs",
     "tag": "git tag $npm_package_version & git push origin $npm_package_version"
@@ -17,5 +25,12 @@
     "moment": "^2.29.4",
     "onchange": "^7.1.0",
     "yaml": "^2.3.4"
+  },
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "concurrently": "^8.2.2",
+    "ejs": "^3.1.9",
+    "es-main": "^1.3.0",
+    "meow": "^13.0.0"
   }
 }
