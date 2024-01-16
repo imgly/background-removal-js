@@ -18,7 +18,6 @@ const AllowedTypes = ['Added', 'Changed', 'Removed', 'Security'];
 
 const scriptName = process.argv[1].split(path.sep).pop();
 
-
 const flags = {
   message: {
     type: 'string',
@@ -54,29 +53,24 @@ const examples = [
   { prompt: `name --type "Added"` },
   { prompt: `name --help` },
   { prompt: `name --version` }
-]
-
+];
 
 function parseStringToArgs(str) {
   return str.match(/(?:[^\s"]+|"[^"]*")+/g);
 }
 
-
-
 function parseExample(prompt) {
-  const args = parseStringToArgs(prompt)
-  const parser = meow("", {
+  const args = parseStringToArgs(prompt);
+  const parser = meow('', {
     argv: args,
     importMeta: import.meta,
     flags
   });
-
-
 }
 function parsePrompt(prompt, flags) {
   // how do I parse the prompt
   const inputArgs =
-    (prompt instanceof Array) ? prompt : parseStringToArgs(prompt);
+    prompt instanceof Array ? prompt : parseStringToArgs(prompt);
 
   const flagText = (str) => chalk.yellow(str);
   const exampleText = (str) => chalk.white(str);
@@ -113,7 +107,9 @@ function parsePrompt(prompt, flags) {
 
       const valueStr = type === 'string' ? `=<${key}>` : '';
 
-      const flagStr = `[${flagText(`--${key}${valueStr} | -${shortFlag}${valueStr}`)}]`;
+      const flagStr = `[${flagText(
+        `--${key}${valueStr} | -${shortFlag}${valueStr}`
+      )}]`;
       lines.push(flagStr);
     }
     return lines.join(' ');
@@ -196,7 +192,7 @@ function main(argv) {
 
     console.info(`${chalk.grey(outFilePath)} has been created successfully.`);
   } catch (error) {
-    console.error(chalk.red(error.message))
+    console.error(chalk.red(error.message));
     process.exit(1);
   }
 }

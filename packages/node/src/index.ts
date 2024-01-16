@@ -1,11 +1,16 @@
 export default removeBackground;
-export { removeBackground, removeForeground, segmentForeground };
+export {
+  removeBackground,
+  removeForeground,
+  segmentForeground,
+  applySegmentationMask
+};
 export type { Config, ImageSource };
 
 import lodash from 'lodash';
 import ndarray from 'ndarray';
 import { initInference, runInference } from './inference';
-import { Config } from './schema';
+import { Config, validateConfig } from './schema';
 import * as utils from './utils';
 import { ImageSource } from './utils';
 
@@ -125,4 +130,35 @@ async function segmentForeground(
 
     return outImage;
   }
+}
+
+async function applySegmentationMask(
+  image,
+  mask,
+  config?: Config
+): Promise<Blob> {
+  config = validateConfig(config);
+  const imageTensor = await utils.imageSourceToImageData(image, config);
+  const [imageHeight, imageWidth, imageChannels] = imageTensor.shape;
+  const maskTensor = await utils.imageSourceToImageData(mask, config);
+  const [maskHeight, maskWidth, maskChannels] = maskTensor.shape;
+
+  const alphaMask =
+    maskHeight !== imageHeight || maskWidth !== imageWidth
+      ? utils.tensorResizeBilinear(maskTensor, imageWidth, imageHeight)
+      : maskTensor;
+  const stride = imageWidth * imageHeight;
+  for (let i = 0; i < stride; i += 1) {
+    const idxImage = imageChannels * i;
+    const idxMask = maskChannels * i;
+    imageTensor.data[idxImage + 3] = alphaMask.data[idxMask]; // alpha information it always in the first (sometimes also in the others)
+  }
+
+  const outImage = await utils.imageEncode(
+    imageTensor,
+    config.output.quality,
+    config.output.format
+  );
+
+  return outImage;
 }
