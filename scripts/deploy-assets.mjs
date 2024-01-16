@@ -33,7 +33,7 @@ async function syncToS3() {
       Object.entries(packageNames).map(async ([path, packageName]) => {
         console.log(`Syncing ${packageName} to S3...`);
         const command = `aws s3 sync --endpoint-url ${endpointUrl} ./${path}/dist s3://${bucketName}/${packageName}/${version}/dist`;
-        await execAsync(command);
+        return await execAsync(command);
       })
     );
 
