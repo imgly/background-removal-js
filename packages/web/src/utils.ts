@@ -6,7 +6,8 @@ export {
   imageBitmapToImageData,
   calculateProportionalSize,
   imageSourceToImageData,
-  ImageSource
+  ImageSource,
+  createCanvas
 };
 
 import ndarray, { NdArray } from 'ndarray';
@@ -17,7 +18,7 @@ import { Config } from './schema';
 type ImageSource = ImageData | ArrayBuffer | Uint8Array | Blob | URL | string;
 
 function imageBitmapToImageData(imageBitmap: ImageBitmap): ImageData {
-  var canvas = new OffscreenCanvas(imageBitmap.width, imageBitmap.height);
+  var canvas = createCanvas(imageBitmap.width, imageBitmap.height);
   var ctx = canvas.getContext('2d')!;
   ctx.drawImage(imageBitmap, 0, 0);
   return ctx.getImageData(0, 0, canvas.width, canvas.height);
@@ -136,4 +137,20 @@ export function convertFloat32ToUint8(
     uint8Array[i] = float32Array.data[i] * 255;
   }
   return ndarray(uint8Array, float32Array.shape);
+}
+
+function createCanvas(width, height) {
+  let canvas = undefined;
+  if (typeof OffscreenCanvas !== 'undefined') {
+    canvas = new OffscreenCanvas(width, height);
+  } else {
+    canvas = document.createElement('canvas');
+  }
+
+  if (!canvas) {
+    throw new Error(
+      `Canvas nor OffscreenCanvas are available in the current context.`
+    );
+  }
+  return canvas;
 }

@@ -3,7 +3,6 @@ export {
   imageEncode,
   tensorResizeBilinear,
   tensorHWCtoBCHW,
-  imageBitmapToImageData,
   calculateProportionalSize,
   imageSourceToImageData,
   ImageSource,
@@ -19,13 +18,6 @@ import ndarray, { NdArray } from 'ndarray';
 import { imageDecode, imageEncode } from './codecs';
 
 type ImageSource = ArrayBuffer | Uint8Array | Blob | URL | string;
-
-function imageBitmapToImageData(imageBitmap: ImageBitmap): ImageData {
-  var canvas = new OffscreenCanvas(imageBitmap.width, imageBitmap.height);
-  var ctx = canvas.getContext('2d')!;
-  ctx.drawImage(imageBitmap, 0, 0);
-  return ctx.getImageData(0, 0, canvas.width, canvas.height);
-}
 
 function tensorResizeBilinear(
   imageTensor: NdArray<Uint8Array>,

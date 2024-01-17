@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- Moved all data into it's own package. Therefore, reducing the main package size for the general case.
+
+- Added option to apply segmentation mask to any image. Used for applying the same mask to srcsets.
+
+### Changed
+
+- Fallback to Canvas if OffscreenCanvas is not available
+
 ## [1.3.0]
 
 ### Added

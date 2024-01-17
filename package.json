@@ -11,8 +11,7 @@
     "changelog-create": "./scripts/changelog/changelog-create.mjs",
     "changelog-generate": "./scripts/changelog/changelog-generate.mjs"
   },
-  "files": [
-  ],
+  "files": [],
   "scripts": {
     "watch:packages": "concurrently \"npm run watch --prefix packages/web\" \"npm run watch --prefix packages/node\"",
     "build": "cd packages/web/ && npm run build && cd - && cd packages/node/ && npm run build && cd - && cd packages/web-data/ && npm run build",

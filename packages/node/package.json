@@ -47,7 +47,7 @@
     "clean": "npx rimraf dist",
     "test": "true",
     "resources": "node ../../scripts/package-resources.mjs",
-    "changelog:create": "node ../../scripts/changelog/create.mjs",
+    "changelog:create": "node ../../scripts/changelog/changelog-create.mjs",
     "changelog:generate": "node ../../scripts/changelog/changelog-generate.mjs",
     "build": "npm run clean && npm run resources && npm run changelog:generate && node scripts/build.mjs",
     "watch": "npm run clean && npm run resources && npm run changelog:generate && node scripts/watch.mjs",
