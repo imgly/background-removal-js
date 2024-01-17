@@ -105,7 +105,7 @@ export default {
       // const imageBlob = await segmentForeground(randomImage, config);
       // const maskBlob = await segmentForeground(randomImage, {...config}); // use this format for maximum efficient
       // const imageBlob = await applySegmentationMask(randomImage, maskBlob, config)
-      console.log(maskBlob);
+      // console.log(maskBlob);
       console.log(imageBlob);
       const url = URL.createObjectURL(imageBlob);
       imageUrl.value = url;
