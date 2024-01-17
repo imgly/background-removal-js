@@ -1,12 +1,10 @@
 {
-  "version": "0.0.0-next",
+  "version": "1.4.0",
   "name": "workspace",
   "workspaces": [
     "packages/web",
     "packages/node"
   ],
-  "preview": true,
-  "private": true,
   "bin": {
     "changelog-create": "./scripts/changelog/changelog-create.mjs",
     "changelog-generate": "./scripts/changelog/changelog-generate.mjs"
