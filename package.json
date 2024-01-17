@@ -1,8 +1,9 @@
 {
-  "version": "1.4.0",
+  "version": "1.4.0-next",
   "name": "workspace",
   "workspaces": [
     "packages/web",
+    "packages/web-data",
     "packages/node"
   ],
   "bin": {
@@ -11,15 +12,16 @@
   },
   "files": [],
   "scripts": {
-    "watch:packages": "concurrently \"npm run watch --prefix packages/web\" \"npm run watch --prefix packages/node\"",
-    "build": "cd packages/web/ && npm run build && cd - && cd packages/node/ && npm run build && cd - && cd packages/web-data/ && npm run build",
-    "publish:web": "cd packages/web/ && npm run publish",
-    "publish:node": "cd packages/node/ && npm run publish",
+    "start": "npm run watch",
+    "watch": "concurrently \"npm run watch --prefix packages/web\" \"npm run watch --prefix packages/node\"",
+    "build": "npm run build --workspaces --if-present",
     "lint": "npx prettier --write --ignore-unknown .",
-    "changelog:generate": "cd packages/web && npm run changelog:generate && cd - && cd packages/node && npm run changelog:generate && cd packages/web-data && npm run changelog:generate",
-    "version": "node ./scripts/package-version.mjs",
+    "publish:latest": "npm run publish:next --workspaces --if-present",
+    "publish:next": "npm run publish:next --workspaces --if-present",
+    "package:version": "node ./scripts/package-version.mjs",
     "deploy-assets": "node -r dotenv/config ./scripts/deploy-assets.mjs",
-    "tag": "git tag $npm_package_version & git push origin $npm_package_version"
+    "tag": "git tag $npm_package_version & git push origin $npm_package_version",
+    "package:pack": "npm run package:pack --workspaces --if-present"
   },
   "devDependencies": {
     "dotenv": "^16.3.1",

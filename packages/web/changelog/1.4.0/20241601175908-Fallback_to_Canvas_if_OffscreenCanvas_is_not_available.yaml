@@ -6,4 +6,4 @@ type: Changed
 # type: Security
 # private: true
 description: |
-    Fallback to Canvas if OffscreenCanvas is not available
+  Fallback to Canvas if OffscreenCanvas is not available

@@ -1,6 +1,6 @@
 {
   "name": "@imgly/background-removal-data",
-  "version": "1.4.0",
+  "version": "1.4.0-next",
   "description": "Background Removal Data",
   "keywords": [
     "background-removal",
@@ -38,8 +38,10 @@
     "changelog:generate": "node ../../scripts/changelog/generate.mjs",
     "build": "npm run clean && npm run resources",
     "watch": "npm run clean && npm run resources",
-    "publish": "npm run build && npm publish --access public",
-    "lint": "npx prettier --write ."
+    "publish:latest": "npm run build && npm publish --tag latest--access public",
+    "publish:next": "npm run build && npm publish --tag next --access public",
+    "lint": "npx prettier --write .",
+    "package:pack": "npm run build && npm pack . ---pack-destination ../../releases"
   },
   "dependencies": {
     "onnxruntime-web": "^1.16.3"
