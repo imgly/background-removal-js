@@ -1,6 +1,7 @@
 import { readFile } from 'node:fs/promises';
 import { exec } from 'child_process';
 import { promisify } from 'util';
+import chalk from 'chalk';
 
 const execAsync = promisify(exec);
 
@@ -32,8 +33,10 @@ async function syncToS3() {
 
     await Promise.allSettled(
       Object.entries(packageNames).map(async ([path, packageName]) => {
+        console.error(`${chalk.red(`NOTE: Syncing might fail when aws client ist not installed nor configured in silence!`)}`)
         console.log(`Syncing ${packageName} to S3...`);
         const command = `aws s3 sync --endpoint-url ${endpointUrl} ./${path}/dist s3://${bucketName}/${packageName}/${version}/dist`;
+        console.log(`Command: ${command}`);
         return await execAsync(command);
       })
     );
