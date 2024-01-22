@@ -23,7 +23,7 @@ The key features of `@imgly/background-removal` are:
 
 - **Seamless Integration with IMG.LY's CE.SDK**: `@imgly/background-removal` provides seamless integration with [IMG.LY's CE.SDK](https://img.ly/products/creative-sdk?utm_source=github&utm_medium=project&utm_campaign=bg-removal), allowing developers to easily incorporate powerful in-browser image matting and background removal capabilities into their projects.
 
-The Neural Network ([ONNX model](https://onnx.ai/)) and WASM files used by `@imgly/background-removal` are hosted on [UNPKG](https://www.unpkg.com/), making it readily available for download to all users of the library. See the section Custom Asset Serving if you want to host data on your own servers.
+The Neural Network ([ONNX model](https://onnx.ai/)) and WASM files used by `@imgly/background-removal` are hosted by [IMG.LY](https://img.ly/) by default. See the section Custom Asset Serving if you want to host them on your own servers.
 
 ## Installation
 
@@ -56,7 +56,7 @@ The library does not need any configuration to get started. However, there are o
 
 ```typescript
 type Config = {
-  publicPath: string; // The public path used for model and wasm files. Default: 'https://unpkg.com/${PACKAGE_NAME}@${PACKAGE_VERSION}/dist/'
+  publicPath: string; // The public path used for model and wasm files. Default: 'https://staticimgly.com/${PACKAGE_NAME}-web/@${PACKAGE_VERSION}/dist/'
   debug: bool; // enable or disable useful console.log outputs
   proxyToWorker: bool; // Whether to proxy the calculations to a web worker. (Default true)
   model: 'small' | 'medium'; // The model to use. (Default "medium")
@@ -112,7 +112,7 @@ The performance is largely dependent on the feature set available. Most prominen
 
 ### Custom Asset Serving
 
-Currently, the wasm and onnx neural networks are served via unpkg. For production use, we advise you to host them yourself. Therefore, copy all .wasm and .onnx files to your public path `$PUBLIC_PATH` and reconfigure the library.
+The wasm and onnx neural networks are hosted by IMG.LY by default. For production use, we advise you to host them yourself. Therefore, copy all .wasm and .onnx files to your public path `$PUBLIC_PATH` and reconfigure the library.
 
 ```shell
 npm i @imgly/background-removal-data

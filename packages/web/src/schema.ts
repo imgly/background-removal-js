@@ -11,7 +11,7 @@ const ConfigSchema = z
       .optional()
       .describe('The public path to the wasm files and the onnx model.')
       .default(
-        'https://unpkg.com/${PACKAGE_NAME}@${PACKAGE_VERSION}-data/dist/'
+        'https://staticimgly.com/@imgly/background-removal-data/@${PACKAGE_VERSION}/dist/'
       )
       .transform((val) => {
         return val
