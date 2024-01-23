@@ -1,6 +1,6 @@
 {
   "name": "@imgly/background-removal-node",
-  "version": "1.4.0",
+  "version": "1.4.0-next",
   "description": "Background Removal in NodeJS",
   "resources": "@imgly/background-removal-node",
   "keywords": [
@@ -49,10 +49,13 @@
     "resources": "node ../../scripts/package-resources.mjs",
     "changelog:create": "node ../../scripts/changelog/changelog-create.mjs",
     "changelog:generate": "node ../../scripts/changelog/changelog-generate.mjs",
-    "build": "npm run clean && npm run resources && npm run changelog:generate && node scripts/build.mjs",
+    "build": "npm run clean && npm run resources && npm run types && npm run changelog:generate && node scripts/build.mjs",
+    "types": " npx tsc --declaration --emitDeclarationOnly --declarationDir dist --declarationMap",
     "watch": "npm run clean && npm run resources && npm run changelog:generate && node scripts/watch.mjs",
-    "publish": "npm run build && npm publish --access public",
-    "lint": "npx prettier --write ."
+    "publish:latest": "npm run build && npm publish --tag latest--access public",
+    "publish:next": "npm run build && npm publish --tag next --access public",
+    "lint": "npx prettier --write .",
+    "package:pack": "npm run build && npm pack . ---pack-destination ../../releases"
   },
   "dependencies": {
     "onnxruntime-node": "^1.15.1",

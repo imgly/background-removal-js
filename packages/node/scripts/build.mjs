@@ -1,18 +1,8 @@
 export { configs };
 import * as esbuild from 'esbuild';
-import dts from 'npm-dts';
 import pkg from '../package.json' assert { type: 'json' };
 
 const dependencies = Object.keys(pkg.dependencies);
-
-const typings = new dts.Generator(
-  {
-    entry: 'src/index.ts',
-    output: 'dist/index.d.ts'
-  },
-  false,
-  true
-);
 
 const configs = [
   {
@@ -37,4 +27,3 @@ const configs = [
 ];
 
 await configs.map(async (config) => await esbuild.build(config));
-await typings.generate();

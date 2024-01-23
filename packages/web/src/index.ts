@@ -150,8 +150,6 @@ async function applySegmentationMask(
   const [imageHeight, imageWidth, imageChannels] = imageTensor.shape;
   const maskTensor = await utils.imageSourceToImageData(mask, config);
   const [maskHeight, maskWidth, maskChannels] = maskTensor.shape;
-  console.log([maskHeight, maskWidth, maskChannels]);
-  console.log([imageHeight, imageWidth, imageChannels]);
 
   const alphaMask =
     maskHeight !== imageHeight || maskWidth !== imageWidth
