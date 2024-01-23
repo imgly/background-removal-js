@@ -6,4 +6,4 @@ type: Changed
 # type: Security
 # private: true
 description: |
-    Typescript bindings are generated with tsc
+  Typescript bindings are generated with tsc

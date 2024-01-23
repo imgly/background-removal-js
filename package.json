@@ -1,5 +1,5 @@
 {
-  "version": "1.4.0-next",
+  "version": "1.4.1",
   "name": "workspace",
   "workspaces": [
     "packages/web",
@@ -16,7 +16,7 @@
     "watch": "concurrently \"npm run watch --prefix packages/web\" \"npm run watch --prefix packages/node\"",
     "build": "npm run build --workspaces --if-present",
     "lint": "npx prettier --write --ignore-unknown .",
-    "publish:latest": "npm run publish:next --workspaces --if-present",
+    "publish:latest": "npm run publish:latest --workspaces --if-present",
     "publish:next": "npm run publish:next --workspaces --if-present",
     "package:version": "node ./scripts/package-version.mjs",
     "deploy-assets": "node -r dotenv/config ./scripts/deploy-assets.mjs",
