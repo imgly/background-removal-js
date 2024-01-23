@@ -25,7 +25,7 @@ The key features of `@imgly/background-removal-node` are:
 
 - **Seamless Integration with IMG.LY's CE.SDK**: `@imgly/background-removal-node` provides seamless integration with [IMG.LY's CE.SDK](https://img.ly/products/creative-sdk?utm_source=github&utm_medium=project&utm_campaign=bg-removal), allowing developers to easily incorporate powerful NodeJS image matting and background removal capabilities into their projects.
 
-The Neural Network ([ONNX model](https://onnx.ai/)) are hosted on [UNPKG](https://www.unpkg.com/), making it readily available for download to all users of the library. See the section Custom Asset Serving if you want to host data on your own servers.
+The Neural Network model files ([ONNX model](https://onnx.ai/)) are hosted by [IMG.LY](https://img.ly/), making it readily available for download to all users of the library. See the section Custom Asset Serving if you want to host data on your own servers.
 
 ## Installation
 
@@ -90,7 +90,7 @@ let config: Config = {
 
 ### Custom Asset Serving
 
-Currently, the wasm and onnx neural networks are served via unpkg. For production use, we advise you to host them yourself. Therefore, copy all .wasm and .onnx files to your public path `$PUBLIC_PATH` and reconfigure the library.
+The wasm and onnx neural networks are hosted by IMG.LY by default. For production use, we advise you to host them yourself. Therefore, copy all .wasm and .onnx files to your public path `$PUBLIC_PATH` and reconfigure the library.
 
 ```shell
 cp node_modules/@imgly/background-removal-node/dist/*.* $PUBLIC_PATH
