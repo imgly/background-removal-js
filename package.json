@@ -1,5 +1,5 @@
 {
-  "version": "1.4.0-next",
+  "version": "1.4.1",
   "name": "workspace",
   "workspaces": [
     "packages/web",
