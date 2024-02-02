@@ -66,6 +66,7 @@
     "zod": "^3.21.4"
   },
   "devDependencies": {
+    "@types/ndarray": "^1.0.14",
     "assert": "^2.0.0",
     "esbuild": "^0.18.18",
     "glob": "^10.3.3",
