@@ -17,7 +17,13 @@ import { loadFromURI } from './resource';
 import ndarray, { NdArray } from 'ndarray';
 import { imageDecode, imageEncode } from './codecs';
 
-type ImageSource = ArrayBuffer | Uint8Array | Blob | URL | string;
+type ImageSource =
+  | ArrayBuffer
+  | Uint8Array
+  | Blob
+  | URL
+  | string
+  | NdArray<Uint8Array>;
 
 function tensorResizeBilinear(
   imageTensor: NdArray<Uint8Array>,
@@ -69,7 +75,7 @@ function tensorResizeBilinear(
 }
 
 function tensorHWCtoBCHW(
-  imageTensor: NdArray<Uint32Array>,
+  imageTensor: NdArray<Uint8Array>,
   mean: number[] = [128, 128, 128],
   std: number[] = [256, 256, 256]
 ): NdArray<Float32Array> {

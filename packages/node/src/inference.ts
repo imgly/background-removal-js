@@ -39,9 +39,9 @@ async function runInference(
   );
 
   let alphamask = ndarray(predictionsDict[0].data, [resolution, resolution, 1]);
-  alphamask = convertFloat32ToUint8(alphamask);
-  alphamask = tensorResizeBilinear(alphamask, srcWidth, srcHeight);
+  let alphamaskU8 = convertFloat32ToUint8(alphamask);
+  alphamaskU8 = tensorResizeBilinear(alphamaskU8, srcWidth, srcHeight);
 
   if (config.progress) config.progress('compute:inference', 1, 1);
-  return alphamask;
+  return alphamaskU8;
 }

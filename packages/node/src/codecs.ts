@@ -11,12 +11,20 @@ async function imageDecode(blob: Blob): Promise<NdArray<Uint8Array>> {
     case 'image/x-alpha8': {
       const width = parseInt(mime.params['width']);
       const height = parseInt(mime.params['height']);
-      return ndarray(await blob.arrayBuffer(), [height, width, 1]);
+      return ndarray(new Uint8Array(await blob.arrayBuffer()), [
+        height,
+        width,
+        1
+      ]);
     }
     case 'image/x-rgba8': {
       const width = parseInt(mime.params['width']);
       const height = parseInt(mime.params['height']);
-      return ndarray(await blob.arrayBuffer(), [height, width, 4]);
+      return ndarray(new Uint8Array(await blob.arrayBuffer()), [
+        height,
+        width,
+        4
+      ]);
     }
     case 'application/octet-stream':
     case `image/png`:
@@ -55,7 +63,10 @@ async function imageEncode(
   switch (type) {
     case 'image/x-alpha8':
     case 'image/x-rgba8': {
-      const mime = MimeType.create(type, { width, height });
+      const mime = MimeType.create(type, {
+        width: width.toString(),
+        height: height.toString()
+      });
       return new Blob([imageTensor.data], { type: mime.toString() });
     }
     case `image/png`:

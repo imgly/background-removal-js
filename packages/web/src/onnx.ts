@@ -85,7 +85,7 @@ async function runOnnxSession(
 
   for (const key of outputs) {
     const output: ort.Tensor = outputData[key];
-    const shape: Number[] = output.dims as number[];
+    const shape: number[] = output.dims as number[];
     const data: Float32Array = output.data as Float32Array;
     const tensor = ndarray(data, shape);
     outputKVPairs.push(tensor);

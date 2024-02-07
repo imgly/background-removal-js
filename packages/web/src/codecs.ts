@@ -9,12 +9,20 @@ async function imageDecode(blob: Blob): Promise<NdArray<Uint8Array>> {
     case 'image/x-alpha8': {
       const width = parseInt(mime.params['width']);
       const height = parseInt(mime.params['height']);
-      return ndarray(await blob.arrayBuffer(), [height, width, 1]);
+      return ndarray(new Uint8Array(await blob.arrayBuffer()), [
+        height,
+        width,
+        1
+      ]);
     }
     case 'image/x-rgba8': {
       const width = parseInt(mime.params['width']);
       const height = parseInt(mime.params['height']);
-      return ndarray(await blob.arrayBuffer(), [height, width, 4]);
+      return ndarray(new Uint8Array(await blob.arrayBuffer()), [
+        height,
+        width,
+        4
+      ]);
     }
     case 'application/octet-stream': // this is an unknwon type
     case `image/png`:
@@ -22,7 +30,11 @@ async function imageDecode(blob: Blob): Promise<NdArray<Uint8Array>> {
     case `image/webp`: {
       const imageBitmap = await createImageBitmap(blob);
       const imageData = imageBitmapToImageData(imageBitmap);
-      return ndarray(imageData.data, [imageData.height, imageData.width, 4]);
+      return ndarray(new Uint8Array(imageData.data), [
+        imageData.height,
+        imageData.width,
+        4
+      ]);
     }
     default:
       throw new Error(
@@ -41,7 +53,10 @@ async function imageEncode(
   switch (format) {
     case 'image/x-alpha8':
     case 'image/x-rgba8': {
-      const mime = MimeType.create(format, { width, height });
+      const mime = MimeType.create(format, {
+        width: width.toString(),
+        height: height.toString()
+      });
       return new Blob([imageTensor.data], { type: mime.toString() });
     }
     case `image/png`:

@@ -15,7 +15,14 @@ import { imageDecode, imageEncode } from './codecs';
 import { ensureAbsoluteURI } from './url';
 import { Config } from './schema';
 
-type ImageSource = ImageData | ArrayBuffer | Uint8Array | Blob | URL | string;
+type ImageSource =
+  | ImageData
+  | ArrayBuffer
+  | Uint8Array
+  | Blob
+  | URL
+  | string
+  | NdArray<Uint8Array>;
 
 function imageBitmapToImageData(imageBitmap: ImageBitmap): ImageData {
   var canvas = createCanvas(imageBitmap.width, imageBitmap.height);
