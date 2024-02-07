@@ -6,4 +6,4 @@ type: Added
 # type: Security
 # private: true
 description: |
-    Bumped onnx runtime to 1.17 Changed
+  Bumped onnx runtime to 1.17 Changed

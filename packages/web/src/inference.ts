@@ -8,7 +8,9 @@ import { loadAsBlob } from './resource';
 import ndarray, { NdArray } from 'ndarray';
 import { convertFloat32ToUint8 } from './utils';
 
-async function initInference(config?: Config): Promise<{ config: Config, session: unknown }> {
+async function initInference(
+  config?: Config
+): Promise<{ config: Config; session: unknown }> {
   config = validateConfig(config);
 
   if (config.debug) console.debug('Loading model...');

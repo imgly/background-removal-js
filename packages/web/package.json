@@ -1,6 +1,6 @@
 {
   "name": "@imgly/background-removal",
-  "version": "1.4.3",
+  "version": "1.4.4",
   "description": "Background Removal in the Browser",
   "keywords": [
     "background-removal",
@@ -60,6 +60,7 @@
   "dependencies": {
     "@types/lodash": "~4.14.0",
     "@types/node": "~20.3.0",
+    "@types/ndarray": "~1.0.14",
     "lodash": "~4.17.0",
     "ndarray": "~1.0.0",
     "onnxruntime-web": "~1.17.0",

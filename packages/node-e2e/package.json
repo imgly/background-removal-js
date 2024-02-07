@@ -6,5 +6,5 @@
     "@imgly/background-removal-node": "file:../node",
     "jest": "^29.6.2"
   },
-  "version": "1.4.3"
+  "version": "1.4.4"
 }
