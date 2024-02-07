@@ -4,17 +4,19 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
-
-### Changed
-
-- Typescript bindings are generated with tsc
-
 ## [1.4.0]
 
 ### Added
 
+- Bumped onnx runtime to 1.17 Changed
+
+- Changed license from GPL to AGPL Changed
+
 - Added option to apply segmentation mask to any image. Used for applying the same mask to srcsets.
+
+### Changed
+
+- Typescript bindings are generated with tsc
 
 ## [1.3.0]
 

@@ -1,7 +1,7 @@
 export default [
   {
     path: '/onnxruntime-web/',
-    source: './node_modules/onnxruntime-web/dist/*.wasm',
+    source: '../../node_modules/onnxruntime-web/dist/*.wasm',
     mime: 'application/wasm'
   },
   {

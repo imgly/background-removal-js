@@ -1,6 +1,6 @@
 {
   "name": "@imgly/background-removal-data",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "description": "Background Removal Data",
   "keywords": [
     "background-removal",
@@ -44,6 +44,6 @@
     "package:pack": "npm run build && npm pack . --pack-destination ../../releases"
   },
   "dependencies": {
-    "onnxruntime-web": "^1.16.3"
+    "onnxruntime-web": "~1.17.0"
   }
 }
