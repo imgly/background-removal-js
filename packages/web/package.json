@@ -1,6 +1,6 @@
 {
   "name": "@imgly/background-removal",
-  "version": "1.4.2",
+  "version": "1.4.3",
   "description": "Background Removal in the Browser",
   "keywords": [
     "background-removal",
@@ -26,12 +26,12 @@
   "source": "./src/index.ts",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
+  "types": "./dist/src/index.d.ts",
   "exports": {
     ".": {
       "require": "./dist/index.cjs",
       "import": "./dist/index.mjs",
-      "types": "./dist/index.d.ts"
+      "types": "./dist/src/index.d.ts"
     }
   },
   "homepage": "https://img.ly/showcases/cesdk/web/background-removal",

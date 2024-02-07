@@ -1,6 +1,6 @@
 {
   "name": "test",
-  "version": "1.4.2",
+  "version": "1.4.3",
   "private": true,
   "dependencies": {
     "@imgly/background-removal": "file:../../web",
