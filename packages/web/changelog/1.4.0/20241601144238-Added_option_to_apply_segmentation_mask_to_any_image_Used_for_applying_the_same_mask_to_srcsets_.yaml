@@ -1,0 +1,9 @@
+---
+type: Added
+# type: Added
+# type: Changed
+# type: Removed
+# type: Security
+# private: true
+description: |
+  Added option to apply segmentation mask to any image. Used for applying the same mask to srcsets.

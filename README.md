@@ -6,7 +6,7 @@
 </p>
 
 Remove backgrounds from images directly in the browser or Node.js environment with ease and no additional costs or privacy concerns.
-Explore an [interactive demo](https://img.ly/showcases/cesdk/web/background-removal/web?utm_source=github&utm_medium=project&utm_campaign=bg-removal).
+Explore an [interactive demo](https://img.ly/showcases/cesdk/web/background-removal/web?utm_source=github&utm_medium=project&utm_campaign=vectorizer).
 
 ## Overview
 
@@ -30,9 +30,9 @@ Whether you are a professional developer or a hobbyist, `@imgly/background-remov
 
 ## License
 
-The software is free for use under the GPL License. Please contact [support@img.ly](mailto:support@img.ly?subject=Background-Removal%20License) for questions about other licensing options.
+The software is free for use under the AGPL License. Please contact [support@img.ly](mailto:support@img.ly?subject=Background-Removal%20License) for questions about other licensing options.
 
 ## Authors & Contributors
 
 This library is made by IMG.LY shipping the world's premier SDKs for building creative applications.
-Start your trial of the [CreativeEditor SDK](https://img.ly/products/creative-sdk?utm_source=github&utm_medium=project&utm_campaign=bg-removal), [PhotoEditor SDK](https://img.ly/products/photo-sdk?utm_source=github&utm_medium=project&utm_campaign=bg-removal) & [VideoEditor SDK](https://img.ly/products/video-sdk?utm_source=github&utm_medium=project&utm_campaign=bg-removal).
+Start your trial of the [CreativeEditor SDK](https://img.ly/products/creative-sdk?utm_source=github&utm_medium=project&utm_campaign=vectorizer), [PhotoEditor SDK](https://img.ly/products/photo-sdk?utm_source=github&utm_medium=project&utm_campaign=vectorizer) & [VideoEditor SDK](https://img.ly/products/video-sdk?utm_source=github&utm_medium=project&utm_campaign=vectorizer).
