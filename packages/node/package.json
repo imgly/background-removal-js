@@ -1,6 +1,6 @@
 {
   "name": "@imgly/background-removal-node",
-  "version": "1.4.4",
+  "version": "1.4.5",
   "description": "Background Removal in NodeJS",
   "resources": "@imgly/background-removal-node",
   "keywords": [
@@ -39,6 +39,7 @@
     "LICENSE.md",
     "README.md",
     "CHANGELOG.md",
+    "ThirdPartyLicenses.json",
     "dist/",
     "bin/"
   ],

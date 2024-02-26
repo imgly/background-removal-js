@@ -1,6 +1,6 @@
 {
   "name": "@imgly/background-removal",
-  "version": "1.4.4",
+  "version": "1.4.5",
   "description": "Background Removal in the Browser",
   "keywords": [
     "background-removal",
@@ -39,6 +39,7 @@
     "LICENSE.md",
     "README.md",
     "CHANGELOG.md",
+    "ThirdPartyLicenses.json",
     "dist/",
     "bin/"
   ],
@@ -57,6 +58,7 @@
     "package:pack": "npm run build && npm pack . --pack-destination ../../releases",
     "lint": "npx prettier --write ."
   },
+  "bundledDependencies": [],
   "dependencies": {
     "@types/lodash": "~4.14.0",
     "@types/node": "~20.3.0",

@@ -1,0 +1,13 @@
+{
+    "onnxruntime-web": {
+        "source": "https://www.npmjs.com/package/onnxruntime-web",
+        "type": "code",
+        "license": "MIT"
+    },
+    "ISNET": {
+        "source": "https://github.com/xuebinqin/DIS",
+        "type": "model",
+        "license": "MIT"
+    }
+
+}

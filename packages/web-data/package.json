@@ -1,6 +1,6 @@
 {
   "name": "@imgly/background-removal-data",
-  "version": "1.4.4",
+  "version": "1.4.5",
   "description": "Background Removal Data",
   "keywords": [
     "background-removal",
@@ -26,6 +26,8 @@
     "LICENSE.md",
     "README.md",
     "CHANGELOG.md",
+    "NOTICE.md",
+    "ThirdPartyLicenses.json",
     "dist/",
     "bin/"
   ],
@@ -34,8 +36,8 @@
     "clean": "npx rimraf dist",
     "test": "true",
     "resources": "node ../../scripts/package-resources.mjs",
-    "changelog:create": "node ../../scripts/changelog/create.mjs",
-    "changelog:generate": "node ../../scripts/changelog/generate.mjs",
+    "changelog:create": "node ../../scripts/changelog/changelog-create.mjs",
+    "changelog:generate": "node ../../scripts/changelog/changelog-generate.mjs",
     "build": "npm run clean && npm run resources",
     "watch": "npm run clean && npm run resources",
     "lint": "npx prettier --write .",
