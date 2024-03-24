@@ -13,7 +13,7 @@ async function initInference(
 ): Promise<{ config: Config; session: unknown }> {
   config = validateConfig(config);
 
-  if (config.debug) console.debug('Loading model...');
+  if (config.debug) console.debug('Loading model...', config.model);
   const model = config.model;
   const blob = await loadAsBlob(`/models/${model}`, config);
   const arrayBuffer = await blob.arrayBuffer();
@@ -37,7 +37,8 @@ async function runInference(
   const predictionsDict = await runOnnxSession(
     session,
     [['input', inputTensor]],
-    ['output']
+    ['output'],
+    config
   );
 
   let alphamask = ndarray(predictionsDict[0].data, [resolution, resolution, 1]);

@@ -13,7 +13,8 @@ export default {
   setup() {
     const images = [
       'https://images.unsplash.com/photo-1686002359940-6a51b0d64f68?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2048&q=80',
-      'https://images.unsplash.com/photo-1590523278191-995cbcda646b?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=1080&fit=max&ixid=eyJhcHBfaWQiOjEyMDd9'
+      'https://images.unsplash.com/photo-1590523278191-995cbcda646b?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=1080&fit=max&ixid=eyJhcHBfaWQiOjEyMDd9',
+      'https://images.unsplash.com/photo-1709248835088-03bb0946d6ab?q=80&w=3387&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
     ];
     const randomImage = images[Math.floor(Math.random() * images.length)];
     const imageUrl = ref(randomImage);
@@ -26,7 +27,8 @@ export default {
     const publicPath = new URL(import.meta.url);
     publicPath.pathname = '/js/';
     const config = {
-      debug: false,
+      // debug: false,
+      debug: true,
       publicPath: publicPath.href,
       progress: (key, current, total) => {
         const [type, subtype] = key.split(':');
@@ -34,6 +36,14 @@ export default {
           0
         )}%`;
       },
+      // device: 'cpu',
+      // model: 'small',
+      // model: 'medium',
+      // model: 'large',
+
+      // model: 'modnet',
+      // model: 'modnet_fp16', //# does not work on webgpu
+      // model: 'modnet_quint8',
       output: {
         quality: 0.8,
         // format: 'image/png'
@@ -141,9 +151,11 @@ export default {
   will-change: filter;
   transition: filter 300ms;
 }
+
 .logo:hover {
   filter: drop-shadow(0 0 2em #646cffaa);
 }
+
 .logo.vue:hover {
   filter: drop-shadow(0 0 2em #42b883aa);
 }

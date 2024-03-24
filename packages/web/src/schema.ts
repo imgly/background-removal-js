@@ -22,6 +22,10 @@ const ConfigSchema = z
       .boolean()
       .default(false)
       .describe('Whether to enable debug logging.'),
+    device: z
+      .enum(['cpu', 'gpu'])
+      .default('cpu')
+      .describe('The device to run the model on.'),
     proxyToWorker: z
       .boolean()
       .default(true)
@@ -36,7 +40,9 @@ const ConfigSchema = z
       .returns(z.void())
       .describe('Progress callback.')
       .optional(),
-    model: z.enum(['small', 'medium']).default('medium'),
+    model: z
+      .enum(['small', 'medium', 'modnet', 'modnet_fp16'])
+      .default('medium'),
     output: z
       .object({
         format: z

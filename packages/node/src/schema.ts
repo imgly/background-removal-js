@@ -45,7 +45,9 @@ const ConfigSchema = z
       .returns(z.void())
       .describe('Progress callback.')
       .optional(),
-    model: z.enum(['small', 'medium', 'large']).default('medium'),
+    model: z
+      .enum(['small', 'medium', 'large', 'modnet', 'modnet_fp16'])
+      .default('medium'),
     output: z
       .object({
         format: z

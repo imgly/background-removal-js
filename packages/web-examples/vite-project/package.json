@@ -1,7 +1,7 @@
 {
   "name": "vite-project",
   "private": true,
-  "version": "1.4.5",
+  "version": "1.5.0",
   "type": "module",
   "scripts": {
     "start": "npm run dev",
