@@ -26,14 +26,11 @@ async function runInference(
   config: Config,
   session: any
 ): Promise<NdArray<Uint8Array>> {
-  if (config.progress) config.progress('compute:inference', 0, 1);
   const resolution = 1024;
   const [srcHeight, srcWidth, srcChannels] = imageTensor.shape;
-
   let tensorImage = tensorResizeBilinear(imageTensor, resolution, resolution);
   const inputTensor = tensorHWCtoBCHW(tensorImage); // this converts also from float to rgba
 
-  // run
   const predictionsDict = await runOnnxSession(
     session,
     [['input', inputTensor]],
@@ -45,6 +42,5 @@ async function runInference(
   let alphamaskU8 = convertFloat32ToUint8(alphamask);
   alphamaskU8 = tensorResizeBilinear(alphamaskU8, srcWidth, srcHeight);
 
-  if (config.progress) config.progress('compute:inference', 1, 1);
   return alphamaskU8;
 }

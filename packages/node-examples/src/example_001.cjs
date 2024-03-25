@@ -27,7 +27,7 @@ async function run() {
       );
     },
     // model: 'small',
-    model: 'medium',
+    model: 'isnet',
     // model: 'large',
     // model: 'modnet',
     // model: 'modnet_fp16',

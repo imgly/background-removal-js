@@ -46,7 +46,18 @@ const ConfigSchema = z
       .describe('Progress callback.')
       .optional(),
     model: z
-      .enum(['small', 'medium', 'large', 'modnet', 'modnet_fp16'])
+      .preprocess((val) => {
+        switch (val) {
+          case 'large':
+            return 'isnet';
+          case 'small':
+            return 'isnet_quint8';
+          case 'medium':
+            return 'isnet_fp16';
+          default:
+            return val;
+        }
+      }, z.enum(['isnet', 'isnet_fp16', 'isnet_quint8', 'modnet', 'modnet_fp16' /*, 'modnet_quint8'*/]))
       .default('medium'),
     output: z
       .object({
@@ -63,19 +74,21 @@ const ConfigSchema = z
       })
       .default({})
   })
-  .default({});
+  .default({})
+  .transform((config) => {
+    if (config.debug) console.log('Config:', config);
+    if (config.debug && !config.progress) {
+      config.progress =
+        config.progress ??
+        ((key, current, total) => {
+          console.debug(`Downloading ${key}: ${current} of ${total}`);
+        });
+    }
+    return config;
+  });
 
 type Config = z.infer<typeof ConfigSchema>;
 
 function validateConfig(configuration?: Config): Config {
-  const config = ConfigSchema.parse(configuration ?? {});
-  if (config.debug) console.log('Config:', config);
-  if (config.debug && !config.progress) {
-    config.progress =
-      config.progress ??
-      ((key, current, total) => {
-        console.debug(`Downloading ${key}: ${current} of ${total}`);
-      });
-  }
-  return config;
+  return ConfigSchema.parse(configuration ?? {});
 }
