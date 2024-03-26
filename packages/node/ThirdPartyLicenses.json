@@ -1,13 +1,17 @@
 {
-    "onnxruntime-web": {
-        "source": "https://www.npmjs.com/package/onnxruntime-web",
-        "type": "code",
-        "license": "MIT"
-    },
-    "ISNET": {
-        "source": "https://github.com/xuebinqin/DIS",
-        "type": "model",
-        "license": "MIT"
-    }
-
+  "onnxruntime-web": {
+    "source": "https://www.npmjs.com/package/onnxruntime-node",
+    "type": "code",
+    "license": "MIT"
+  },
+  "ISNET": {
+    "source": "https://github.com/xuebinqin/DIS",
+    "type": "model",
+    "license": "MIT"
+  },
+  "Modnet": {
+    "source": "https://github.com/ZHKKKe/MODNet",
+    "type": "model",
+    "license": "Apache-2.0"
+  }
 }

@@ -1,12 +1,18 @@
 export { createOnnxSession, runOnnxSession };
 
 import ndarray, { NdArray } from 'ndarray';
-import * as ort from 'onnxruntime-web';
+import type ORT from 'onnxruntime-web';
+
+import * as ort_cpu from 'onnxruntime-web';
+// @ts-ignore
+import * as ort_gpu from 'onnxruntime-web/webgpu';
+
 import { loadAsUrl } from './resource';
 import { simd, threads } from './feature-detect';
 import { Config } from './schema';
 
 async function createOnnxSession(model: any, config: Config) {
+  const ort = config.device === 'gpu' ? ort_gpu : ort_cpu;
   const capabilities = {
     simd: await simd(),
     threads: await threads(),
@@ -14,34 +20,51 @@ async function createOnnxSession(model: any, config: Config) {
     // @ts-ignore
     webgpu: navigator.gpu !== undefined
   };
+
+  const useWebGPU = config.device === 'gpu' && capabilities.webgpu;
+  const useThreads = capabilities.threads;
+  const useSimd = capabilities.simd;
+
+  const executionProviders = [useWebGPU ? 'webgpu' : 'wasm'];
+
   if (config.debug) {
     console.debug('Capabilities:', capabilities);
+    console.debug('Using WebGPU:', useWebGPU);
+    console.debug('Using Threads:', useThreads);
+    console.debug('Using SIMD:', useSimd);
     ort.env.debug = true;
     ort.env.logLevel = 'verbose';
   }
 
   ort.env.wasm.numThreads = capabilities.numThreads;
   ort.env.wasm.simd = capabilities.simd;
-  ort.env.wasm.proxy = config.proxyToWorker;
+  ort.env.wasm.proxy = useWebGPU ? false : config.proxyToWorker;
 
   ort.env.wasm.wasmPaths = {
     'ort-wasm-simd-threaded.wasm':
-      capabilities.simd && capabilities.threads
+      useThreads && useSimd
         ? await loadAsUrl(
-            '/onnxruntime-web/ort-wasm-simd-threaded.wasm',
+            useWebGPU
+              ? '/onnxruntime-web/ort-wasm-simd-threaded.jsep.wasm'
+              : '/onnxruntime-web/ort-wasm-simd-threaded.wasm',
             config
           )
         : undefined,
     'ort-wasm-simd.wasm':
-      capabilities.simd && !capabilities.threads
-        ? await loadAsUrl('/onnxruntime-web/ort-wasm-simd.wasm', config)
+      !useThreads && useSimd
+        ? await loadAsUrl(
+            useWebGPU
+              ? '/onnxruntime-web/ort-wasm-simd.jsep.wasm'
+              : '/onnxruntime-web/ort-wasm-simd.wasm',
+            config
+          )
         : undefined,
     'ort-wasm-threaded.wasm':
-      !capabilities.simd && capabilities.threads
+      !useWebGPU && useThreads && !useSimd
         ? await loadAsUrl('/onnxruntime-web/ort-wasm-threaded.wasm', config)
         : undefined,
     'ort-wasm.wasm':
-      !capabilities.simd && !capabilities.threads
+      !useWebGPU && !useThreads && !useSimd
         ? await loadAsUrl('/onnxruntime-web/ort-wasm.wasm', config)
         : undefined
   };
@@ -50,8 +73,8 @@ async function createOnnxSession(model: any, config: Config) {
     console.debug('ort.env.wasm:', ort.env.wasm);
   }
 
-  const ort_config: ort.InferenceSession.SessionOptions = {
-    executionProviders: ['wasm'],
+  const ort_config: ORT.InferenceSession.SessionOptions = {
+    executionProviders: executionProviders,
     graphOptimizationLevel: 'all',
     executionMode: 'parallel',
     enableCpuMemArena: true
@@ -60,7 +83,7 @@ async function createOnnxSession(model: any, config: Config) {
   const session = await ort.InferenceSession.create(model, ort_config).catch(
     (e: any) => {
       throw new Error(
-        `Failed to create session: ${e}. Please check if the publicPath is set correctly.`
+        `Failed to create session: "${e}". Please check if the publicPath is set correctly.`
       );
     }
   );
@@ -70,8 +93,10 @@ async function createOnnxSession(model: any, config: Config) {
 async function runOnnxSession(
   session: any,
   inputs: [string, NdArray<Float32Array>][],
-  outputs: [string]
+  outputs: [string],
+  config: Config
 ) {
+  const ort = config.device === 'gpu' ? ort_gpu : ort_cpu;
   const feeds: Record<string, any> = {};
   for (const [key, tensor] of inputs) {
     feeds[key] = new ort.Tensor(
@@ -84,7 +109,7 @@ async function runOnnxSession(
   const outputKVPairs: NdArray<Float32Array>[] = [];
 
   for (const key of outputs) {
-    const output: ort.Tensor = outputData[key];
+    const output: ORT.Tensor = outputData[key];
     const shape: number[] = output.dims as number[];
     const data: Float32Array = output.data as Float32Array;
     const tensor = ndarray(data, shape);

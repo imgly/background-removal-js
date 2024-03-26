@@ -38,22 +38,25 @@ async function removeBackground(
 ): Promise<Blob> {
   const { config, session } = await init(configuration);
 
+  if (config.progress) config.progress('compute:decode', 0, 4);
+
   const imageTensor = await utils.imageSourceToImageData(image, config);
   const [width, height, channels] = imageTensor.shape;
-
+  config.progress?.('compute:inference', 1, 4);
   const alphamask = await runInference(imageTensor, config, session);
   const stride = width * height;
-
+  config.progress?.('compute:mask', 2, 4);
   const outImageTensor = imageTensor;
   for (let i = 0; i < stride; i += 1) {
     outImageTensor.data[4 * i + 3] = alphamask.data[i];
   }
-
+  config.progress?.('compute:encode', 3, 4);
   const outImage = await utils.imageEncode(
     outImageTensor,
     config.output.quality,
     config.output.format
   );
+  config.progress?.('compute:encode', 4, 4);
 
   return outImage;
 }

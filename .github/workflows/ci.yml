@@ -10,20 +10,21 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [19.x, 20.x, 21.x]
+        node-version: [21.x]
     steps:
       - uses: actions/checkout@v3
         with:
           lfs: true
-      - name: Install cargo and wasm-pack
-        run: |
-          curl https://sh.rustup.rs -sSf | sh -s -- -y
-          export PATH="$HOME/.cargo/bin:$PATH"
-          cargo install wasm-pack clippy
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
       - run: npm ci
+      - run: npm run lint:check --if-present
       - run: npm run build --if-present
-      - run: npm test
+      - run: npm run test --if-present
+      - run: npm run package:pack --if-present
+      # - uses: actions/upload-artifact@v4
+      #   with:
+      #     name: my-artifact
+      #     path: releases/

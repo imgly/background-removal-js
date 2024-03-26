@@ -6,4 +6,4 @@ type: Added
 # type: Security
 # private: true
 description: |
-  Added ThirdPartyLicenses.json
+  Added isnet model for webgpu
