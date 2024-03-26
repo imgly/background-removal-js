@@ -10,7 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - Added Modnet models Added
 
-- Added option to execute on gpu (webgpu) and cpu  Added
+- Added option to execute on gpu (webgpu) and cpu Added
 
 - Added isnet model for webgpu Added
 
