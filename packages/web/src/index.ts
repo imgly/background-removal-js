@@ -9,6 +9,7 @@ export {
 export type { Config, ImageSource };
 
 import lodash from 'lodash';
+
 import ndarray from 'ndarray';
 import { initInference, runInference } from './inference';
 import { preload as preloadResources } from './resource';

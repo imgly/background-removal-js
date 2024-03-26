@@ -2,6 +2,8 @@ export { Config, ConfigSchema, validateConfig };
 
 import { z } from 'zod';
 
+import * as feature from './features';
+
 import pkg from '../package.json';
 
 const ConfigSchema = z
@@ -95,23 +97,33 @@ const ConfigSchema = z
           );
       }
     }
+
+    // always switch to gpu
+
     if (config.device == 'gpu') {
-      switch (config.model) {
-        case 'isnet':
-          break;
-        case 'isnet_fp16':
-        case 'isnet_quint8':
-          if (config.debug) console.debug('Switching to f32 model for GPU');
-          config.model = 'isnet';
-          break;
-        case 'modnet':
-          break;
-        case 'modnet_fp16':
-          if (config.debug) console.debug('Switching to f32 model for GPU');
-          config.model = 'modnet';
-          break;
+      if (!feature.webgpu()) {
+        if (config.debug)
+          console.debug('Switching to CPU for GPU not supported.');
+        config.device = 'cpu';
+      } else {
+        switch (config.model) {
+          case 'isnet':
+            break;
+          case 'isnet_fp16':
+          case 'isnet_quint8':
+            if (config.debug) console.debug('Switching to f32 model for GPU');
+            config.model = 'isnet';
+            break;
+          case 'modnet':
+            break;
+          case 'modnet_fp16':
+            if (config.debug) console.debug('Switching to f32 model for GPU');
+            config.model = 'modnet';
+            break;
+        }
       }
     }
+
     return config;
   });
 
