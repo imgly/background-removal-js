@@ -41,9 +41,9 @@
     "build": "npm run clean && npm run resources",
     "watch": "npm run clean && npm run resources",
     "lint": "npx prettier --write .",
-    "publish:latest": "npm run build && npm publish --tag latest --access public",
-    "publish:next": "npm run build && npm publish --tag next --access public",
-    "package:pack": "npm run build && npm pack . --pack-destination ../../releases"
+    "publish:latest": "npm publish --tag latest --access public",
+    "publish:next": "npm publish --tag next --access public",
+    "package:pack": "npm pack . --pack-destination ../../releases"
   },
   "dependencies": {
     "onnxruntime-web": "~1.17.0"
