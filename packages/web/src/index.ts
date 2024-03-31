@@ -8,7 +8,7 @@ export {
 };
 export type { Config, ImageSource };
 
-import lodash from 'lodash';
+import { memoize } from 'lodash-es';
 import ndarray from 'ndarray';
 import { initInference, runInference } from './inference';
 import { preload as preloadResources } from './resource';
@@ -16,7 +16,6 @@ import { Config, validateConfig } from './schema';
 import * as utils from './utils';
 import { ImageSource } from './utils';
 
-const { memoize } = lodash;
 const init = memoize(initInference, (config) => JSON.stringify(config));
 
 async function preload(configuration?: Config): Promise<void> {

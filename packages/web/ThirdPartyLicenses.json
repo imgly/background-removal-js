@@ -9,7 +9,7 @@
         "type": "model",
         "license": "MIT"
     },
-    "lodash": {
+    "lodash-es": {
         "source": "https://lodash.com/",
         "type": "code",
         "license": "MIT"
