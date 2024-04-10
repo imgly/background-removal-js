@@ -1,5 +1,9 @@
 # Background Removal in the Browser & Node.js
 
+### 🚨 We are Hiring 🚨
+
+We are currently hiring a (remote) Solutions Engineer / Advocate for Web (f/m/d). If you are working with our background removal library you might be a perfect fit! Apply at https://imgly.jobs.personio.com/job/1435044?language=en&display=en
+
 <p align="center">
 <img src="https://storage.googleapis.com/imgly-static-assets/static/blog/github-releases/background-removal-free-plugin-app.jpg" alt="background removal js showcase" />
 
