@@ -52,6 +52,7 @@ const ConfigSchema = z
           .enum([
             'image/png',
             'image/jpeg',
+            'image/jpg',
             'image/webp',
             'image/x-rgba8',
             'image/x-alpha8'

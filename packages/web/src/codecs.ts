@@ -27,6 +27,7 @@ async function imageDecode(blob: Blob): Promise<NdArray<Uint8Array>> {
     case 'application/octet-stream': // this is an unknwon type
     case `image/png`:
     case `image/jpeg`:
+    case `image/jpg`:
     case `image/webp`: {
       const imageBitmap = await createImageBitmap(blob);
       const imageData = imageBitmapToImageData(imageBitmap);
@@ -61,6 +62,7 @@ async function imageEncode(
     }
     case `image/png`:
     case `image/jpeg`:
+    case `image/jpg`:
     case `image/webp`: {
       const imageData = new ImageData(
         new Uint8ClampedArray(imageTensor.data),
