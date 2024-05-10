@@ -26,9 +26,9 @@ async function syncToS3() {
     }
 
     const packageNames = {
-      'packages/node': '@imgly/background-removal-node',
-      'packages/web': '@imgly/background-removal',
-      'packages/web-data': '@imgly/background-removal-data'
+      'packages/node': 'imgly/background-removal-node',
+      'packages/web': 'imgly/background-removal',
+      'packages/web-data': 'imgly/background-removal-data'
     };
 
     await Promise.allSettled(

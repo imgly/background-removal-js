@@ -13,7 +13,7 @@ const ConfigSchema = z
       .optional()
       .describe('The public path to the wasm files and the onnx model.')
       .default(
-        'https://staticimgly.com/@imgly/background-removal-data/${PACKAGE_VERSION}/dist/'
+        'https://staticimgly.com/imgly/background-removal-data/${PACKAGE_VERSION}/dist/'
       )
       .transform((val) => {
         return val
