@@ -49,7 +49,7 @@ export default {
       },
       // rescale: false,
       rescale: true,
-      // device: 'gpu',
+      device: 'gpu',
       // device: 'cpu',
       model: 'isnet',
       // model: 'isnet_fp16',
@@ -116,6 +116,10 @@ export default {
     };
 
     const load = async () => {
+      const randomImage = image
+      ? image
+      : images[Math.floor(Math.random() * images.length)];
+
       isRunning.value = true;
       resetTimer();
 

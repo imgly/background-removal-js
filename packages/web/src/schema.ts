@@ -30,7 +30,7 @@ const ConfigSchema = z
       .describe('Whether to rescale the image.'),
     device: z
       .enum(['cpu', 'gpu'])
-      .default('gpu')
+      .default('cpu')
       .describe('The device to run the model on.'),
     proxyToWorker: z
       .boolean()
