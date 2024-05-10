@@ -58,6 +58,7 @@ The library does not need any configuration to get started. However, there are o
 type Config = {
   publicPath: string; // The public path used for model and wasm files. Default: 'https://staticimgly.com/${PACKAGE_NAME}-data/${PACKAGE_VERSION}/dist/'
   debug: bool; // enable or disable useful console.log outputs
+  device: 'cpu' | 'gpu'; // choose the execution device. gpu will use webgpu if available
   proxyToWorker: bool; // Whether to proxy the calculations to a web worker. (Default true)
   model: 'small' | 'medium'; // The model to use. (Default "medium")
   output: {

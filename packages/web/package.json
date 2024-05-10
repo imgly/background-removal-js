@@ -1,6 +1,6 @@
 {
   "name": "@imgly/background-removal",
-  "version": "1.4.5",
+  "version": "1.5.0",
   "description": "Background Removal in the Browser",
   "keywords": [
     "background-removal",
@@ -53,20 +53,22 @@
     "build": "npm run clean && npm run types && npm run resources && npm run changelog:generate && node scripts/build.mjs",
     "types": " npx tsc --declaration --emitDeclarationOnly --declarationDir dist --declarationMap",
     "watch": "npm run clean && npm run resources && npm run changelog:generate && node scripts/watch.mjs",
-    "publish:latest": "npm run build && npm publish --tag latest --access public",
-    "publish:next": "npm run build && npm publish --tag next --access public",
-    "package:pack": "npm run build && npm pack . --pack-destination ../../releases",
+    "publish:latest": "npm publish --tag latest --access public",
+    "publish:next": "npm publish --tag next --access public",
+    "package:pack": "npm pack . --pack-destination ../../releases",
     "lint": "npx prettier --write ."
   },
-  "bundledDependencies": [],
+  "engines": {
+    "node": "=20.0.0"
+  },
   "dependencies": {
-    "@types/lodash": "~4.14.0",
-    "@types/node": "~20.3.0",
+    "@types/lodash-es": "^4.17.12",
     "@types/ndarray": "~1.0.14",
-    "lodash": "~4.17.0",
+    "@types/node": "~20.3.0",
+    "lodash-es": "^4.17.21",
     "ndarray": "~1.0.0",
     "onnxruntime-web": "~1.17.0",
-    "zod": "~3.21.0"
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "assert": "~2.0.0",
@@ -80,5 +82,6 @@
     "util": "~0.12.0",
     "webpack": "~5.85.0",
     "webpack-cli": "~5.1.0"
-  }
+  },
+  "bundleDependencies": []
 }

@@ -29,6 +29,7 @@ async function imageDecode(blob: Blob): Promise<NdArray<Uint8Array>> {
     case 'application/octet-stream':
     case `image/png`:
     case `image/jpeg`:
+    case `image/jpg`:
     case `image/webp`: {
       const decoded = sharp(buffer);
       let { width, height, channels } = await decoded.metadata();

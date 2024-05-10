@@ -4,13 +4,12 @@ export {
   tensorResizeBilinear,
   tensorHWCtoBCHW,
   imageBitmapToImageData,
-  calculateProportionalSize,
   imageSourceToImageData,
-  ImageSource,
+  type ImageSource,
   createCanvas
 };
 
-import ndarray, { NdArray } from 'ndarray';
+import ndarray, { NdArray, TypedArray } from 'ndarray';
 import { imageDecode, imageEncode } from './codecs';
 import { ensureAbsoluteURI } from './url';
 import { Config } from './schema';
@@ -31,19 +30,44 @@ function imageBitmapToImageData(imageBitmap: ImageBitmap): ImageData {
   return ctx.getImageData(0, 0, canvas.width, canvas.height);
 }
 
-function tensorResizeBilinear(
-  imageTensor: NdArray<Uint8Array>,
+function createTypeArray<T extends TypedArray>(length: number) {
+  if (typeof Uint8Array !== 'undefined') {
+    return new Uint8Array(length) as T;
+  } else if (typeof Uint8ClampedArray !== 'undefined') {
+    return new Uint8ClampedArray(length) as T;
+  } else if (typeof Uint16Array !== 'undefined') {
+    return new Uint16Array(length) as T;
+  } else if (typeof Uint32Array !== 'undefined') {
+    return new Uint32Array(length) as T;
+  } else if (typeof Float32Array !== 'undefined') {
+    return new Float32Array(length) as T;
+  } else if (typeof Float64Array !== 'undefined') {
+    return new Float64Array(length) as T;
+  } else {
+    throw new Error('TypedArray not supported');
+  }
+}
+function tensorResizeBilinear<T extends TypedArray>(
+  imageTensor: NdArray<T>,
   newWidth: number,
-  newHeight: number
-): NdArray<Uint8Array> {
+  newHeight: number,
+  proportional: boolean = false
+): NdArray<T> {
   const [srcHeight, srcWidth, srcChannels] = imageTensor.shape;
-  // Calculate the scaling factors
-  const scaleX = srcWidth / newWidth;
-  const scaleY = srcHeight / newHeight;
+
+  let scaleX = srcWidth / newWidth;
+  let scaleY = srcHeight / newHeight;
+
+  if (proportional) {
+    const downscaling = Math.max(scaleX, scaleY) > 1.0;
+    scaleX = scaleY = downscaling
+      ? Math.max(scaleX, scaleY)
+      : Math.min(scaleX, scaleY);
+  }
 
   // Create a new NdArray to store the resized image
   const resizedImageData = ndarray(
-    new Uint8Array(srcChannels * newWidth * newHeight),
+    createTypeArray<T>(srcChannels * newWidth * newHeight),
     [newHeight, newWidth, srcChannels]
   );
   // Perform interpolation to fill the resized NdArray
@@ -71,8 +95,8 @@ function tensorResizeBilinear(
           dx * (1 - dy) * p2 +
           (1 - dx) * dy * p3 +
           dx * dy * p4;
-
-        resizedImageData.set(y, x, c, Math.round(interpolatedValue));
+        // console.log(interpolatedValue);
+        resizedImageData.set(y, x, c, interpolatedValue);
       }
     }
   }
@@ -99,20 +123,6 @@ function tensorHWCtoBCHW(
   }
 
   return ndarray(float32Data, [1, 3, srcHeight, srcWidth]);
-}
-
-function calculateProportionalSize(
-  originalWidth: number,
-  originalHeight: number,
-  maxWidth: number,
-  maxHeight: number
-): [number, number] {
-  const widthRatio = maxWidth / originalWidth;
-  const heightRatio = maxHeight / originalHeight;
-  const scalingFactor = Math.min(widthRatio, heightRatio);
-  const newWidth = Math.floor(originalWidth * scalingFactor);
-  const newHeight = Math.floor(originalHeight * scalingFactor);
-  return [newWidth, newHeight];
 }
 
 async function imageSourceToImageData(

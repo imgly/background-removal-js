@@ -6,7 +6,8 @@
     "start": "node src/example_001.cjs"
   },
   "dependencies": {
-    "@imgly/background-removal-node": "file:../node"
+    "@imgly/background-removal-node": "file:../node",
+    "uuidv4": "^6.2.13"
   },
-  "version": "1.4.5"
+  "version": "1.5.0"
 }

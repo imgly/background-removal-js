@@ -6,4 +6,4 @@ type: Added
 # type: Security
 # private: true
 description: |
-  Added ThirdPartyLicenses.json
+  Added option to execute on gpu (webgpu) and cpu. Enable by setting `device: "gpu"`

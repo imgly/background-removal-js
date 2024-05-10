@@ -1,32 +1,12 @@
 # Todos
 
-- [ ] Create release script
+## Todo 2.0
 
-  - [ ] Update Version number
-  - [ ] Move changelog to this version folder
-  - [ ] Publish on npm
-  - [ ] Publish to cdn
-    - [ ] Replace aws cli was aws sdk
-
-- [ ] Provide typescript bindings
-- [x] Provide access to filesystem for nodejs version
-- [ ] Update build script to external dependencies from `package.json`
-- [ ] use logger callback instead of `console.log`
-  ```
-    logger: (level, message: string, args...) => void
-  ```
+- [ ] use logger/telemetry callback instead of custom debug output
 - [ ] use resolver callback instead of publicPath as such we can allow various
   ```
       resolve: (path: string) => Response
   ```
-- [ ] use decode callback to allow different types of image decoders
-  ```
-      decode: (buffer: Uint8Array, mimetype: string) => Uint8Array
-  ```
-- [ ] use encode callback to allow differnt types of image encoders
-
-  ```
-      encode: (buffer: Uint8Array, mimetype: string) => Uint8Array
-  ```
-
-- [ ] use zod to check each api endpoint and not just the config. This will allow checking the input and the output
+- [ ] default to `gpu`
+- [ ] remove image encode and decode
+- [ ] removebg should get `ImageData` and return raw `ImageData`
