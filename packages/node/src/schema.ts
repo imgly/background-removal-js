@@ -49,8 +49,6 @@ const ConfigSchema = z
       .preprocess(
         (val) => {
           switch (val) {
-            case 'large':
-              return 'isnet';
             case 'small':
               return 'isnet_quint8';
             case 'medium':
@@ -59,7 +57,7 @@ const ConfigSchema = z
               return val;
           }
         },
-        z.enum(['isnet', 'isnet_fp16', 'isnet_quint8'])
+        z.enum(['isnet_fp16', 'isnet_quint8'])
       )
       .default('medium'),
     output: z

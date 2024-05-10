@@ -27,7 +27,7 @@ async function run() {
       );
     },
     // model: 'small',
-    model: 'isnet',
+    // model: 'isnet_fp16',
     output: {
       quality: 0.8,
       format: 'image/webp' //image/jpeg, image/webp
