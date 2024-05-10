@@ -117,8 +117,8 @@ export default {
 
     const load = async () => {
       const randomImage = image
-      ? image
-      : images[Math.floor(Math.random() * images.length)];
+        ? image
+        : images[Math.floor(Math.random() * images.length)];
 
       isRunning.value = true;
       resetTimer();
