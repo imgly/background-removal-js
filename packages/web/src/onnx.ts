@@ -4,7 +4,6 @@ import ndarray, { NdArray } from 'ndarray';
 import type ORT from 'onnxruntime-web';
 
 import * as ort_cpu from 'onnxruntime-web';
-
 import * as ort_gpu from 'onnxruntime-web/webgpu';
 
 import { loadAsUrl } from './resource';
@@ -13,7 +12,7 @@ import { Config } from './schema';
 
 async function createOnnxSession(model: any, config: Config) {
   const useWebGPU = config.device === 'gpu';
-  const useThreads = feat.threads();
+  const useThreads = await feat.threads();
   const useSimd = feat.simd();
   const proxyToWorker = config.proxyToWorker;
   const executionProviders = [useWebGPU ? 'webgpu' : 'wasm'];
@@ -93,7 +92,6 @@ async function runOnnxSession(
   }
   const outputData = await session.run(feeds, {});
   const outputKVPairs: NdArray<Float32Array>[] = [];
-
   for (const key of outputs) {
     const output: ORT.Tensor = outputData[key];
     const shape: number[] = output.dims as number[];

@@ -28,10 +28,6 @@ async function run() {
     },
     // model: 'small',
     model: 'isnet',
-    // model: 'large',
-    // model: 'modnet',
-    // model: 'modnet_fp16',
-    // model: 'modnet_quint8',
     output: {
       quality: 0.8,
       format: 'image/webp' //image/jpeg, image/webp

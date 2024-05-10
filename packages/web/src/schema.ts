@@ -24,9 +24,13 @@ const ConfigSchema = z
       .boolean()
       .default(false)
       .describe('Whether to enable debug logging.'),
+    rescale: z
+      .boolean()
+      .default(true)
+      .describe('Whether to rescale the image.'),
     device: z
       .enum(['cpu', 'gpu'])
-      .default('cpu')
+      .default('gpu')
       .describe('The device to run the model on.'),
     proxyToWorker: z
       .boolean()
@@ -56,13 +60,7 @@ const ConfigSchema = z
               return val;
           }
         },
-        z.enum([
-          'isnet',
-          'isnet_fp16',
-          'isnet_quint8',
-          'modnet',
-          'modnet_fp16' /*, 'modnet_quint8'*/
-        ])
+        z.enum(['isnet', 'isnet_fp16', 'isnet_quint8'])
       )
       .default('medium'),
     output: z
@@ -113,12 +111,6 @@ const ConfigSchema = z
           case 'isnet_quint8':
             if (config.debug) console.debug('Switching to f32 model for GPU');
             config.model = 'isnet';
-            break;
-          case 'modnet':
-            break;
-          case 'modnet_fp16':
-            if (config.debug) console.debug('Switching to f32 model for GPU');
-            config.model = 'modnet';
             break;
         }
       }

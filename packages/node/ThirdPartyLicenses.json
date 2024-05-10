@@ -8,10 +8,5 @@
     "source": "https://github.com/xuebinqin/DIS",
     "type": "model",
     "license": "MIT"
-  },
-  "Modnet": {
-    "source": "https://github.com/ZHKKKe/MODNet",
-    "type": "model",
-    "license": "Apache-2.0"
   }
 }

@@ -59,13 +59,7 @@ const ConfigSchema = z
               return val;
           }
         },
-        z.enum([
-          'isnet',
-          'isnet_fp16',
-          'isnet_quint8',
-          'modnet',
-          'modnet_fp16' /*, 'modnet_quint8'*/
-        ])
+        z.enum(['isnet', 'isnet_fp16', 'isnet_quint8'])
       )
       .default('medium'),
     output: z

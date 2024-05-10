@@ -3,6 +3,7 @@ export {
   preload,
   removeBackground,
   removeForeground,
+  alphamask,
   segmentForeground,
   applySegmentationMask
 };
@@ -10,10 +11,9 @@ export type { Config, ImageSource };
 
 import lodash from 'lodash';
 
-import ndarray from 'ndarray';
 import { initInference, runInference } from './inference';
 import { preload as preloadResources } from './resource';
-import { Config, validateConfig } from './schema';
+import { Config, ConfigSchema, validateConfig } from './schema';
 import * as utils from './utils';
 import { ImageSource } from './utils';
 
@@ -41,13 +41,19 @@ async function removeBackground(
 
   if (config.progress) config.progress('compute:decode', 0, 4);
 
-  const imageTensor = await utils.imageSourceToImageData(image, config);
-  const [width, height, channels] = imageTensor.shape;
+  const inputImageTensor = await utils.imageSourceToImageData(image, config);
+
   config.progress?.('compute:inference', 1, 4);
-  const alphamask = await runInference(imageTensor, config, session);
-  const stride = width * height;
+  const [alphamask, imageTensor] = await runInference(
+    inputImageTensor,
+    config,
+    session
+  );
+
   config.progress?.('compute:mask', 2, 4);
   const outImageTensor = imageTensor;
+  const [width, height] = outImageTensor.shape;
+  const stride = width * height;
   for (let i = 0; i < stride; i += 1) {
     outImageTensor.data[4 * i + 3] = alphamask.data[i];
   }
@@ -76,11 +82,15 @@ async function removeForeground(
   const { config, session } = await init(configuration);
 
   const imageTensor = await utils.imageSourceToImageData(image, config);
-  const [width, height, channels] = imageTensor.shape;
+  const [alphamask, imageInput] = await runInference(
+    imageTensor,
+    config,
+    session
+  );
 
-  const alphamask = await runInference(imageTensor, config, session);
+  const outImageTensor = imageInput;
+  const [width, height, channels] = outImageTensor.shape;
   const stride = width * height;
-  const outImageTensor = imageTensor;
   for (let i = 0; i < stride; i += 1) {
     outImageTensor.data[4 * i + 3] = 255 - alphamask.data[i];
   }
@@ -101,6 +111,8 @@ async function removeForeground(
  * @param configuration - The optional configuration for the segmentation.
  * @returns A Promise that resolves to the segmented foreground as a Blob.
  */
+
+const alphamask = segmentForeground;
 async function segmentForeground(
   image: ImageSource,
   configuration?: Config
@@ -108,41 +120,33 @@ async function segmentForeground(
   const { config, session } = await init(configuration);
 
   const imageTensor = await utils.imageSourceToImageData(image, config);
-  const [height, width, channels] = imageTensor.shape;
+  let [height, width, channels] = imageTensor.shape;
 
-  const alphamask = await runInference(imageTensor, config, session);
+  const [alphamask, imageInput] = await runInference(
+    imageTensor,
+    config,
+    session
+  );
 
-  switch (config.output.format) {
-    case 'image/x-alpha8': {
-      const outImage = await utils.imageEncode(
-        alphamask,
-        config.output.quality,
-        config.output.format
-      );
-      return outImage;
-    }
-    default: {
-      const stride = width * height;
-      const outImageTensor = ndarray(new Uint8Array(channels * stride), [
-        height,
-        width,
-        channels
-      ]);
-      for (let i = 0; i < stride; i += 1) {
-        const index = 4 * i + 3;
-        outImageTensor.data[index] = alphamask.data[i]; //Red
-        outImageTensor.data[index + 1] = alphamask.data[i]; //Green
-        outImageTensor.data[index + 2] = alphamask.data[i]; // Blue
-        outImageTensor.data[index + 3] = 255;
-      }
-      const outImage = await utils.imageEncode(
-        outImageTensor,
-        config.output.quality,
-        config.output.format
-      );
-      return outImage;
-    }
+  const stride = width * height;
+  const outImageTensor = imageTensor;
+  for (let i = 0; i < stride; i += 1) {
+    const index = 4 * i;
+
+    let alpha = alphamask.data[i];
+
+    outImageTensor.data[index] = 255;
+    outImageTensor.data[index + 1] = 255;
+    outImageTensor.data[index + 2] = 255;
+    outImageTensor.data[index + 3] = alpha;
   }
+
+  const outImage = await utils.imageEncode(
+    outImageTensor,
+    config.output.quality,
+    config.output.format
+  );
+  return outImage;
 }
 
 async function applySegmentationMask(
