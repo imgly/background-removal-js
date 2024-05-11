@@ -62,10 +62,10 @@
     "node": "=20.0.0"
   },
   "dependencies": {
-    "@types/lodash-es": "^4.17.12",
+    "@types/lodash.memoize": "~4.1.9",
     "@types/ndarray": "~1.0.14",
     "@types/node": "~20.3.0",
-    "lodash-es": "^4.17.21",
+    "lodash.memoize": "~4.1.2",
     "ndarray": "~1.0.0",
     "onnxruntime-web": "~1.17.0",
     "zod": "^3.23.8"

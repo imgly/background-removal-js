@@ -59,10 +59,10 @@
     "package:pack": "npm pack . --pack-destination ../../releases"
   },
   "dependencies": {
-    "@types/lodash": "~4.14.195",
+    "@types/lodash.memoize": "~4.1.9",
     "@types/ndarray": "~1.0.14",
     "@types/node": "~20.3.1",
-    "lodash": "~4.17.21",
+    "lodash.memoize": "~4.1.2",
     "ndarray": "~1.0.19",
     "onnxruntime-node": "~1.17.0",
     "sharp": "~0.32.4",

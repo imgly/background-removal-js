@@ -7,14 +7,13 @@ export {
 };
 export type { Config, ImageSource };
 
-import lodash from 'lodash';
+import memoize from 'lodash.memoize';
 import ndarray from 'ndarray';
 import { initInference, runInference } from './inference';
 import { Config, validateConfig } from './schema';
 import * as utils from './utils';
 import { ImageSource } from './utils';
 
-const { memoize } = lodash;
 const init = memoize(initInference, (config) => JSON.stringify(config));
 
 /**
