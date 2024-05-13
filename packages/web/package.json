@@ -1,6 +1,6 @@
 {
   "name": "@imgly/background-removal",
-  "version": "1.5.0",
+  "version": "1.5.1",
   "description": "Background Removal in the Browser",
   "keywords": [
     "background-removal",
@@ -57,9 +57,6 @@
     "publish:next": "npm publish --tag next --access public",
     "package:pack": "npm pack . --pack-destination ../../releases",
     "lint": "npx prettier --write ."
-  },
-  "engines": {
-    "node": "=20.0.0"
   },
   "dependencies": {
     "@types/lodash-es": "^4.17.12",
