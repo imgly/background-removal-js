@@ -8,7 +8,7 @@ async function preload(config: Config): Promise<void> {
   const resourceResponse = await fetch(resourceUrl);
   if (!resourceResponse.ok) {
     throw new Error(
-      `Resource metadata not found. Ensure that the config.publicPath is configured correctl: ${config.publicPath}`
+      `Resource metadata not found. Ensure that the config.publicPath is configured correctly: ${config.publicPath}`
     );
   }
   const resourceMap = await resourceResponse.json();
