@@ -46,6 +46,6 @@
     "package:pack": "npm pack . --pack-destination ../../releases"
   },
   "dependencies": {
-    "onnxruntime-web": "~1.17.0"
+    "onnxruntime-web": "~1.18.0"
   }
 }

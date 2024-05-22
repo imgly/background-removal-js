@@ -64,7 +64,7 @@
     "@types/node": "~20.3.0",
     "lodash-es": "^4.17.21",
     "ndarray": "~1.0.0",
-    "onnxruntime-web": "~1.17.0",
+    "onnxruntime-web": "~1.18.0",
     "zod": "^3.23.8"
   },
   "devDependencies": {

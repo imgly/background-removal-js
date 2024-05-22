@@ -39,7 +39,6 @@ export default {
     publicPath.pathname = '/js/';
     const config = {
       debug: false,
-      // debug: true,
       publicPath: publicPath.href,
       progress: (key, current, total) => {
         const [type, subtype] = key.split(':');
@@ -51,7 +50,7 @@ export default {
       rescale: true,
       device: 'gpu',
       // device: 'cpu',
-      model: 'isnet',
+      // model: 'isnet',
       // model: 'isnet_fp16',
       // model: 'isnet_quint8',
       output: {

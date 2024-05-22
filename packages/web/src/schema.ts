@@ -103,19 +103,8 @@ const ConfigSchema = z
         if (config.debug)
           console.debug('Switching to CPU for GPU not supported.');
         config.device = 'cpu';
-      } else {
-        switch (config.model) {
-          case 'isnet':
-            break;
-          case 'isnet_fp16':
-          case 'isnet_quint8':
-            if (config.debug) console.debug('Switching to f32 model for GPU');
-            config.model = 'isnet';
-            break;
-        }
       }
     }
-
     return config;
   });
 
