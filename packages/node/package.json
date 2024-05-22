@@ -1,6 +1,6 @@
 {
   "name": "@imgly/background-removal-node",
-  "version": "1.5.1",
+  "version": "1.5.2",
   "description": "Background Removal in NodeJS",
   "resources": "@imgly/background-removal-node",
   "keywords": [
