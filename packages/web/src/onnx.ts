@@ -12,18 +12,18 @@ import { Config } from './schema';
 
 async function createOnnxSession(model: any, config: Config) {
   const useWebGPU = config.device === 'gpu';
-  
+
   const useSimd = config.useSimd;
-  const numThreads = config.numThreads
-  const useThreads = await feat.threads() && (numThreads != 1); // numThreads 0 is auto
+  const numThreads = config.numThreads;
+  const useThreads = (await feat.threads()) && numThreads != 1; // numThreads 0 is auto
   const proxyToWorker = config.proxyToWorker;
   const executionProviders = [useWebGPU ? 'webgpu' : 'wasm'];
   const ort = useWebGPU ? ort_gpu : ort_cpu;
 
-  console.log("useThreads", useThreads)
-  console.log("numThreads", numThreads)
-  console.log("simd", useSimd)
-  console.log("device", config.device)
+  console.log('useThreads', useThreads);
+  console.log('numThreads', numThreads);
+  console.log('simd', useSimd);
+  console.log('device', config.device);
   console.log('Proxy to Worker:', proxyToWorker);
 
   if (config.debug) {

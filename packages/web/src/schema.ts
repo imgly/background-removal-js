@@ -26,12 +26,11 @@ const ConfigSchema = z
       .boolean()
       .default(false)
       .describe('Whether to enable debug logging.'),
-    numThreads: z.number()
+    numThreads: z
+      .number()
       .default(feat.maxNumThreads())
       .describe('The number of threads to use.'),
-    useSimd: z.boolean()
-      .default(feat.simd())
-      .describe('Whether to use SIMD.'),
+    useSimd: z.boolean().default(feat.simd()).describe('Whether to use SIMD.'),
     rescale: z
       .boolean()
       .default(true)

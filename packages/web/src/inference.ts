@@ -43,9 +43,9 @@ async function runInference(
 
   const inputTensor = tensorHWCtoBCHW(resizedImageTensor); // this converts also from float to rgba
 
-  let predictionsDict
+  let predictionsDict;
   for (let i = 0; i < 10; i++) {
-     predictionsDict = await runOnnxSession(
+    predictionsDict = await runOnnxSession(
       session.base,
       [['input', inputTensor]],
       ['output'],
