@@ -6,6 +6,8 @@ import * as feature from './features';
 
 import pkg from '../package.json';
 
+import * as feat from './features';
+
 const ConfigSchema = z
   .object({
     publicPath: z
@@ -24,6 +26,12 @@ const ConfigSchema = z
       .boolean()
       .default(false)
       .describe('Whether to enable debug logging.'),
+    numThreads: z.number()
+      .default(feat.maxNumThreads())
+      .describe('The number of threads to use.'),
+    useSimd: z.boolean()
+      .default(feat.simd())
+      .describe('Whether to use SIMD.'),
     rescale: z
       .boolean()
       .default(true)
@@ -62,7 +70,7 @@ const ConfigSchema = z
         },
         z.enum(['isnet', 'isnet_fp16', 'isnet_quint8'])
       )
-      .default('medium'),
+      .default('isnet_fp16'),
     output: z
       .object({
         format: z

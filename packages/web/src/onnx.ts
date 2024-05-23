@@ -12,11 +12,19 @@ import { Config } from './schema';
 
 async function createOnnxSession(model: any, config: Config) {
   const useWebGPU = config.device === 'gpu';
-  const useThreads = await feat.threads();
-  const useSimd = feat.simd();
+  
+  const useSimd = config.useSimd;
+  const numThreads = config.numThreads
+  const useThreads = await feat.threads() && (numThreads != 1); // numThreads 0 is auto
   const proxyToWorker = config.proxyToWorker;
   const executionProviders = [useWebGPU ? 'webgpu' : 'wasm'];
   const ort = useWebGPU ? ort_gpu : ort_cpu;
+
+  console.log("useThreads", useThreads)
+  console.log("numThreads", numThreads)
+  console.log("simd", useSimd)
+  console.log("device", config.device)
+  console.log('Proxy to Worker:', proxyToWorker);
 
   if (config.debug) {
     console.debug('\tUsing Threads:', useThreads);
@@ -28,8 +36,8 @@ async function createOnnxSession(model: any, config: Config) {
     ort.env.logLevel = 'verbose';
   }
 
-  ort.env.wasm.numThreads = feat.maxNumThreads();
-  ort.env.wasm.simd = feat.simd();
+  ort.env.wasm.numThreads = numThreads;
+  ort.env.wasm.simd = useSimd;
   ort.env.wasm.proxy = proxyToWorker;
 
   const wasmPaths = {
@@ -62,7 +70,7 @@ async function createOnnxSession(model: any, config: Config) {
     executionMode: 'parallel',
     enableCpuMemArena: true
   };
-
+  console.time('createOnnxSession');
   const session = await ort.InferenceSession.create(model, ort_config).catch(
     (e: any) => {
       throw new Error(
@@ -70,6 +78,7 @@ async function createOnnxSession(model: any, config: Config) {
       );
     }
   );
+  console.timeEnd('createOnnxSession');
   return session;
 }
 
@@ -90,7 +99,9 @@ async function runOnnxSession(
       tensor.shape
     );
   }
+  console.time('runOnnxSession');
   const outputData = await session.run(feeds, {});
+  console.timeEnd('runOnnxSession');
   const outputKVPairs: NdArray<Float32Array>[] = [];
   for (const key of outputs) {
     const output: ORT.Tensor = outputData[key];

@@ -43,12 +43,15 @@ async function runInference(
 
   const inputTensor = tensorHWCtoBCHW(resizedImageTensor); // this converts also from float to rgba
 
-  let predictionsDict = await runOnnxSession(
-    session.base,
-    [['input', inputTensor]],
-    ['output'],
-    config
-  );
+  let predictionsDict
+  for (let i = 0; i < 10; i++) {
+     predictionsDict = await runOnnxSession(
+      session.base,
+      [['input', inputTensor]],
+      ['output'],
+      config
+    );
+  }
 
   let alphamask = ndarray(predictionsDict[0].data, [resolution, resolution, 1]);
 
