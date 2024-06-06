@@ -114,7 +114,7 @@ export default {
       isRunning.value = false;
     };
 
-    const load = async () => {
+    const load = async (type) => {
       const randomImage = image
         ? image
         : images[Math.floor(Math.random() * images.length)];
@@ -123,15 +123,22 @@ export default {
       resetTimer();
 
       imageUrl.value = randomImage;
-      const imageBlob = await removeBackground(randomImage, config);
+      let imageBlob;
+      if (type === 'remove') {
+        imageBlob = await removeBackground(randomImage, config);
+      } else {
+        const maskBlob = await segmentForeground(randomImage, config);
+        console.log(maskBlob);
+        imageBlob = await applySegmentationMask(randomImage, maskBlob, config);
+      }
+      console.log(imageBlob);
+
+      // const imageBlob = await removeBackground(randomImage, config);
       // const imageBlob = await alphamask(randomImage, config)
       // const maskBlob = await trimap(randomImage, config)
       // const imageBlob = await removeForeground(randomImage, config);
       // const imageBlob = await segmentForeground(randomImage, config);
-      // const maskBlob = await segmentForeground(randomImage, {...config}); // use this format for maximum efficient
-      // const imageBlob = await applySegmentationMask(randomImage, maskBlob, config)
-      // console.log(maskBlob);
-      console.log(imageBlob);
+
       const url = URL.createObjectURL(imageBlob);
       imageUrl.value = url;
       isRunning.value = false;
@@ -156,7 +163,8 @@ export default {
       <p>{{ caption }}</p>
       <p>Processing: {{ seconds }} s</p>
 
-      <button :disabled="isRunning" @click="load">Click me</button>
+      <button :disabled="isRunning" @click="load('remove')">Click me (removeBackground)</button>
+      <button :disabled="isRunning" @click="load('segment')">Click me (applySegmentationMask)</button>
     </header>
   </div>
 </template>
@@ -175,5 +183,9 @@ export default {
 
 .logo.vue:hover {
   filter: drop-shadow(0 0 2em #42b883aa);
+}
+
+button:not(:last-child) {
+  margin-right: 1em;
 }
 </style>
