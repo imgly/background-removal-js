@@ -167,7 +167,7 @@ async function applySegmentationMask(
   for (let i = 0; i < stride; i += 1) {
     const idxImage = imageChannels * i;
     const idxMask = maskChannels * i;
-    imageTensor.data[idxImage + 3] = alphaMask.data[idxMask]; // alpha information it always in the first (sometimes also in the others)
+    imageTensor.data[idxImage + 3] = alphaMask.data[idxMask + 3];
   }
 
   const outImage = await utils.imageEncode(
