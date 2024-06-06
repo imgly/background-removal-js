@@ -163,8 +163,12 @@ export default {
       <p>{{ caption }}</p>
       <p>Processing: {{ seconds }} s</p>
 
-      <button :disabled="isRunning" @click="load('remove')">Click me (removeBackground)</button>
-      <button :disabled="isRunning" @click="load('segment')">Click me (applySegmentationMask)</button>
+      <button :disabled="isRunning" @click="load('remove')">
+        Click me (removeBackground)
+      </button>
+      <button :disabled="isRunning" @click="load('segment')">
+        Click me (applySegmentationMask)
+      </button>
     </header>
   </div>
 </template>
