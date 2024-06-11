@@ -1,12 +1,16 @@
 # Background Removal in NodeJs
 
+### 🚨 We are hiring 🚨
+
+We are always looking for great people at IMG.LY. If you are working with our background removal library you might be a perfect fit! **Apply now at [IMG.LY Careers](https://img.ly/company/careers/?utm_source=github&utm_medium=readme&utm_campaign=background-removal-js)**
+
 <p align="center">
-<img src="https://img.ly/showcases/cesdk/web/s/case-thumbnail/background-removal/background-removal-0.png?utm_source=github&utm_medium=project&utm_campaign=vectorizer" alt="background removal js showcase" />
+<img src="https://img.ly/showcases/cesdk/web/s/case-thumbnail/background-removal/background-removal-0.png?utm_source=github&utm_medium=project&utm_campaign=background-removal-js" alt="background removal js showcase" />
 
 </p>
 
 Remove backgrounds from images in NodeJs environment with ease and no additional costs or privacy concerns.
-Explore an [interactive demo](https://img.ly/showcases/cesdk/web/background-removal/web?utm_source=github&utm_medium=project&utm_campaign=vectorizer).
+Explore an [interactive demo](https://img.ly/showcases/cesdk/web/background-removal/web?utm_source=github&utm_medium=project&utm_campaign=background-removal-js).
 
 ## News
 
@@ -23,7 +27,7 @@ For more detail information please refer to the [CHANGELOG](./CHANGELOG.md).
 
 The key features of `@imgly/background-removal-node` are:
 
-- **Seamless Integration with IMG.LY's CE.SDK**: `@imgly/background-removal-node` provides seamless integration with [IMG.LY's CE.SDK](https://img.ly/products/creative-sdk?utm_source=github&utm_medium=project&utm_campaign=vectorizer), allowing developers to easily incorporate powerful NodeJS image matting and background removal capabilities into their projects.
+- **Seamless Integration with IMG.LY's CE.SDK**: `@imgly/background-removal-node` provides seamless integration with [IMG.LY's CE.SDK](https://img.ly/products/creative-sdk?utm_source=github&utm_medium=project&utm_campaign=background-removal-js), allowing developers to easily incorporate powerful NodeJS image matting and background removal capabilities into their projects.
 
 The Neural Network model files ([ONNX model](https://onnx.ai/)) are hosted by [IMG.LY](https://img.ly/), making it readily available for download to all users of the library. See the section Custom Asset Serving if you want to host data on your own servers.
 
@@ -159,4 +163,4 @@ The software is free for use under the AGPL License. Please contact [support@img
 ## Authors & Contributors
 
 This library is made by IMG.LY shipping the world's premier SDKs for building creative applications.
-Start your trial of the [CreativeEditor SDK](https://img.ly/products/creative-sdk?utm_source=github&utm_medium=project&utm_campaign=vectorizer-node), [PhotoEditor SDK](https://img.ly/products/photo-sdk?utm_source=github&utm_medium=project&utm_campaign=vectorizer-node) & [VideoEditor SDK](https://img.ly/products/video-sdk?utm_source=github&utm_medium=project&utm_campaign=vectorizer-node).
+Start your trial of the [CreativeEditor SDK](https://img.ly/products/creative-sdk?utm_source=github&utm_medium=project&utm_campaign=background-removal-js-node), [PhotoEditor SDK](https://img.ly/products/photo-sdk?utm_source=github&utm_medium=project&utm_campaign=background-removal-js-node) & [VideoEditor SDK](https://img.ly/products/video-sdk?utm_source=github&utm_medium=project&utm_campaign=background-removal-js-node).

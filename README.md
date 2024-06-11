@@ -1,8 +1,8 @@
 # Background Removal in the Browser & Node.js
 
-### 🚨 We are Hiring 🚨
+### 🚨 We are hiring 🚨
 
-We are currently hiring a (remote) Solutions Engineer / Advocate for Web (f/m/d). If you are working with our background removal library you might be a perfect fit! Apply at https://imgly.jobs.personio.com/job/1435044?language=en&display=en
+We are always looking for great people at IMG.LY. If you are working with our background removal library you might be a perfect fit! **Apply now at [IMG.LY Careers](https://img.ly/company/careers/?utm_source=github&utm_medium=readme&utm_campaign=background-removal-js)**
 
 <p align="center">
 <img src="https://storage.googleapis.com/imgly-static-assets/static/blog/github-releases/background-removal-free-plugin-app.jpg" alt="background removal js showcase" />
@@ -10,7 +10,7 @@ We are currently hiring a (remote) Solutions Engineer / Advocate for Web (f/m/d)
 </p>
 
 Remove backgrounds from images directly in the browser or Node.js environment with ease and no additional costs or privacy concerns.
-Explore an [interactive demo](https://img.ly/showcases/cesdk/web/background-removal/web?utm_source=github&utm_medium=project&utm_campaign=vectorizer).
+Explore an [interactive demo](https://img.ly/showcases/cesdk/web/background-removal/web?utm_source=github&utm_medium=project&utm_campaign=background-removal-js).
 
 ## Overview
 
@@ -39,4 +39,4 @@ The software is free for use under the AGPL License. Please contact [support@img
 ## Authors & Contributors
 
 This library is made by IMG.LY shipping the world's premier SDKs for building creative applications.
-Start your trial of the [CreativeEditor SDK](https://img.ly/products/creative-sdk?utm_source=github&utm_medium=project&utm_campaign=vectorizer), [PhotoEditor SDK](https://img.ly/products/photo-sdk?utm_source=github&utm_medium=project&utm_campaign=vectorizer) & [VideoEditor SDK](https://img.ly/products/video-sdk?utm_source=github&utm_medium=project&utm_campaign=vectorizer).
+Start your trial of the [CreativeEditor SDK](https://img.ly/products/creative-sdk?utm_source=github&utm_medium=project&utm_campaign=background-removal-js), [PhotoEditor SDK](https://img.ly/products/photo-sdk?utm_source=github&utm_medium=project&utm_campaign=background-removal-js) & [VideoEditor SDK](https://img.ly/products/video-sdk?utm_source=github&utm_medium=project&utm_campaign=background-removal-js).
