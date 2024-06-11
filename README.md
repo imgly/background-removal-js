@@ -2,7 +2,7 @@
 
 ### 🚨 We are hiring 🚨
 
-We are always looking for great people @IMG.LY. If you are working with our background removal library you might be a perfect fit! Apply now at [IMG.LY Careers](https://img.ly/company/careers/?utm_source=github&utm_medium=readme&utm_campaign=background-removal-js)
+We are always looking for great people at IMG.LY. If you are working with our background removal library you might be a perfect fit! **Apply now at [IMG.LY Careers](https://img.ly/company/careers/?utm_source=github&utm_medium=readme&utm_campaign=background-removal-js)**
 
 <p align="center">
 <img src="https://storage.googleapis.com/imgly-static-assets/static/blog/github-releases/background-removal-free-plugin-app.jpg" alt="background removal js showcase" />
