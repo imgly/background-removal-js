@@ -1,9 +1,17 @@
-import { readFile } from 'node:fs/promises';
-import { exec } from 'child_process';
-import { promisify } from 'util';
 import chalk from 'chalk';
+import { exec } from 'child_process';
+import { readFile } from 'node:fs/promises';
+import { promisify } from 'util';
 
 const execAsync = promisify(exec);
+
+const execAsyncWithErrors = async (command, options) => {
+  try {
+    const { stdout, stderr } = await execAsync(command, options);
+  } catch (error) {
+    throw error;
+  }
+};
 
 async function syncToS3() {
   try {
@@ -38,10 +46,27 @@ async function syncToS3() {
             `NOTE: Syncing might fail when aws client ist not installed nor configured in silence!`
           )}`
         );
+        // cwd based on package name:
+        const cwd = path;
+        // npm packing:
+        await execAsyncWithErrors(
+          `rm -rf ./${path}/tmp && mkdir -p ./${path}/tmp`
+        );
+        // we pack the package to also publish the package.tgz to s3
+        const packCommand = `npm pack . --pack-destination ./tmp`;
+        console.log(`Packing ${packageName} using ${packCommand}...`);
+        await execAsyncWithErrors(packCommand, { cwd });
+        // rename the .tgz from e.g imgly-background-removal-data-1.5.3.tgz to package.tgz to have a stable name
+        await execAsyncWithErrors('mv ./tmp/*.tgz ./tmp/package.tgz', { cwd });
+        // npm extract:
+        const extractCommand = `tar -xvzf ./tmp/* -C ./tmp --strip-components=1`;
+        console.log(`Extracting ${packageName} using ${extractCommand}...`);
+        await execAsyncWithErrors(extractCommand, { cwd });
+        // sync to s3:
         console.log(`Syncing ${packageName} to S3...`);
-        const command = `aws s3 sync --endpoint-url ${endpointUrl} ./${path}/dist s3://${bucketName}/${packageName}/${version}/dist`;
+        const command = `aws s3 sync --endpoint-url ${endpointUrl} ./${path}/tmp s3://${bucketName}/${packageName}/${version}`;
         console.log(`Command: ${command}`);
-        return await execAsync(command);
+        return await execAsyncWithErrors(command);
       })
     );
 
