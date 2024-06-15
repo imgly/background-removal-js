@@ -117,12 +117,11 @@ The performance is largely dependent on the feature set available. Most prominen
 
 ### Custom Asset Serving
 
-The wasm and onnx neural networks are hosted by IMG.LY by default. For production use, we advise you to host them yourself. Therefore, copy all .wasm and .onnx files to your public path `$PUBLIC_PATH` and reconfigure the library.
+The wasm and onnx neural networks are hosted by IMG.LY by default. For production use, we advise you to host them yourself:
 
-```shell
-npm i @imgly/background-removal-data
-cp node_modules/@imgly/background-removal-data/dist/* $PUBLIC_PATH
-```
+- Download the following package with the package version that matches your `@imgly/background-removal` version from the IMG.LY CDN and decompress it. Note that you need to replace `YOUR_PACKAGE_VERSION` with the actual version of the package you are using. The URL is
+  `https://staticimgly.com/@imgly/background-removal-data/YOUR_PACKAGE_VERSION/package.tgz`.
+- Move the content of the `package/dist` folder to be served by your web server. This often is the `/public` folder.
 
 ```typescript
 import imglyRemoveBackground, {Config} from "@imgly/background-removal"
