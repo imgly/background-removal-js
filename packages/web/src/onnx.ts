@@ -26,7 +26,7 @@ async function getUseWebGPU(config: Config): Promise<boolean> {
 }
 
 async function createOnnxSession(model: any, config: Config) {
-  const useWebGPU = getUseWebGPU(config);
+  const useWebGPU = await getUseWebGPU(config);
   const useThreads = await feat.threads();
   const useSimd = feat.simd();
   const proxyToWorker = config.proxyToWorker;
@@ -94,7 +94,7 @@ async function runOnnxSession(
   outputs: [string],
   config: Config
 ) {
-  const useWebGPU = getUseWebGPU(config);
+  const useWebGPU = await getUseWebGPU(config);
   const ort = useWebGPU ? ort_gpu : ort_cpu;
 
   const feeds: Record<string, any> = {};
