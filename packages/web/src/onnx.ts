@@ -10,8 +10,23 @@ import { loadAsUrl } from './resource';
 import * as feat from './features';
 import { Config } from './schema';
 
-async function createOnnxSession(model: any, config: Config) {
+/**
+ * Fallbacks to CPU when WebGPU is available (navigator.gpu) but no adapter is available
+ *
+ * Avoid throwing error "Failed to get GPU adapter" here: https://www.npmjs.com/package/onnxruntime-web
+ *
+ * Docs for WebGPU requestAdapter: https://developer.mozilla.org/en-US/docs/Web/API/GPU/requestAdapter#return_value
+ */
+async function getUseWebGPU(config: Config): Promise<boolean> {
   const useWebGPU = config.device === 'gpu';
+  if (!useWebGPU) return false;
+  const adapter = await navigator.gpu.requestAdapter();
+  if (adapter === null) return false;
+  return true;
+}
+
+async function createOnnxSession(model: any, config: Config) {
+  const useWebGPU = getUseWebGPU(config);
   const useThreads = await feat.threads();
   const useSimd = feat.simd();
   const proxyToWorker = config.proxyToWorker;
@@ -79,7 +94,7 @@ async function runOnnxSession(
   outputs: [string],
   config: Config
 ) {
-  const useWebGPU = config.device === 'gpu';
+  const useWebGPU = getUseWebGPU(config);
   const ort = useWebGPU ? ort_gpu : ort_cpu;
 
   const feeds: Record<string, any> = {};
