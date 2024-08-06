@@ -17,7 +17,7 @@ import { Config } from './schema';
  *
  * Docs for WebGPU requestAdapter: https://developer.mozilla.org/en-US/docs/Web/API/GPU/requestAdapter#return_value
  */
-async function getUseWebGPU(config: Config): Promise<boolean> {
+async function canUseWebGPU(config: Config): Promise<boolean> {
   const useWebGPU = config.device === 'gpu';
   if (!useWebGPU) return false;
   const adapter = await navigator.gpu.requestAdapter();
