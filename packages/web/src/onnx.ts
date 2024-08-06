@@ -7,13 +7,13 @@ import * as ort_cpu from 'onnxruntime-web';
 import * as ort_gpu from 'onnxruntime-web/webgpu';
 
 import { loadAsUrl } from './resource';
-import * as feat from './features';
+import * as caps from './capabilities';
 import { Config } from './schema';
 
 async function createOnnxSession(model: any, config: Config) {
-  const useWebGPU = config.device === 'gpu';
-  const useThreads = await feat.threads();
-  const useSimd = feat.simd();
+  const useWebGPU = config.device === 'gpu' && (await caps.webgpu());
+  const useThreads = await caps.threads();
+  const useSimd = caps.simd();
   const proxyToWorker = config.proxyToWorker;
   const executionProviders = [useWebGPU ? 'webgpu' : 'wasm'];
   const ort = useWebGPU ? ort_gpu : ort_cpu;
@@ -28,8 +28,8 @@ async function createOnnxSession(model: any, config: Config) {
     ort.env.logLevel = 'verbose';
   }
 
-  ort.env.wasm.numThreads = feat.maxNumThreads();
-  ort.env.wasm.simd = feat.simd();
+  ort.env.wasm.numThreads = caps.maxNumThreads();
+  ort.env.wasm.simd = caps.simd();
   ort.env.wasm.proxy = proxyToWorker;
 
   const wasmPaths = {
@@ -79,7 +79,7 @@ async function runOnnxSession(
   outputs: [string],
   config: Config
 ) {
-  const useWebGPU = config.device === 'gpu';
+  const useWebGPU = config.device === 'gpu' && (await caps.webgpu());
   const ort = useWebGPU ? ort_gpu : ort_cpu;
 
   const feeds: Record<string, any> = {};

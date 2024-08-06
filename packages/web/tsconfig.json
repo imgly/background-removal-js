@@ -5,6 +5,7 @@
     "esModuleInterop": true,
     "emitDeclarationOnly": true,
     "declaration": true,
+    "allowJs": true,
     "target": "ES6",
     "moduleResolution": "Node16"
   }

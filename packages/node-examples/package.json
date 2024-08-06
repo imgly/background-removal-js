@@ -9,5 +9,5 @@
     "@imgly/background-removal-node": "file:../node",
     "uuidv4": "^6.2.13"
   },
-  "version": "1.5.3"
+  "version": "1.5.5"
 }

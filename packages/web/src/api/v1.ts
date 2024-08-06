@@ -20,8 +20,7 @@ import { ImageSource } from '../utils';
 const init = memoize(initInference, (config) => JSON.stringify(config));
 
 async function preload(configuration?: Config): Promise<void> {
-  const config = validateConfig(configuration);
-  await preloadResources(config);
+  await init(configuration);
   return;
 }
 

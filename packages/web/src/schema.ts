@@ -2,8 +2,6 @@ export { Config, ConfigSchema, validateConfig };
 
 import { z } from 'zod';
 
-import * as feature from './features';
-
 import pkg from '../package.json';
 
 const ConfigSchema = z
@@ -96,15 +94,6 @@ const ConfigSchema = z
       }
     }
 
-    // always switch to gpu
-
-    if (config.device == 'gpu') {
-      if (!feature.webgpu()) {
-        if (config.debug)
-          console.debug('Switching to CPU for GPU not supported.');
-        config.device = 'cpu';
-      }
-    }
     return config;
   });
 
