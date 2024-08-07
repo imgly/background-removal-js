@@ -1,5 +1,5 @@
 {
-  "version": "1.5.3",
+  "version": "1.5.5",
   "name": "workspace",
   "workspaces": [
     "packages/web",
@@ -38,7 +38,7 @@
     "meow": "~13.0.0",
     "moment": "~2.29.4",
     "onchange": "~7.1.0",
-    "prettier": "3.2.5",
+    "prettier": "^3.2.5",
     "yaml": "~2.3.4"
   }
 }

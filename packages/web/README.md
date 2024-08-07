@@ -1,15 +1,10 @@
 # Background Removal in the Browser
 
-### 🚨 We are hiring 🚨
-
 We are always looking for great people at IMG.LY. If you are working with our background removal library you might be a perfect fit! **Apply now at [IMG.LY Careers](https://img.ly/company/careers/?utm_source=github&utm_medium=readme&utm_campaign=background-removal-js)**
 
-<p align="center">
-<img src="https://img.ly/showcases/cesdk/web/s/case-thumbnail/background-removal/background-removal-0.png?utm_source=github&utm_medium=project&utm_campaign=background-removal-js" alt="background removal js showcase" />
-</p>
+&lt;p align="center"&gt; &lt;img src="https://img.ly/showcases/cesdk/web/s/case-thumbnail/background-removal/background-removal-0.png?utm_source=github&utm_medium=project&utm_campaign=background-removal-js" alt="background removal js showcase" /&gt; &lt;/p&gt;
 
-Remove backgrounds from images directly in the browser environment with ease and no additional costs or privacy concerns.
-Explore an [interactive demo](https://img.ly/showcases/cesdk/web/background-removal/web?utm_source=github&utm_medium=project&utm_campaign=background-removal-js).
+Remove backgrounds from images directly in the browser environment with ease and no additional costs or privacy concerns. Explore an [interactive demo](https://img.ly/showcases/cesdk/web/background-removal/web?utm_source=github&utm_medium=project&utm_campaign=background-removal-js).
 
 ## News
 
@@ -64,7 +59,7 @@ type Config = {
   debug: bool; // enable or disable useful console.log outputs
   device: 'cpu' | 'gpu'; // choose the execution device. gpu will use webgpu if available
   proxyToWorker: bool; // Whether to proxy the calculations to a web worker. (Default true)
-  model: 'small' | 'medium'; // The model to use. (Default "medium")
+  model: 'isnet' | 'isnet_fp16' | 'isnet_quint8'; // The model to use. (Default "isnet_fp16")
   output: {
     format: 'image/png' | 'image/jpeg' | 'image/webp'; // The output format. (Default "image/png")
     quality: number; // The quality. (Default: 0.8)
@@ -77,8 +72,8 @@ type Config = {
 
 The onnx model is shipped in various sizes and needs.
 
-- small (~40 MB) is the smallest model and is in most cases working fine but sometimes shows some artifacts. It's a quantized model.
-- medium (~80MB) is the default model.
+- small (\~40 MB) is the smallest model and is in most cases working fine but sometimes shows some artifacts. It's a quantized model.
+- medium (\~80MB) is the default model.
 
 ### Preloading Assets
 
@@ -91,7 +86,6 @@ const config: Configuration = ...;
 preload(config).then(() => {
   console.log("Asset preloading succeeded")
 })
-
 ```
 
 ### Download Progress Monitoring
@@ -119,8 +113,7 @@ The performance is largely dependent on the feature set available. Most prominen
 
 The wasm and onnx neural networks are hosted by IMG.LY by default. For production use, we advise you to host them yourself:
 
-- Download the following package with the package version that matches your `@imgly/background-removal` version from the IMG.LY CDN and decompress it. Note that you need to replace `YOUR_PACKAGE_VERSION` with the actual version of the package you are using. The URL is
-  `https://staticimgly.com/@imgly/background-removal-data/YOUR_PACKAGE_VERSION/package.tgz`.
+- Download the following package with the package version that matches your `@imgly/background-removal` version from the IMG.LY CDN and decompress it. Note that you need to replace `YOUR_PACKAGE_VERSION` with the actual version of the package you are using. The URL is `https://staticimgly.com/@imgly/background-removal-data/YOUR_PACKAGE_VERSION/package.tgz`.
 - Move the content of the `package/dist` folder to be served by your web server. This often is the `/public` folder.
 
 ```typescript
@@ -185,5 +178,4 @@ The software is free for use under the AGPL License. Please contact [support@img
 
 ## Authors & Contributors
 
-This library is made by IMG.LY shipping the world's premier SDKs for building creative applications.
-Start your trial of the [CreativeEditor SDK](https://img.ly/products/creative-sdk?utm_source=github&utm_medium=project&utm_campaign=background-removal-js), [PhotoEditor SDK](https://img.ly/products/photo-sdk?utm_source=github&utm_medium=project&utm_campaign=background-removal-js) & [VideoEditor SDK](https://img.ly/products/video-sdk?utm_source=github&utm_medium=project&utm_campaign=background-removal-js).
+This library is made by IMG.LY shipping the world's premier SDKs for building creative applications. Start your trial of the [CreativeEditor SDK](https://img.ly/products/creative-sdk?utm_source=github&utm_medium=project&utm_campaign=background-removal-js), [PhotoEditor SDK](https://img.ly/products/photo-sdk?utm_source=github&utm_medium=project&utm_campaign=background-removal-js) & [VideoEditor SDK](https://img.ly/products/video-sdk?utm_source=github&utm_medium=project&utm_campaign=background-removal-js).

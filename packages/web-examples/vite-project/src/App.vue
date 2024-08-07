@@ -87,9 +87,9 @@ export default {
 
     onMounted(async () => {
       // Optional Preload all assets
-      // await preload(config).then(() => {
-      //   console.log('Asset preloading succeeded');
-      // });
+      await preload(config).then(() => {
+        console.log('Asset preloading succeeded');
+      });
       if (isRunning.value) {
         interval = setInterval(() => {
           seconds.value = calculateSecondsBetweenDates(

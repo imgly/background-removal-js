@@ -122,5 +122,9 @@ export const bigInt = () =>
       ])
     );
 
-export const webgpu = () => navigator.gpu !== undefined;
+export const webgpu = async () => {
+  if (navigator.gpu === undefined) return false;
+  const adapter = await navigator.gpu.requestAdapter();
+  return adapter !== null;
+};
 export const maxNumThreads = () => navigator.hardwareConcurrency ?? 4;
