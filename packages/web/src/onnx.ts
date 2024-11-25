@@ -6,21 +6,18 @@ import type ORT from 'onnxruntime-web';
 import * as ort_cpu from 'onnxruntime-web';
 import * as ort_gpu from 'onnxruntime-web/webgpu';
 
-import { loadAsUrl } from './resource';
 import * as caps from './capabilities';
 import { Config } from './schema';
+import { loadAsUrl, resolveChunkUrls } from './resource';
 
 async function createOnnxSession(model: any, config: Config) {
   const useWebGPU = config.device === 'gpu' && (await caps.webgpu());
-  const useThreads = await caps.threads();
-  const useSimd = caps.simd();
-  const proxyToWorker = config.proxyToWorker;
+  // BUG: proxyToWorker is not working for WASM/CPU Backend for now
+  const proxyToWorker = useWebGPU && config.proxyToWorker;
   const executionProviders = [useWebGPU ? 'webgpu' : 'wasm'];
   const ort = useWebGPU ? ort_gpu : ort_cpu;
 
-  if (config.debug) {
-    console.debug('\tUsing Threads:', useThreads);
-    console.debug('\tUsing SIMD:', useSimd);
+  if (true || config.debug) {
     console.debug('\tUsing WebGPU:', useWebGPU);
     console.debug('\tProxy to Worker:', proxyToWorker);
 
@@ -29,28 +26,20 @@ async function createOnnxSession(model: any, config: Config) {
   }
 
   ort.env.wasm.numThreads = caps.maxNumThreads();
-  ort.env.wasm.simd = caps.simd();
   ort.env.wasm.proxy = proxyToWorker;
 
-  const wasmPaths = {
-    'ort-wasm-simd-threaded.wasm': useThreads && useSimd,
-    'ort-wasm-simd.wasm': !useThreads && useSimd,
-    'ort-wasm-threaded.wasm': !useWebGPU && useThreads && !useSimd,
-    'ort-wasm.wasm': !useWebGPU && !useThreads && !useSimd
+  // The path inside the resource bundle
+  const baseFilePath = useWebGPU
+    ? '/onnxruntime-web/ort-wasm-simd-threaded.jsep'
+    : '/onnxruntime-web/ort-wasm-simd-threaded';
+
+  const wasmPath = await loadAsUrl(`${baseFilePath}.wasm`, config);
+  const mjsPath = await loadAsUrl(`${baseFilePath}.mjs`, config);
+
+  ort.env.wasm.wasmPaths = {
+    mjs: mjsPath,
+    wasm: wasmPath
   };
-
-  const proxiedWasmPaths = {};
-  for (const [key, value] of Object.entries(wasmPaths)) {
-    if (value) {
-      const wasmPath =
-        useWebGPU && key.includes('simd')
-          ? `/onnxruntime-web/${key.replace('.wasm', '.jsep.wasm')}`
-          : `/onnxruntime-web/${key}`;
-      proxiedWasmPaths[key] = await loadAsUrl(wasmPath, config);
-    }
-  }
-
-  ort.env.wasm.wasmPaths = proxiedWasmPaths;
 
   if (config.debug) {
     console.debug('ort.env.wasm:', ort.env.wasm);
