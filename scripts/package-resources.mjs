@@ -117,25 +117,28 @@ function isFunction(variable) {
   return typeof variable === 'function';
 }
 
-const ChunkSize = 4 * 1024 * 1024; // 4 MB chunks
 async function transform(fileName, entry) {
-  const buffer = Buffer.alloc(ChunkSize);
+  const DefaultChunkSize = 4 * 1024 * 1024; // 4 MB chunks
+
+  const chunkSize = entry.chunkSize || DefaultChunkSize;
+  const buffer = Buffer.alloc(chunkSize);
 
   const fileSize = await sizeFile(fileName);
   const fileHandle = fs.openSync(fileName);
   const chunks = [];
-  for (let offset = 0; offset < fileSize; offset += ChunkSize) {
-    const bytesRead = fs.readSync(fileHandle, buffer, 0, ChunkSize, offset);
+  for (let offset = 0; offset < fileSize; offset += chunkSize) {
+    const bytesRead = fs.readSync(fileHandle, buffer, 0, chunkSize, offset);
 
     const data = buffer.subarray(0, bytesRead);
     const hash = crypto.createHash('sha256');
     hash.update(data);
     const chunkHash = hash.digest('hex');
-    const url = chunkHash;
-    const destFile = path.resolve(DefaultOutDir, chunkHash);
+    const name = entry.name ? entry.name : chunkHash;
+    const destFile = path.resolve(DefaultOutDir, name);
     fs.writeFileSync(destFile, data);
     chunks.push({
       hash: chunkHash,
+      name: name,
       offsets: [offset, offset + bytesRead]
     });
   }
