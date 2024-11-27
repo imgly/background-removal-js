@@ -17,7 +17,7 @@ async function createOnnxSession(model: any, config: Config) {
   const executionProviders = [useWebGPU ? 'webgpu' : 'wasm'];
   const ort = useWebGPU ? ort_gpu : ort_cpu;
 
-  if (true || config.debug) {
+  if (config.debug) {
     console.debug('\tUsing WebGPU:', useWebGPU);
     console.debug('\tProxy to Worker:', proxyToWorker);
 
