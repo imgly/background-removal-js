@@ -1,0 +1,13 @@
+diff --git a/node_modules/onnxruntime-web/package.json b/node_modules/onnxruntime-web/package.json
+index 3ec7652..8afaaa0 100644
+--- a/node_modules/onnxruntime-web/package.json
++++ b/node_modules/onnxruntime-web/package.json
+@@ -97,7 +97,7 @@
+     },
+     "./webgpu": {
+       "node": null,
+-      "import": "./dist/ort.webgpu.bundle.min.mjs",
++      "import": "./dist/ort.webgpu.min.mjs",
+       "require": "./dist/ort.webgpu.min.js",
+       "types": "./types.d.ts"
+     }

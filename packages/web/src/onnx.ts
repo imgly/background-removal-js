@@ -28,17 +28,9 @@ async function createOnnxSession(model: any, config: Config) {
   ort.env.wasm.numThreads = caps.maxNumThreads();
   ort.env.wasm.proxy = proxyToWorker;
 
-  // The path inside the resource bundle
-  const baseFilePath = useWebGPU
-    ? '/onnxruntime-web/ort-wasm-simd-threaded.jsep'
-    : '/onnxruntime-web/ort-wasm-simd-threaded';
-
-  const wasmPath = await loadAsUrl(`${baseFilePath}.wasm`, config);
-  const mjsPath = await loadAsUrl(`${baseFilePath}.mjs`, config);
-
   ort.env.wasm.wasmPaths = {
-    mjs: mjsPath,
-    wasm: wasmPath
+    mjs: 'https://cdn.jsdelivr.net/npm/onnxruntime-web@1.20.1/dist/ort-wasm-simd-threaded.mjs',
+    wasm: 'https://cdn.jsdelivr.net/npm/onnxruntime-web@1.20.1/dist/ort-wasm-simd-threaded.wasm'
   };
 
   if (config.debug) {
