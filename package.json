@@ -23,7 +23,8 @@
     "deploy-assets": "node -r dotenv/config ./scripts/deploy-assets.mjs",
     "tag": "git tag $npm_package_version & git push origin $npm_package_version",
     "package:pack": "npm run package:pack --workspaces --if-present",
-    "prepare": "husky"
+    "prepare": "husky",
+    "postinstall": "patch-package"
   },
   "devDependencies": {
     "chalk": "~5.3.0",
@@ -40,5 +41,8 @@
     "onchange": "~7.1.0",
     "prettier": "^3.2.5",
     "yaml": "~2.3.4"
+  },
+  "dependencies": {
+    "patch-package": "^8.0.0"
   }
 }
