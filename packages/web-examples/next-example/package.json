@@ -14,7 +14,6 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "@imgly/background-removal": "file:../../web",
-    "@imgly/background-removal-data": "file:../../web-data",
     "onnxruntime-web": "1.21.0-dev.20250114-228dd16893"
   },
   "devDependencies": {
