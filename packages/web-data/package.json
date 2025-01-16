@@ -33,6 +33,7 @@
   ],
   "scripts": {
     "start": "npm run watch",
+    "serve": "npx http-server dist --cors",
     "clean": "npx rimraf dist",
     "test": "true",
     "resources": "node ../../scripts/package-resources.mjs",
