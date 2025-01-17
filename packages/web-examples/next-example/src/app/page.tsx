@@ -1,5 +1,5 @@
-import CustomEditorNoSSR from './CustomEditorNoSSR';
+import BackgroundRemovalNoSSR from './BackgroundRemovalNoSSR';
 
 export default function Home() {
-  return <CustomEditorNoSSR />;
+  return <BackgroundRemovalNoSSR />;
 }
