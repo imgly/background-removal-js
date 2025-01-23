@@ -1,6 +1,6 @@
 {
   "name": "@imgly/background-removal-data",
-  "version": "1.5.7",
+  "version": "1.5.8-rc.2",
   "description": "Background Removal Data",
   "keywords": [
     "background-removal",

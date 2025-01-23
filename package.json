@@ -1,5 +1,5 @@
 {
-  "version": "1.5.7",
+  "version": "1.5.8-rc.2",
   "name": "workspace",
   "workspaces": [
     "packages/web",

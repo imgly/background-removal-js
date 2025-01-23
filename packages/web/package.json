@@ -1,6 +1,6 @@
 {
   "name": "@imgly/background-removal",
-  "version": "1.5.7",
+  "version": "1.5.8-rc.2",
   "description": "Background Removal in the Browser",
   "keywords": [
     "background-removal",
