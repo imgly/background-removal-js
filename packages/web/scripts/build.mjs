@@ -3,10 +3,7 @@ export { configs };
 import * as esbuild from 'esbuild';
 import pkg from '../package.json' assert { type: 'json' };
 
-const dependencies = [
-  Object.keys(pkg.dependencies),
-  Object.keys(pkg.peerDependencies)
-].flat();
+const dependencies = [Object.keys(pkg.peerDependencies)].flat();
 
 const configs = [
   {
