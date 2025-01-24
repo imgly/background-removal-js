@@ -67,6 +67,10 @@ type Config = {
 };
 ```
 
+### NextJS
+
+Note that currently only NextJS 15 is supported.
+
 ### Download Size vs Quality
 
 The onnx model is shipped in various sizes and needs.
