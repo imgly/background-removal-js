@@ -26,12 +26,12 @@ The Neural Network ([ONNX model](https://onnx.ai/)) and WASM files used by `@img
 
 ## Installation
 
-You can install `@imgly/background-removal` via npm or yarn. Use the following commands to install the package:
+You can install `@imgly/background-removal` via npm or yarn. You also need to install the onnxruntime-web peer dependency. Use the following commands to install the packages:
 
 ### NPM
 
 ```shell
-npm install @imgly/background-removal
+npm install @imgly/background-removal onnxruntime-web@1.21.0-dev.20250114-228dd16893
 ```
 
 ## Usage
