@@ -26,12 +26,12 @@ The Neural Network ([ONNX model](https://onnx.ai/)) and WASM files used by `@img
 
 ## Installation
 
-You can install `@imgly/background-removal` via npm or yarn. Use the following commands to install the package:
+You can install `@imgly/background-removal` via npm or yarn. You also need to install the onnxruntime-web peer dependency. Use the following commands to install the packages:
 
 ### NPM
 
 ```shell
-npm install @imgly/background-removal
+npm install @imgly/background-removal onnxruntime-web@1.21.0-dev.20250114-228dd16893
 ```
 
 ## Usage
@@ -58,7 +58,6 @@ type Config = {
   publicPath: string; // The public path used for model and wasm files. Default: 'https://staticimgly.com/${PACKAGE_NAME}-data/${PACKAGE_VERSION}/dist/'
   debug: bool; // enable or disable useful console.log outputs
   device: 'cpu' | 'gpu'; // choose the execution device. gpu will use webgpu if available
-  proxyToWorker: bool; // Whether to proxy the calculations to a web worker. (Default true)
   model: 'isnet' | 'isnet_fp16' | 'isnet_quint8'; // The model to use. (Default "isnet_fp16")
   output: {
     format: 'image/png' | 'image/jpeg' | 'image/webp'; // The output format. (Default "image/png")
@@ -67,6 +66,10 @@ type Config = {
   };
 };
 ```
+
+### NextJS
+
+Note that currently only NextJS 15 is supported.
 
 ### Download Size vs Quality
 

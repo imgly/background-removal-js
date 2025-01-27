@@ -32,7 +32,7 @@ const ConfigSchema = z
       .describe('The device to run the model on.'),
     proxyToWorker: z
       .boolean()
-      .default(true)
+      .default(false)
       .describe('Whether to proxy inference to a web worker.'),
     fetchArgs: z
       .any()
