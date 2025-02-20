@@ -9,10 +9,9 @@ export {
 };
 export type { Config, ImageSource };
 
-import { memoize } from 'lodash-es';
+import memoize from 'lodash-es/memoize';
 
 import { initInference, runInference } from '../inference';
-import { preload as preloadResources } from '../resource';
 import { Config, validateConfig } from '../schema';
 import * as utils from '../utils';
 import { ImageSource } from '../utils';
