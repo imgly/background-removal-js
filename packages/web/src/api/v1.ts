@@ -9,7 +9,7 @@ export {
 };
 export type { Config, ImageSource };
 
-import { memoize } from 'lodash';
+import { memoize } from 'lodash-es';
 
 import { initInference, runInference } from '../inference';
 import { preload as preloadResources } from '../resource';
