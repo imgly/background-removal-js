@@ -31,7 +31,7 @@ You can install `@imgly/background-removal` via npm or yarn. You also need to in
 ### NPM
 
 ```shell
-npm install @imgly/background-removal onnxruntime-web@1.21.0-dev.20250114-228dd16893
+npm install @imgly/background-removal onnxruntime-web@1.21.0-dev.20250206-d981b153d3
 ```
 
 ## Usage
