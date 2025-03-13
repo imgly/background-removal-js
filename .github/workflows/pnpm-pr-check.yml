@@ -1,0 +1,13 @@
+name: Build and test pnpm workspace
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-test:
+    name: Build and test
+    uses: imgly/github-workflows/.github/workflows/pnpm-pr-check.yml@v1
+    secrets: inherit

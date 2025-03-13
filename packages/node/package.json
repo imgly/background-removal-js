@@ -44,19 +44,21 @@
     "bin/"
   ],
   "scripts": {
-    "start": "npm run watch",
+    "start": "pnpm run watch",
     "clean": "npx rimraf dist",
     "test": "true",
     "resources": "node ../../scripts/package-resources.mjs",
     "changelog:create": "node ../../scripts/changelog/changelog-create.mjs",
     "changelog:generate": "node ../../scripts/changelog/changelog-generate.mjs",
-    "build": "npm run clean && npm run resources && npm run types && npm run changelog:generate && node scripts/build.mjs",
-    "types": " npx tsc --declaration --emitDeclarationOnly --declarationDir dist --declarationMap",
-    "watch": "npm run clean && npm run resources && npm run changelog:generate && node scripts/watch.mjs",
-    "lint": "npx prettier --write .",
-    "publish:latest": "npm publish --tag latest --access public",
-    "publish:next": "npm publish --tag next --access public",
-    "package:pack": "npm pack . --pack-destination ../../releases"
+    "build": "pnpm run clean && pnpm run resources && pnpm run types && pnpm run changelog:generate && node scripts/build.mjs",
+    "types": "tsc --declaration --emitDeclarationOnly --declarationDir dist --declarationMap",
+    "watch": "pnpm run clean && pnpm run resources && pnpm run changelog:generate && node scripts/watch.mjs",
+    "check:all": "pnpm run check:pretty",
+    "check:pretty": "prettier --list-different './src/**/*.{ts,tsx}'",
+    "pretty": "prettier --write './src/**/*.{ts,tsx}'",
+    "publish:latest": "pnpm publish --tag latest --access public",
+    "publish:next": "pnpm publish --tag next --access public",
+    "package:pack": "pnpm pack . --pack-destination ../../releases"
   },
   "dependencies": {
     "@types/lodash": "~4.14.195",

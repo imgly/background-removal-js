@@ -32,19 +32,18 @@
     "bin/"
   ],
   "scripts": {
-    "start": "npm run watch",
+    "start": "pnpm run watch",
     "serve": "npx http-server dist --cors",
     "clean": "npx rimraf dist",
     "test": "true",
     "resources": "node ../../scripts/package-resources.mjs",
     "changelog:create": "node ../../scripts/changelog/changelog-create.mjs",
     "changelog:generate": "node ../../scripts/changelog/changelog-generate.mjs",
-    "build": "npm run clean && npm run resources",
-    "watch": "npm run clean && npm run resources",
-    "lint": "npx prettier --write .",
-    "publish:latest": "npm publish --tag latest --access public",
-    "publish:next": "npm publish --tag next --access public",
-    "package:pack": "npm pack . --pack-destination ../../releases"
+    "build": "pnpm run clean && pnpm run resources",
+    "watch": "pnpm run clean && pnpm run resources",
+    "publish:latest": "pnpm publish --tag latest --access public",
+    "publish:next": "pnpm publish --tag next --access public",
+    "package:pack": "pnpm pack . --pack-destination ../../releases"
   },
   "dependencies": {
     "onnxruntime-web": "1.21.0-dev.20250206-d981b153d3"

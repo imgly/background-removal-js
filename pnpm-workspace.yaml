@@ -1,0 +1,8 @@
+packages:
+  - packages/*
+  - packages/web-examples/*
+onlyBuiltDependencies:
+  - esbuild
+  - onnxruntime-node
+  - protobufjs
+  - sharp
