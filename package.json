@@ -1,28 +1,24 @@
 {
   "version": "1.6.0",
   "name": "workspace",
-  "workspaces": [
-    "packages/web",
-    "packages/web-data",
-    "packages/node"
-  ],
+  "private": true,
   "bin": {
     "changelog-create": "./scripts/changelog/changelog-create.mjs",
     "changelog-generate": "./scripts/changelog/changelog-generate.mjs"
   },
   "files": [],
   "scripts": {
-    "start": "npm run watch",
-    "watch": "concurrently \"npm run watch --prefix packages/web\" \"npm run watch --prefix packages/node\"",
-    "build": "npm run build --workspaces --if-present",
+    "start": "pnpm run watch",
+    "watch": "concurrently \"pnpm run watch --prefix packages/web\" \"pnpm run watch --prefix packages/node\"",
+    "build": "pnpm recursive run build",
     "lint:fix": "npx prettier -c -w --ignore-unknown .",
     "lint:check": "npx prettier -c --ignore-unknown .",
-    "publish:latest": "npm run publish:latest --workspaces --if-present && npm run deploy-assets",
-    "publish:next": "npm run publish:next --workspaces --if-present && npm run deploy-assets",
+    "publish:latest": "pnpm run publish:latest --workspaces --if-present && pnpm run deploy-assets",
+    "publish:next": "pnpm run publish:next --workspaces --if-present && pnpm run deploy-assets",
     "package:version": "node ./scripts/package-version.mjs",
     "deploy-assets": "node -r dotenv/config ./scripts/deploy-assets.mjs",
     "tag": "git tag $npm_package_version & git push origin $npm_package_version",
-    "package:pack": "npm run package:pack --workspaces --if-present",
+    "package:pack": "pnpm run package:pack --workspaces --if-present",
     "prepare": "husky"
   },
   "devDependencies": {
@@ -38,7 +34,9 @@
     "meow": "~13.0.0",
     "moment": "~2.29.4",
     "onchange": "~7.1.0",
-    "prettier": "^3.2.5",
+    "prettier": "^3.5.3",
+    "rimraf": "^6.0.1",
     "yaml": "~2.3.4"
-  }
+  },
+  "packageManager": "pnpm@10.6.5+sha512.cdf928fca20832cd59ec53826492b7dc25dc524d4370b6b4adbf65803d32efaa6c1c88147c0ae4e8d579a6c9eec715757b50d4fa35eea179d868eada4ed043af"
 }

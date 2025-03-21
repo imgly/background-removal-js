@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {},
   "devDependencies": {
-    "@imgly/background-removal-node": "file:../node",
+    "@imgly/background-removal-node": "workspace:*",
     "jest": "^29.6.2"
   },
   "version": "1.6.0"

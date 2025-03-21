@@ -1,7 +1,15 @@
 export { configs };
 
 import * as esbuild from 'esbuild';
-import pkg from '../package.json' assert { type: 'json' };
+import { readFileSync } from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+const pkg = JSON.parse(
+  readFileSync(path.resolve(__dirname, '../package.json'))
+);
 
 const dependencies = [Object.keys(pkg.peerDependencies)].flat();
 
