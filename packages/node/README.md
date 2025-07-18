@@ -14,6 +14,7 @@ Explore an [interactive demo](https://img.ly/showcases/cesdk/web/background-remo
 
 ## News
 
+- **`July 18th, 2025`:** Updated to use stable ONNX runtime version 1.21.0 instead of dev version.
 - **`November 8th, 2023`:** Added support for raw `rgba8` export formats.
 - **`November 6th, 2023`:** Added support `foreground`, `background` and `mask` export type
 - **`November 6th, 2023`:** Added support for `webp` and `jpeg` export formats.
