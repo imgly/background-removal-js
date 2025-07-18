@@ -9,5 +9,5 @@
     "@imgly/background-removal-node": "workspace:*",
     "uuidv4": "^6.2.13"
   },
-  "version": "1.6.1"
+  "version": "1.7.0"
 }
