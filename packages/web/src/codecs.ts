@@ -63,6 +63,7 @@ async function imageEncode(
     }
     case `image/png`:
     case `image/jpeg`:
+    case `image/jpg`:
     case `image/webp`: {
       const imageData = new ImageData(
         new Uint8ClampedArray(imageTensor.data),

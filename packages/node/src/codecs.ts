@@ -72,6 +72,7 @@ async function imageEncode(
     }
     case `image/png`:
     case `image/jpeg`:
+    case `image/jpg`:
     case `image/webp`:
       const format = type.split('/').pop()! as Keys;
       const buffer = await image
