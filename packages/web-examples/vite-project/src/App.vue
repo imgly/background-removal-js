@@ -200,6 +200,11 @@ export default {
     const activeTool = ref<ToolMode>('none');
     const isDrawing = ref(false);
     const lastMousePos = ref({ x: 0, y: 0 });
+    
+    const brushCursorPos = ref({ x: 0, y: 0 });
+    const isMouseOverCanvas = ref(false);
+    const pendingPreviewUpdate = ref(false);
+    let previewUpdateRAFId: number | null = null;
 
     const brushConfig = ref<BrushConfig>({
       size: 30,
@@ -603,6 +608,39 @@ export default {
       }).join('');
     };
 
+    const updateTaskPreviewQuick = (task: ImageTask) => {
+      if (!task.originalImageData || !task.currentMask || !task.maskCanvas) return;
+
+      const [height, width] = task.originalImageData.shape;
+      const resultData = ndarray(new Uint8Array(task.originalImageData.data), task.originalImageData.shape);
+      
+      const stride = width * height;
+      for (let i = 0; i < stride; i += 1) {
+        resultData.data[4 * i + 3] = task.currentMask.data[i];
+      }
+
+      const canvas = task.maskCanvas;
+      const ctx = canvas.getContext('2d')!;
+      const imageData = ndArrayToImageData(resultData);
+      ctx.putImageData(imageData, 0, 0);
+    };
+
+    const schedulePreviewUpdate = (_task: ImageTask) => {
+      pendingPreviewUpdate.value = true;
+      
+      if (previewUpdateRAFId !== null) {
+        cancelAnimationFrame(previewUpdateRAFId);
+      }
+      
+      previewUpdateRAFId = requestAnimationFrame(() => {
+        if (pendingPreviewUpdate.value && selectedTask.value) {
+          updateTaskPreviewQuick(selectedTask.value);
+        }
+        pendingPreviewUpdate.value = false;
+        previewUpdateRAFId = null;
+      });
+    };
+
     const updateTaskPreview = async (task: ImageTask) => {
       if (!task.originalImageData || !task.currentMask) return;
 
@@ -694,31 +732,46 @@ export default {
       }
     };
 
-    const handleMouseDown = (e: MouseEvent, task: ImageTask) => {
-      if (activeTool.value === 'none' || !task.maskCanvas) return;
-      isDrawing.value = true;
+    const getCanvasCoords = (e: MouseEvent, task: ImageTask) => {
+      const target = e.currentTarget as HTMLElement;
+      const rect = target.getBoundingClientRect();
+      const scaleX = task.maskCanvas ? task.maskCanvas.width / rect.width : 1;
+      const scaleY = task.maskCanvas ? task.maskCanvas.height / rect.height : 1;
       
-      const rect = (e.target as HTMLElement).getBoundingClientRect();
-      const scaleX = task.maskCanvas.width / rect.width;
-      const scaleY = task.maskCanvas.height / rect.height;
-      
-      lastMousePos.value = {
+      return {
         x: (e.clientX - rect.left) * scaleX,
-        y: (e.clientY - rect.top) * scaleY
+        y: (e.clientY - rect.top) * scaleY,
+        displayX: e.clientX - rect.left,
+        displayY: e.clientY - rect.top,
+        rectWidth: rect.width,
+        rectHeight: rect.height
       };
-
-      if (activeTool.value === 'erase' || activeTool.value === 'restore') {
-        drawBrushStroke(task, lastMousePos.value.x, lastMousePos.value.y, activeTool.value);
-        updateTaskPreview(task);
-      }
     };
 
-    const handleMouseMove = (e: MouseEvent, task: ImageTask) => {
-      if (!isDrawing.value || activeTool.value === 'none' || !task.maskCanvas) return;
+    const handleMouseEnter = (_e: MouseEvent, _task: ImageTask) => {
+      if (activeTool.value === 'none') return;
+      isMouseOverCanvas.value = true;
+    };
 
-      const rect = (e.target as HTMLElement).getBoundingClientRect();
-      const scaleX = task.maskCanvas.width / rect.width;
-      const scaleY = task.maskCanvas.height / rect.height;
+    const handleMouseLeave = () => {
+      isMouseOverCanvas.value = false;
+      isDrawing.value = false;
+    };
+
+    const handleMouseMoveAlways = (e: MouseEvent, task: ImageTask) => {
+      if (activeTool.value === 'none') return;
+      
+      const coords = getCanvasCoords(e, task);
+      brushCursorPos.value = {
+        x: coords.displayX,
+        y: coords.displayY
+      };
+      
+      if (!isDrawing.value) return;
+      
+      const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+      const scaleX = task.maskCanvas ? task.maskCanvas.width / rect.width : 1;
+      const scaleY = task.maskCanvas ? task.maskCanvas.height / rect.height : 1;
       
       const x = (e.clientX - rect.left) * scaleX;
       const y = (e.clientY - rect.top) * scaleY;
@@ -737,7 +790,26 @@ export default {
         }
 
         lastMousePos.value = { x, y };
-        updateTaskPreview(task);
+        schedulePreviewUpdate(task);
+      }
+    };
+
+    const handleMouseDown = (e: MouseEvent, task: ImageTask) => {
+      if (activeTool.value === 'none' || !task.maskCanvas) return;
+      isDrawing.value = true;
+      
+      const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+      const scaleX = task.maskCanvas.width / rect.width;
+      const scaleY = task.maskCanvas.height / rect.height;
+      
+      lastMousePos.value = {
+        x: (e.clientX - rect.left) * scaleX,
+        y: (e.clientY - rect.top) * scaleY
+      };
+
+      if (activeTool.value === 'erase' || activeTool.value === 'restore') {
+        drawBrushStroke(task, lastMousePos.value.x, lastMousePos.value.y, activeTool.value);
+        schedulePreviewUpdate(task);
       }
     };
 
@@ -1104,6 +1176,8 @@ export default {
       presetBackgrounds,
       showColorPicker,
       colorPickerType,
+      isMouseOverCanvas,
+      brushCursorPos,
       addFiles,
       retryTask,
       retryAllFailed,
@@ -1122,7 +1196,10 @@ export default {
       getStatusText,
       selectTask,
       handleMouseDown,
-      handleMouseMove,
+      handleMouseMoveAlways,
+      handleMouseEnter,
+      handleMouseLeave,
+      handleMouseUp,
       rgbToHex,
       hexToRgb
     };
@@ -1471,8 +1548,11 @@ export default {
                 <div 
                   class="image-wrapper result-wrapper"
                   @mousedown="(e: Event) => handleMouseDown(e as MouseEvent, selectedTask!)"
-                  @mousemove="(e: Event) => handleMouseMove(e as MouseEvent, selectedTask!)"
-                  :style="{ cursor: activeTool === 'erase' || activeTool === 'restore' ? 'crosshair' : 'default' }"
+                  @mousemove="(e: Event) => handleMouseMoveAlways(e as MouseEvent, selectedTask!)"
+                  @mouseenter="(e: Event) => handleMouseEnter(e as MouseEvent, selectedTask!)"
+                  @mouseleave="handleMouseLeave"
+                  @mouseup="handleMouseUp"
+                  :style="{ cursor: activeTool === 'erase' || activeTool === 'restore' ? 'none' : 'default' }"
                 >
                   <img 
                     :src="selectedTask.previewUrl" 
@@ -1482,12 +1562,14 @@ export default {
                   <span class="image-label">结果 ({{ activeTool === 'none' ? '点击选择' : activeTool === 'erase' ? '擦除模式' : '恢复模式' }})</span>
                   
                   <div 
-                    v-if="activeTool === 'erase' || activeTool === 'restore'"
+                    v-if="(activeTool === 'erase' || activeTool === 'restore') && isMouseOverCanvas"
                     class="brush-indicator"
                     :style="{ 
                       width: brushConfig.size + 'px', 
                       height: brushConfig.size + 'px',
-                      borderColor: activeTool === 'erase' ? '#ef4444' : '#10b981'
+                      borderColor: activeTool === 'erase' ? '#ef4444' : '#10b981',
+                      left: brushCursorPos.x + 'px',
+                      top: brushCursorPos.y + 'px'
                     }"
                   ></div>
                 </div>
@@ -2112,13 +2194,12 @@ export default {
 
 .brush-indicator {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
   border: 2px dashed;
   border-radius: 50%;
   pointer-events: none;
   opacity: 0.8;
+  transform: translate(-50%, -50%);
+  z-index: 100;
 }
 
 .processing-view {
