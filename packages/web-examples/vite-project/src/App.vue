@@ -34,32 +34,25 @@ export default {
     const startDate = ref(Date.now());
     const caption = ref('Click me to remove background');
     let interval = null;
+    let currentLoadPromise = null;
 
     const publicPath = new URL(import.meta.url);
     publicPath.pathname = '/js/';
     const config = {
-      debug: false,
+      debug: true,
       publicPath: publicPath.href,
       progress: (key, current, total) => {
         const [type, subtype] = key.split(':');
-        caption.value = `${type} ${subtype} ${((current / total) * 100).toFixed(
-          0
-        )}%`;
+        const progress = ((current / total) * 100).toFixed(0);
+        caption.value = `${type} ${subtype} ${progress}%`;
+        console.log(`[Progress] ${type} ${subtype}: ${progress}%`);
       },
-      // rescale: false,
       rescale: true,
-      device: 'gpu',
-      // device: 'cpu',
-      // model: 'isnet',
-      // model: 'isnet_fp16',
-      // model: 'isnet_quint8',
+      device: 'cpu',
+      model: 'isnet_quint8',
       output: {
         quality: 0.8,
         format: 'image/png'
-        // format: 'image/jpeg'
-        // format: 'image/webp'
-        //format: 'image/x-rgba8'
-        //format: 'image/x-alpha8'
       }
     };
 
@@ -86,10 +79,13 @@ export default {
     );
 
     onMounted(async () => {
-      // Optional Preload all assets
-      await preload(config).then(() => {
+      try {
+        await preload(config);
         console.log('Asset preloading succeeded');
-      });
+      } catch (error) {
+        console.error('Asset preloading failed:', error);
+      }
+
       if (isRunning.value) {
         interval = setInterval(() => {
           seconds.value = calculateSecondsBetweenDates(
@@ -115,34 +111,43 @@ export default {
     };
 
     const load = async (type) => {
-      const randomImage = image
+      if (isRunning.value || currentLoadPromise) {
+        console.log('Already processing, please wait...');
+        return;
+      }
+
+      const selectedImage = image
         ? image
         : images[Math.floor(Math.random() * images.length)];
 
       isRunning.value = true;
       resetTimer();
 
-      imageUrl.value = randomImage;
-      let imageBlob;
-      if (type === 'remove') {
-        imageBlob = await removeBackground(randomImage, config);
-      } else {
-        const maskBlob = await segmentForeground(randomImage, config);
-        console.log(maskBlob);
-        imageBlob = await applySegmentationMask(randomImage, maskBlob, config);
+      try {
+        currentLoadPromise = (async () => {
+          let imageBlob;
+          if (type === 'remove') {
+            imageBlob = await removeBackground(selectedImage, config);
+          } else {
+            const maskBlob = await segmentForeground(selectedImage, config);
+            console.log(maskBlob);
+            imageBlob = await applySegmentationMask(selectedImage, maskBlob, config);
+          }
+          console.log(imageBlob);
+
+          const resultUrl = URL.createObjectURL(imageBlob);
+          imageUrl.value = resultUrl;
+        })();
+
+        await currentLoadPromise;
+      } catch (error) {
+        console.error('Processing failed:', error);
+        throw error;
+      } finally {
+        currentLoadPromise = null;
+        isRunning.value = false;
+        stopTimer();
       }
-      console.log(imageBlob);
-
-      // const imageBlob = await removeBackground(randomImage, config);
-      // const imageBlob = await alphamask(randomImage, config)
-      // const maskBlob = await trimap(randomImage, config)
-      // const imageBlob = await removeForeground(randomImage, config);
-      // const imageBlob = await segmentForeground(randomImage, config);
-
-      const url = URL.createObjectURL(imageBlob);
-      imageUrl.value = url;
-      isRunning.value = false;
-      stopTimer();
     };
 
     if (auto) load();
