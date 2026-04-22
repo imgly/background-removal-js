@@ -25,16 +25,14 @@ export default {
     const imageParam = params.get('image');
     const auto = params.get('auto') || false;
 
-    const currentImageIndex = ref(Math.floor(Math.random() * images.length));
-    const imageUrl = ref(imageParam || images[currentImageIndex.value]);
-    const isShowingResult = ref(false);
-    const isRunning = ref(false);
+    const currentImageIndex = ref(0);
+    const displayImageUrl = ref('');
+    const isProcessing = ref(false);
     const isPreloading = ref(true);
     const seconds = ref(0);
     const startDate = ref(Date.now());
     const caption = ref('Loading model...');
     let interval = null;
-    let currentLoadPromise = null;
 
     const publicPath = new URL(import.meta.url);
     publicPath.pathname = '/js/';
@@ -66,7 +64,7 @@ export default {
     };
 
     watch(
-      () => isRunning.value,
+      () => isProcessing.value,
       (newVal) => {
         if (newVal) {
           interval = setInterval(() => {
@@ -81,19 +79,23 @@ export default {
       }
     );
 
+    const getCurrentOriginalImage = () => {
+      if (imageParam) {
+        return imageParam;
+      }
+      return images[currentImageIndex.value];
+    };
+
     const buttonDisabled = computed(() => {
-      return isRunning.value || isPreloading.value;
+      return isProcessing.value || isPreloading.value;
     });
 
     const buttonText = computed(() => {
       if (isPreloading.value) {
         return 'Loading model...';
       }
-      if (isRunning.value) {
+      if (isProcessing.value) {
         return 'Processing...';
-      }
-      if (isShowingResult.value) {
-        return 'Next Image';
       }
       return 'Remove Background';
     });
@@ -102,61 +104,29 @@ export default {
       if (isPreloading.value) {
         return 'Loading model...';
       }
-      if (isRunning.value) {
+      if (isProcessing.value) {
         return 'Processing...';
-      }
-      if (isShowingResult.value) {
-        return 'Next Image';
       }
       return 'Segment Mask';
     });
 
-    const statusText = computed(() => {
-      if (isPreloading.value) {
-        return 'Loading model and resources...';
-      }
-      if (isRunning.value) {
-        return `Processing: ${seconds.value} s`;
-      }
-      if (isShowingResult.value) {
-        return 'Done! Click "Next Image" to process another image';
-      }
-      return 'Click "Remove Background" to process the current image';
-    });
-
-    const getCurrentOriginalImage = () => {
+    const selectNextImage = () => {
       if (imageParam) {
-        return imageParam;
-      }
-      return images[currentImageIndex.value];
-    };
-
-    const goToNextImage = () => {
-      if (isRunning.value) {
+        displayImageUrl.value = imageParam;
         return;
       }
-
-      if (imageParam) {
-        imageUrl.value = imageParam;
-        isShowingResult.value = false;
-        caption.value = 'Click "Remove Background" to process the current image';
-        return;
-      }
-
       currentImageIndex.value = (currentImageIndex.value + 1) % images.length;
-      imageUrl.value = images[currentImageIndex.value];
-      isShowingResult.value = false;
-      caption.value = 'Click "Remove Background" to process the current image';
+      displayImageUrl.value = images[currentImageIndex.value];
     };
 
     const processCurrentImage = async (type) => {
-      if (isRunning.value || currentLoadPromise) {
+      if (isProcessing.value) {
         return;
       }
 
       const imageToProcess = getCurrentOriginalImage();
 
-      isRunning.value = true;
+      isProcessing.value = true;
       startDate.value = Date.now();
       seconds.value = 0;
       caption.value = 'Processing image...';
@@ -171,33 +141,28 @@ export default {
         }
 
         const resultUrl = URL.createObjectURL(imageBlob);
-        imageUrl.value = resultUrl;
-        isShowingResult.value = true;
-        caption.value = 'Done! Click "Next Image" to process another image';
+        displayImageUrl.value = resultUrl;
+        caption.value = 'Done! Click to process another image';
       } catch (error) {
         console.error('Processing failed:', error);
         caption.value = 'Processing failed, please try again';
       } finally {
-        currentLoadPromise = null;
-        isRunning.value = false;
+        isProcessing.value = false;
       }
     };
 
     const load = async (type) => {
-      if (isPreloading.value || isRunning.value) {
+      if (isPreloading.value || isProcessing.value) {
         return;
       }
 
-      if (isShowingResult.value) {
-        goToNextImage();
-        return;
-      }
-
-      currentLoadPromise = processCurrentImage(type);
-      await currentLoadPromise;
+      selectNextImage();
+      await processCurrentImage(type);
     };
 
     onMounted(() => {
+      selectNextImage();
+      
       preload(config)
         .then(() => {
           console.log('Asset preloading succeeded');
@@ -228,13 +193,11 @@ export default {
     }
 
     return {
-      imageUrl,
-      isRunning,
+      displayImageUrl,
+      isProcessing,
       isPreloading,
-      isShowingResult,
       seconds,
       caption,
-      statusText,
       buttonDisabled,
       buttonText,
       buttonSegmentText,
@@ -251,11 +214,10 @@ export default {
 <template>
   <div id="app">
     <header>
-      <img :src="imageUrl" alt="logo" />
+      <img :src="displayImageUrl" alt="logo" />
       <p>{{ caption }}</p>
-      <p v-if="isRunning">Processing: {{ seconds }} s</p>
+      <p v-if="isProcessing">Processing: {{ seconds }} s</p>
       <p v-else-if="isPreloading">Loading model and resources...</p>
-      <p v-else-if="isShowingResult">Ready for next image</p>
 
       <button :disabled="buttonDisabled" @click="load('remove')">
         {{ buttonText }}
