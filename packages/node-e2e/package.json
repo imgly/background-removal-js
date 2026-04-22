@@ -1,10 +1,24 @@
 {
   "name": "e2e",
   "private": true,
-  "scripts": {},
+  "scripts": {
+    "test": "jest",
+    "test:unit": "jest --testPathPattern=unit/",
+    "test:integration": "jest --testPathPattern=integration/",
+    "test:performance": "jest --testPathPattern=performance/ --runInBand",
+    "test:error": "jest --testPathPattern=error/",
+    "test:browser": "playwright test",
+    "test:all": "pnpm run test:unit && pnpm run test:integration && pnpm run test:error",
+    "test:ci": "jest --testPathPattern='unit|integration|error' --runInBand",
+    "playwright:install": "playwright install",
+    "playwright:install-deps": "playwright install-deps"
+  },
   "devDependencies": {
     "@imgly/background-removal-node": "workspace:*",
-    "jest": "^29.6.2"
+    "@playwright/test": "^1.40.0",
+    "jest": "^29.6.2",
+    "jest-environment-node": "^29.6.2",
+    "perf_hooks": "^0.0.1"
   },
   "version": "1.7.0"
 }
