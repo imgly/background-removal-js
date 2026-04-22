@@ -22,13 +22,12 @@ export default {
 
     const url = new URL(window.location.href);
     const params = new URLSearchParams(url.search);
-    const image = params.get('image');
+    const imageParam = params.get('image');
     const auto = params.get('auto') || false;
-    const initialImage = image
-      ? image
-      : images[Math.floor(Math.random() * images.length)];
 
-    const imageUrl = ref(initialImage);
+    const currentImageIndex = ref(Math.floor(Math.random() * images.length));
+    const imageUrl = ref(imageParam || images[currentImageIndex.value]);
+    const isShowingResult = ref(false);
     const isRunning = ref(false);
     const isPreloading = ref(true);
     const seconds = ref(0);
@@ -36,7 +35,6 @@ export default {
     const caption = ref('Loading model...');
     let interval = null;
     let currentLoadPromise = null;
-    let pendingImageToProcess = null;
 
     const publicPath = new URL(import.meta.url);
     publicPath.pathname = '/js/';
@@ -47,7 +45,7 @@ export default {
         const [type, subtype] = key.split(':');
         const progress = ((current / total) * 100).toFixed(0);
         if (type === 'fetch') {
-          caption.value = `Loading ${subtype}: ${progress}%`;
+          caption.value = `Loading: ${progress}%`;
         } else if (type === 'compute') {
           caption.value = `Processing: ${subtype} ${progress}%`;
         }
@@ -87,87 +85,135 @@ export default {
       return isRunning.value || isPreloading.value;
     });
 
-    onMounted(() => {
-      preload(config)
-        .then(() => {
-          console.log('Asset preloading succeeded');
-          isPreloading.value = false;
-          caption.value = 'Click me to remove background';
-        })
-        .catch((error) => {
-          console.error('Asset preloading failed:', error);
-          isPreloading.value = false;
-          caption.value = 'Ready (will load on first use)';
-        });
-
+    const buttonText = computed(() => {
+      if (isPreloading.value) {
+        return 'Loading model...';
+      }
       if (isRunning.value) {
-        interval = setInterval(() => {
-          seconds.value = calculateSecondsBetweenDates(
-            startDate.value,
-            Date.now()
-          );
-        }, 100);
+        return 'Processing...';
       }
+      if (isShowingResult.value) {
+        return 'Next Image';
+      }
+      return 'Remove Background';
     });
 
-    onUnmounted(() => {
-      clearInterval(interval);
+    const buttonSegmentText = computed(() => {
+      if (isPreloading.value) {
+        return 'Loading model...';
+      }
+      if (isRunning.value) {
+        return 'Processing...';
+      }
+      if (isShowingResult.value) {
+        return 'Next Image';
+      }
+      return 'Segment Mask';
     });
 
-    const resetTimer = () => {
-      isRunning.value = true;
-      startDate.value = Date.now();
-      seconds.value = 0;
-    };
-
-    const stopTimer = () => {
-      isRunning.value = false;
-    };
-
-    const selectNextImage = () => {
-      if (image) {
-        return image;
+    const statusText = computed(() => {
+      if (isPreloading.value) {
+        return 'Loading model and resources...';
       }
-      return images[Math.floor(Math.random() * images.length)];
+      if (isRunning.value) {
+        return `Processing: ${seconds.value} s`;
+      }
+      if (isShowingResult.value) {
+        return 'Done! Click "Next Image" to process another image';
+      }
+      return 'Click "Remove Background" to process the current image';
+    });
+
+    const getCurrentOriginalImage = () => {
+      if (imageParam) {
+        return imageParam;
+      }
+      return images[currentImageIndex.value];
     };
 
-    const processImage = async (type, imageToProcess) => {
-      let imageBlob;
-      if (type === 'remove') {
-        imageBlob = await removeBackground(imageToProcess, config);
-      } else {
-        const maskBlob = await segmentForeground(imageToProcess, config);
-        imageBlob = await applySegmentationMask(imageToProcess, maskBlob, config);
+    const goToNextImage = () => {
+      if (isRunning.value) {
+        return;
       }
 
-      const resultUrl = URL.createObjectURL(imageBlob);
-      imageUrl.value = resultUrl;
+      if (imageParam) {
+        imageUrl.value = imageParam;
+        isShowingResult.value = false;
+        caption.value = 'Click "Remove Background" to process the current image';
+        return;
+      }
+
+      currentImageIndex.value = (currentImageIndex.value + 1) % images.length;
+      imageUrl.value = images[currentImageIndex.value];
+      isShowingResult.value = false;
+      caption.value = 'Click "Remove Background" to process the current image';
     };
 
-    const load = async (type) => {
+    const processCurrentImage = async (type) => {
       if (isRunning.value || currentLoadPromise) {
         return;
       }
 
-      const imageToProcess = selectNextImage();
+      const imageToProcess = getCurrentOriginalImage();
 
       isRunning.value = true;
-      resetTimer();
+      startDate.value = Date.now();
+      seconds.value = 0;
       caption.value = 'Processing image...';
 
       try {
-        currentLoadPromise = processImage(type, imageToProcess);
-        await currentLoadPromise;
-        caption.value = 'Done! Click to process another image';
+        let imageBlob;
+        if (type === 'remove') {
+          imageBlob = await removeBackground(imageToProcess, config);
+        } else {
+          const maskBlob = await segmentForeground(imageToProcess, config);
+          imageBlob = await applySegmentationMask(imageToProcess, maskBlob, config);
+        }
+
+        const resultUrl = URL.createObjectURL(imageBlob);
+        imageUrl.value = resultUrl;
+        isShowingResult.value = true;
+        caption.value = 'Done! Click "Next Image" to process another image';
       } catch (error) {
         console.error('Processing failed:', error);
         caption.value = 'Processing failed, please try again';
       } finally {
         currentLoadPromise = null;
         isRunning.value = false;
-        stopTimer();
       }
     };
+
+    const load = async (type) => {
+      if (isPreloading.value || isRunning.value) {
+        return;
+      }
+
+      if (isShowingResult.value) {
+        goToNextImage();
+        return;
+      }
+
+      currentLoadPromise = processCurrentImage(type);
+      await currentLoadPromise;
+    };
+
+    onMounted(() => {
+      preload(config)
+        .then(() => {
+          console.log('Asset preloading succeeded');
+          isPreloading.value = false;
+          caption.value = 'Click "Remove Background" to process the current image';
+        })
+        .catch((error) => {
+          console.error('Asset preloading failed:', error);
+          isPreloading.value = false;
+          caption.value = 'Ready (will load on first use)';
+        });
+    });
+
+    onUnmounted(() => {
+      clearInterval(interval);
+    });
 
     const checkAndAutoLoad = () => {
       if (!isPreloading.value) {
@@ -185,9 +231,13 @@ export default {
       imageUrl,
       isRunning,
       isPreloading,
+      isShowingResult,
       seconds,
       caption,
+      statusText,
       buttonDisabled,
+      buttonText,
+      buttonSegmentText,
       load
     };
   }
@@ -205,16 +255,13 @@ export default {
       <p>{{ caption }}</p>
       <p v-if="isRunning">Processing: {{ seconds }} s</p>
       <p v-else-if="isPreloading">Loading model and resources...</p>
+      <p v-else-if="isShowingResult">Ready for next image</p>
 
       <button :disabled="buttonDisabled" @click="load('remove')">
-        <span v-if="isPreloading">Loading model...</span>
-        <span v-else-if="isRunning">Processing...</span>
-        <span v-else>Click me (removeBackground)</span>
+        {{ buttonText }}
       </button>
       <button :disabled="buttonDisabled" @click="load('segment')">
-        <span v-if="isPreloading">Loading model...</span>
-        <span v-else-if="isRunning">Processing...</span>
-        <span v-else>Click me (applySegmentationMask)</span>
+        {{ buttonSegmentText }}
       </button>
     </header>
   </div>
