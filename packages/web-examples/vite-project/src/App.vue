@@ -1,5 +1,5 @@
 <script>
-import { ref, watch, onMounted, onUnmounted, computed } from 'vue';
+import { ref, watch, onMounted, onUnmounted } from 'vue';
 
 import {
   preload,
@@ -30,11 +30,9 @@ export default {
 
     const imageUrl = ref(randomImage);
     const isRunning = ref(false);
-    const isPreloading = ref(true);
     const seconds = ref(0);
     const startDate = ref(Date.now());
-    const caption = ref('Loading model...');
-    const progressInfo = ref('');
+    const caption = ref('Click me to remove background');
     let interval = null;
     let currentLoadPromise = null;
 
@@ -46,12 +44,7 @@ export default {
       progress: (key, current, total) => {
         const [type, subtype] = key.split(':');
         const progress = ((current / total) * 100).toFixed(0);
-        if (type === 'fetch') {
-          progressInfo.value = `Downloading ${subtype}: ${progress}%`;
-        } else if (type === 'compute') {
-          progressInfo.value = `Processing: ${subtype} ${progress}%`;
-        }
-        caption.value = progressInfo.value;
+        caption.value = `${type} ${subtype} ${progress}%`;
         console.log(`[Progress] ${type} ${subtype}: ${progress}%`);
       },
       rescale: true,
@@ -85,22 +78,13 @@ export default {
       }
     );
 
-    const buttonDisabled = computed(() => {
-      return isRunning.value || isPreloading.value;
-    });
-
-    onMounted(() => {
-      preload(config)
-        .then(() => {
-          console.log('Asset preloading succeeded');
-          isPreloading.value = false;
-          caption.value = 'Click me to remove background';
-        })
-        .catch((error) => {
-          console.error('Preload failed:', error);
-          isPreloading.value = false;
-          caption.value = 'Ready (preload failed, will load on first use)';
-        });
+    onMounted(async () => {
+      try {
+        await preload(config);
+        console.log('Asset preloading succeeded');
+      } catch (error) {
+        console.error('Asset preloading failed:', error);
+      }
 
       if (isRunning.value) {
         interval = setInterval(() => {
@@ -127,13 +111,8 @@ export default {
     };
 
     const load = async (type) => {
-      if (isRunning.value) {
+      if (isRunning.value || currentLoadPromise) {
         console.log('Already processing, please wait...');
-        return;
-      }
-
-      if (currentLoadPromise) {
-        console.log('Waiting for previous operation...');
         return;
       }
 
@@ -143,9 +122,6 @@ export default {
 
       isRunning.value = true;
       resetTimer();
-      caption.value = 'Processing image...';
-
-      const originalImageUrl = imageUrl.value;
 
       try {
         currentLoadPromise = (async () => {
@@ -161,14 +137,12 @@ export default {
 
           const resultUrl = URL.createObjectURL(imageBlob);
           imageUrl.value = resultUrl;
-          caption.value = 'Done! Click to process another image';
         })();
 
         await currentLoadPromise;
       } catch (error) {
         console.error('Processing failed:', error);
-        imageUrl.value = originalImageUrl;
-        caption.value = 'Processing failed, please try again';
+        throw error;
       } finally {
         currentLoadPromise = null;
         isRunning.value = false;
@@ -176,18 +150,9 @@ export default {
       }
     };
 
-    if (auto) {
-      const checkAndLoad = () => {
-        if (!isPreloading.value) {
-          load('remove');
-        } else {
-          setTimeout(checkAndLoad, 100);
-        }
-      };
-      checkAndLoad();
-    }
+    if (auto) load();
 
-    return { imageUrl, isRunning, isPreloading, seconds, caption, buttonDisabled, load };
+    return { imageUrl, isRunning, seconds, caption, load };
   }
 };
 </script>
@@ -201,18 +166,13 @@ export default {
     <header>
       <img :src="imageUrl" alt="logo" />
       <p>{{ caption }}</p>
-      <p v-if="isRunning">Processing: {{ seconds }} s</p>
-      <p v-else-if="isPreloading">Loading model and resources...</p>
+      <p>Processing: {{ seconds }} s</p>
 
-      <button :disabled="buttonDisabled" @click="load('remove')">
-        <span v-if="isPreloading">Loading model...</span>
-        <span v-else-if="isRunning">Processing...</span>
-        <span v-else>Click me (removeBackground)</span>
+      <button :disabled="isRunning" @click="load('remove')">
+        Click me (removeBackground)
       </button>
-      <button :disabled="buttonDisabled" @click="load('segment')">
-        <span v-if="isPreloading">Loading model...</span>
-        <span v-else-if="isRunning">Processing...</span>
-        <span v-else>Click me (applySegmentationMask)</span>
+      <button :disabled="isRunning" @click="load('segment')">
+        Click me (applySegmentationMask)
       </button>
     </header>
   </div>

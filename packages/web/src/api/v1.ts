@@ -5,15 +5,13 @@ export {
   removeForeground,
   alphamask,
   segmentForeground,
-  applySegmentationMask,
-  clearCache
+  applySegmentationMask
 };
 export type { Config, ImageSource };
 
 import memoize from 'lodash-es/memoize';
 
 import { initInference, runInference } from '../inference';
-import { clearCache as clearResourceCache } from '../resource';
 import { Config, validateConfig } from '../schema';
 import * as utils from '../utils';
 import { ImageSource } from '../utils';
@@ -23,10 +21,6 @@ const init = memoize(initInference, (config) => JSON.stringify(config));
 async function preload(configuration?: Config): Promise<void> {
   await init(configuration);
   return;
-}
-
-async function clearCache(): Promise<void> {
-  await clearResourceCache();
 }
 
 /**

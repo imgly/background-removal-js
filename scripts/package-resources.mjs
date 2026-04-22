@@ -6,10 +6,8 @@ import { fileURLToPath } from 'node:url';
 
 import { globSync } from 'glob';
 
-// All paths are relative to the directory of this file
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const BaseDir = __dirname;
+// Use current working directory as base directory
+const BaseDir = process.cwd();
 const DefaultOutDir = path.resolve(BaseDir, './dist');
 const DefaultEntry = {
   mime: 'application/octet-stream'
@@ -154,12 +152,14 @@ async function transform(fileName, entry) {
 }
 
 async function loadConfig() {
-  if (fileExists(path.resolve(BaseDir, '.resources.mjs'))) {
-    const resources = await import(`file://${path.resolve(BaseDir, '.resources.mjs')}`);
+  const configPath = path.resolve(BaseDir, '.resources.mjs');
+  if (fileExists(configPath)) {
+    const resources = await import(`file://${configPath}`);
     const entries = resources.default;
     return entries;
   }
-  return [];
+  console.error(`Config file not found: ${configPath}`);
+  process.exit(-1);
 }
 
 async function main() {
@@ -197,12 +197,13 @@ async function loadResourceMetadata() {
   }
   return [];
 }
+
 async function saveResourceMetadata(filesToProcess) {
   const resourcesMetadata = {};
   for (const fileToProcess of Object.keys(filesToProcess)) {
     const entry = filesToProcess[fileToProcess];
     const metadata = await transform(fileToProcess, entry, DefaultOutDir);
-    const key = path.join(entry.path, path.basename(fileToProcess));
+    const key = toUnixPath(path.join(entry.path, path.basename(fileToProcess)));
     resourcesMetadata[key] = metadata;
   }
   fs.writeFileSync(
