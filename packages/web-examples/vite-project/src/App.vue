@@ -26,6 +26,8 @@ export default {
     const auto = params.get('auto') || false;
 
     const currentImageIndex = ref(0);
+    const originalImageUrl = ref('');
+    const resultImageUrl = ref('');
     const displayImageUrl = ref('');
     const isProcessing = ref(false);
     const isPreloading = ref(true);
@@ -80,10 +82,7 @@ export default {
     );
 
     const getCurrentOriginalImage = () => {
-      if (imageParam) {
-        return imageParam;
-      }
-      return images[currentImageIndex.value];
+      return originalImageUrl.value;
     };
 
     const buttonDisabled = computed(() => {
@@ -112,11 +111,26 @@ export default {
 
     const selectNextImage = () => {
       if (imageParam) {
+        originalImageUrl.value = imageParam;
         displayImageUrl.value = imageParam;
         return;
       }
       currentImageIndex.value = (currentImageIndex.value + 1) % images.length;
+      originalImageUrl.value = images[currentImageIndex.value];
       displayImageUrl.value = images[currentImageIndex.value];
+      resultImageUrl.value = '';
+      caption.value = 'Click "Remove Background" to process the current image';
+    };
+
+    const selectCurrentImage = () => {
+      if (imageParam) {
+        originalImageUrl.value = imageParam;
+        displayImageUrl.value = imageParam;
+        return;
+      }
+      originalImageUrl.value = images[currentImageIndex.value];
+      displayImageUrl.value = images[currentImageIndex.value];
+      resultImageUrl.value = '';
     };
 
     const processCurrentImage = async (type) => {
@@ -124,7 +138,12 @@ export default {
         return;
       }
 
-      const imageToProcess = getCurrentOriginalImage();
+      if (!originalImageUrl.value) {
+        caption.value = 'No image selected for processing';
+        return;
+      }
+
+      const imageToProcess = originalImageUrl.value;
 
       isProcessing.value = true;
       startDate.value = Date.now();
@@ -141,8 +160,9 @@ export default {
         }
 
         const resultUrl = URL.createObjectURL(imageBlob);
+        resultImageUrl.value = resultUrl;
         displayImageUrl.value = resultUrl;
-        caption.value = 'Done! Click to process another image';
+        caption.value = 'Done! Click "Next Image" to process another image';
       } catch (error) {
         console.error('Processing failed:', error);
         caption.value = 'Processing failed, please try again';
@@ -156,12 +176,11 @@ export default {
         return;
       }
 
-      selectNextImage();
       await processCurrentImage(type);
     };
 
     onMounted(() => {
-      selectNextImage();
+      selectCurrentImage();
       
       preload(config)
         .then(() => {
@@ -201,7 +220,8 @@ export default {
       buttonDisabled,
       buttonText,
       buttonSegmentText,
-      load
+      load,
+      selectNextImage
     };
   }
 };
@@ -224,6 +244,9 @@ export default {
       </button>
       <button :disabled="buttonDisabled" @click="load('segment')">
         {{ buttonSegmentText }}
+      </button>
+      <button :disabled="isProcessing || isPreloading" @click="selectNextImage">
+        Next Image
       </button>
     </header>
   </div>
