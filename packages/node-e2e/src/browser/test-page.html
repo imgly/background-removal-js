@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Background Removal Test Page</title>
+</head>
+<body>
+  <h1>Background Removal Test Page</h1>
+  
+  <div id="test-results"></div>
+  <div id="performance-metrics"></div>
+  
+  <script type="module">
+    import { removeBackground, preload, segmentForeground, applySegmentationMask } from '/dist/index.esm.js';
+    
+    window.backgroundRemoval = {
+      removeBackground,
+      preload,
+      segmentForeground,
+      applySegmentationMask
+    };
+    
+    window.testResults = [];
+    window.performanceMetrics = [];
+    
+    window.logTestResult = function(name, passed, message = '') {
+      window.testResults.push({ name, passed, message, timestamp: Date.now() });
+      const resultsDiv = document.getElementById('test-results');
+      const status = passed ? 'PASS' : 'FAIL';
+      const color = passed ? 'color: green;' : 'color: red;';
+      resultsDiv.innerHTML += `<div style="${color}">[${status}] ${name}: ${message}</div>`;
+    };
+    
+    window.logPerformance = function(metric, value, unit = 'ms') {
+      window.performanceMetrics.push({ metric, value, unit, timestamp: Date.now() });
+      const metricsDiv = document.getElementById('performance-metrics');
+      metricsDiv.innerHTML += `<div>Performance: ${metric} = ${value} ${unit}</div>`;
+    };
+    
+    window.getTestResults = function() {
+      return window.testResults;
+    };
+    
+    window.getPerformanceMetrics = function() {
+      return window.performanceMetrics;
+    };
+    
+    window.clearResults = function() {
+      window.testResults = [];
+      window.performanceMetrics = [];
+      document.getElementById('test-results').innerHTML = '';
+      document.getElementById('performance-metrics').innerHTML = '';
+    };
+    
+    console.log('Background Removal API loaded and available at window.backgroundRemoval');
+  </script>
+</body>
+</html>
