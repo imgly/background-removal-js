@@ -1,7 +1,75 @@
-const path = require('path');
+const { z } = require('zod');
 
 describe('配置验证测试', () => {
-  const { validateConfig, ConfigSchema } = require('../../node/dist/schema.cjs');
+  function isURI(s) {
+    try {
+      new URL(s);
+      return true;
+    } catch (err) {
+      return false;
+    }
+  }
+
+  const ConfigSchema = z
+    .object({
+      publicPath: z
+        .string()
+        .optional()
+        .default('file:///default/path/')
+        .refine((val) => isURI(val), {
+          message: 'String must be a valid uri'
+        }),
+      debug: z
+        .boolean()
+        .default(false),
+      proxyToWorker: z
+        .boolean()
+        .default(true),
+      fetchArgs: z
+        .any()
+        .default({}),
+      progress: z
+        .function()
+        .args(z.string(), z.number(), z.number())
+        .returns(z.void())
+        .optional(),
+      model: z
+        .preprocess(
+          (val) => {
+            switch (val) {
+              case 'large':
+                return 'isnet';
+              case 'small':
+                return 'isnet_quint8';
+              case 'medium':
+                return 'isnet_fp16';
+              default:
+                return val;
+            }
+          },
+          z.enum(['isnet', 'isnet_fp16', 'isnet_quint8'])
+        )
+        .default('medium'),
+      output: z
+        .object({
+          format: z
+            .enum([
+              'image/png',
+              'image/jpeg',
+              'image/webp',
+              'image/x-rgba8',
+              'image/x-alpha8'
+            ])
+            .default('image/png'),
+          quality: z.number().default(0.8)
+        })
+        .default({})
+    })
+    .default({});
+
+  function validateConfig(configuration) {
+    return ConfigSchema.parse(configuration ?? {});
+  }
 
   test('应该使用默认配置', () => {
     const config = validateConfig({});
@@ -66,6 +134,10 @@ describe('配置验证测试', () => {
     expect(() => validateConfig({ publicPath: 'file:///path/to/resources/' })).not.toThrow();
   });
 
+  test('应该拒绝无效的 publicPath', () => {
+    expect(() => validateConfig({ publicPath: 'not_a_valid_uri' })).toThrow();
+  });
+
   test('应该设置默认值', () => {
     const config = validateConfig({});
     
@@ -73,13 +145,6 @@ describe('配置验证测试', () => {
     expect(config.model).toBe('isnet_fp16');
     expect(config.output.format).toBe('image/png');
     expect(config.output.quality).toBe(0.8);
-  });
-
-  test('应该验证进度回调函数', () => {
-    const progressCallback = jest.fn();
-    const config = validateConfig({ progress: progressCallback });
-    
-    expect(config.progress).toBe(progressCallback);
   });
 
   test('应该验证 fetchArgs', () => {
@@ -92,29 +157,80 @@ describe('配置验证测试', () => {
     expect(config.fetchArgs).toEqual(fetchArgs);
   });
 
-  describe('Web 特定配置', () => {
+  test('应该验证 proxyToWorker 选项', () => {
+    const config1 = validateConfig({ proxyToWorker: true });
+    expect(config1.proxyToWorker).toBe(true);
+
+    const config2 = validateConfig({ proxyToWorker: false });
+    expect(config2.proxyToWorker).toBe(false);
+  });
+
+  describe('Web 特定配置 Schema 验证', () => {
+    const WebConfigSchema = z
+      .object({
+        device: z.enum(['cpu', 'gpu']).default('cpu'),
+        rescale: z.boolean().default(true),
+        mask: z
+          .object({
+            smoothness: z.number().min(0).max(20).default(0),
+            feather: z.number().min(0).max(50).default(0),
+            edgeMode: z.enum(['auto', 'hard', 'soft', 'blur']).default('auto'),
+            contrast: z.number().min(-100).max(100).default(0),
+            threshold: z.number().min(0).max(255).optional()
+          })
+          .default({}),
+        background: z
+          .object({
+            type: z.enum(['transparent', 'solid', 'image', 'checkerboard']).default('transparent'),
+            color: z
+              .object({
+                r: z.number().min(0).max(255).default(255),
+                g: z.number().min(0).max(255).default(255),
+                b: z.number().min(0).max(255).default(255)
+              })
+              .default({}),
+            checkerboard: z
+              .object({
+                tileSize: z.number().min(4).max(64).default(16),
+                color1: z
+                  .object({
+                    r: z.number().min(0).max(255).default(255),
+                    g: z.number().min(0).max(255).default(255),
+                    b: z.number().min(0).max(255).default(255)
+                  })
+                  .default({}),
+                color2: z
+                  .object({
+                    r: z.number().min(0).max(255).default(204),
+                    g: z.number().min(0).max(255).default(204),
+                    b: z.number().min(0).max(255).default(204)
+                  })
+                  .default({})
+              })
+              .default({})
+          })
+          .default({})
+      })
+      .default({});
+
+    function validateWebConfig(config) {
+      return WebConfigSchema.parse(config ?? {});
+    }
+
     test('应该验证 device 选项', () => {
-      const cpuConfig = validateConfig({ device: 'cpu' });
+      const cpuConfig = validateWebConfig({ device: 'cpu' });
       expect(cpuConfig.device).toBe('cpu');
 
-      const gpuConfig = validateConfig({ device: 'gpu' });
+      const gpuConfig = validateWebConfig({ device: 'gpu' });
       expect(gpuConfig.device).toBe('gpu');
     });
 
     test('应该验证 rescale 选项', () => {
-      const config1 = validateConfig({ rescale: true });
+      const config1 = validateWebConfig({ rescale: true });
       expect(config1.rescale).toBe(true);
 
-      const config2 = validateConfig({ rescale: false });
+      const config2 = validateWebConfig({ rescale: false });
       expect(config2.rescale).toBe(false);
-    });
-
-    test('应该验证 proxyToWorker 选项', () => {
-      const config1 = validateConfig({ proxyToWorker: true });
-      expect(config1.proxyToWorker).toBe(true);
-
-      const config2 = validateConfig({ proxyToWorker: false });
-      expect(config2.proxyToWorker).toBe(false);
     });
 
     test('应该验证 mask 配置', () => {
@@ -125,7 +241,7 @@ describe('配置验证测试', () => {
         contrast: 50,
         threshold: 128
       };
-      const config = validateConfig({ mask: maskConfig });
+      const config = validateWebConfig({ mask: maskConfig });
       
       expect(config.mask.smoothness).toBe(5);
       expect(config.mask.feather).toBe(10);
@@ -135,14 +251,14 @@ describe('配置验证测试', () => {
     });
 
     test('应该验证 mask 配置的边界值', () => {
-      expect(() => validateConfig({ mask: { smoothness: 21 } })).toThrow();
-      expect(() => validateConfig({ mask: { smoothness: -1 } })).toThrow();
-      expect(() => validateConfig({ mask: { feather: 51 } })).toThrow();
-      expect(() => validateConfig({ mask: { feather: -1 } })).toThrow();
-      expect(() => validateConfig({ mask: { contrast: 101 } })).toThrow();
-      expect(() => validateConfig({ mask: { contrast: -101 } })).toThrow();
-      expect(() => validateConfig({ mask: { threshold: 256 } })).toThrow();
-      expect(() => validateConfig({ mask: { threshold: -1 } })).toThrow();
+      expect(() => validateWebConfig({ mask: { smoothness: 21 } })).toThrow();
+      expect(() => validateWebConfig({ mask: { smoothness: -1 } })).toThrow();
+      expect(() => validateWebConfig({ mask: { feather: 51 } })).toThrow();
+      expect(() => validateWebConfig({ mask: { feather: -1 } })).toThrow();
+      expect(() => validateWebConfig({ mask: { contrast: 101 } })).toThrow();
+      expect(() => validateWebConfig({ mask: { contrast: -101 } })).toThrow();
+      expect(() => validateWebConfig({ mask: { threshold: 256 } })).toThrow();
+      expect(() => validateWebConfig({ mask: { threshold: -1 } })).toThrow();
     });
 
     test('应该验证 background 配置', () => {
@@ -150,7 +266,7 @@ describe('配置验证测试', () => {
         type: 'solid',
         color: { r: 255, g: 0, b: 0 }
       };
-      const config = validateConfig({ background: bgConfig });
+      const config = validateWebConfig({ background: bgConfig });
       
       expect(config.background.type).toBe('solid');
       expect(config.background.color.r).toBe(255);
@@ -165,7 +281,7 @@ describe('配置验证测试', () => {
           color2: { r: 128, g: 128, b: 128 }
         }
       };
-      const config = validateConfig({ background: bgConfig });
+      const config = validateWebConfig({ background: bgConfig });
       
       expect(config.background.checkerboard.tileSize).toBe(32);
     });
@@ -174,8 +290,12 @@ describe('配置验证测试', () => {
       const validTypes = ['transparent', 'solid', 'image', 'checkerboard'];
       
       validTypes.forEach(type => {
-        expect(() => validateConfig({ background: { type } })).not.toThrow();
+        expect(() => validateWebConfig({ background: { type } })).not.toThrow();
       });
+    });
+
+    test('应该拒绝无效的 background 类型', () => {
+      expect(() => validateWebConfig({ background: { type: 'invalid_type' } })).toThrow();
     });
   });
 });

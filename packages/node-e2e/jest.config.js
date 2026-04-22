@@ -11,13 +11,7 @@ module.exports = {
   testTimeout: 300000,
   maxWorkers: 1,
   setupFilesAfterEnv: [],
-  reporters: [
-    'default',
-    ['jest-html-reporter', {
-      pageTitle: 'Background Removal Test Report',
-      outputPath: 'test-report.html'
-    }]
-  ],
+  reporters: ['default'],
   collectCoverage: false,
   coverageDirectory: 'coverage',
   coverageReporters: ['text', 'lcov', 'html']

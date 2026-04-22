@@ -16,9 +16,7 @@
   "devDependencies": {
     "@imgly/background-removal-node": "workspace:*",
     "@playwright/test": "^1.40.0",
-    "jest": "^29.6.2",
-    "jest-environment-node": "^29.6.2",
-    "perf_hooks": "^0.0.1"
+    "jest": "^29.6.2"
   },
   "version": "1.7.0"
 }

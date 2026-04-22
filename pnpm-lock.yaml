@@ -132,12 +132,6 @@ importers:
       jest:
         specifier: ^29.6.2
         version: 29.7.0(@types/node@20.3.3)
-      jest-environment-node:
-        specifier: ^29.6.2
-        version: 29.7.0
-      perf_hooks:
-        specifier: ^0.0.1
-        version: 0.0.1
 
   packages/node-examples:
     dependencies:
@@ -3358,9 +3352,6 @@ packages:
   path-scurry@2.0.0:
     resolution: {integrity: sha512-ypGJsmGtdXUOeM5u93TyeIEfEhM6s+ljAhrk5vAvSx8uyY/02OvrZnA0YNGUrPXfpJMgI1ODd3nwz8Npx4O4cg==}
     engines: {node: 20 || >=22}
-
-  perf_hooks@0.0.1:
-    resolution: {integrity: sha512-qG/D9iA4KDme+KF4vCObJy6Bouu3BlQnmJ8jPydVPm32NJBD9ZK1ZNgXSYaZKHkVC1sKSqUiLgFvAZPUiIEnBw==}
 
   picocolors@1.1.1:
     resolution: {integrity: sha512-xceH2snhtb5M9liqDsmEw56le376mTZkEX/jEb/RxNFyegNul7eNslCXP9FDj/Lcu0X8KEyMceP2ntpaHrDEVA==}
@@ -7720,8 +7711,6 @@ snapshots:
     dependencies:
       lru-cache: 11.0.2
       minipass: 7.1.2
-
-  perf_hooks@0.0.1: {}
 
   picocolors@1.1.1: {}
 

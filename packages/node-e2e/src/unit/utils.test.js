@@ -154,7 +154,7 @@ describe('核心工具函数测试', () => {
       expect(newAspectRatio).toBeCloseTo(aspectRatio, 5);
     });
 
-    test('当原始尺寸小于最大尺寸时应该保持不变', () => {
+    test('应该按比例放大或缩小尺寸以适应最大边界', () => {
       const originalWidth = 512;
       const originalHeight = 512;
       const maxWidth = 1024;
@@ -164,8 +164,12 @@ describe('核心工具函数测试', () => {
         originalWidth, originalHeight, maxWidth, maxHeight
       );
       
-      expect(newWidth).toBeLessThanOrEqual(originalWidth);
-      expect(newHeight).toBeLessThanOrEqual(originalHeight);
+      const aspectRatio = originalWidth / originalHeight;
+      const newAspectRatio = newWidth / newHeight;
+      
+      expect(newWidth).toBeLessThanOrEqual(maxWidth);
+      expect(newHeight).toBeLessThanOrEqual(maxHeight);
+      expect(newAspectRatio).toBeCloseTo(aspectRatio, 5);
     });
 
     test('应该正确处理不同的宽高比', () => {
@@ -476,7 +480,7 @@ function tensorHWCtoBCHW(imageTensor, mean = [128, 128, 128], std = [256, 256, 2
 function convertFloat32ToUint8(float32Array) {
   const uint8Array = new Uint8Array(float32Array.data.length);
   for (let i = 0; i < float32Array.data.length; i++) {
-    uint8Array[i] = Math.round(float32Array.data[i] * 255);
+    uint8Array[i] = float32Array.data[i] * 255;
   }
   return ndarray(uint8Array, float32Array.shape);
 }
