@@ -11,6 +11,7 @@ interface ImageTask {
   name: string;
   status: TaskStatus;
   progress: number;
+  displayProgress: number;
   progressText: string;
   resultBlob: Blob | null;
   resultUrl: string | null;
@@ -19,6 +20,8 @@ interface ImageTask {
   retryCount: number;
   processingTime: number;
   startTime: number;
+  currentStage: string;
+  stageStartTime: number;
 }
 
 interface QueueStats {
@@ -33,6 +36,20 @@ interface QueueStats {
 
 const MAX_CONCURRENT = 1;
 const MAX_RETRIES = 3;
+
+const STAGE_WEIGHTS: Record<string, { start: number; end: number; description: string }> = {
+  fetch: { start: 0, end: 8, description: '加载资源' },
+  decode: { start: 8, end: 18, description: '解码图片' },
+  inference: { start: 18, end: 78, description: 'AI处理中' },
+  mask: { start: 78, end: 88, description: '生成掩码' },
+  encode: { start: 88, end: 98, description: '编码结果' }
+};
+
+const ANIMATION_INTERVAL = 50;
+const PROGRESS_SMOOTHING = 0.15;
+
+let animationFrameId: number | null = null;
+const activeAnimations = new Map<string, { targetProgress: number; lastUpdate: number }>();
 
 export default {
   name: 'App',
@@ -124,6 +141,7 @@ export default {
         name: file.name,
         status: 'pending',
         progress: 0,
+        displayProgress: 0,
         progressText: 'Waiting...',
         resultBlob: null,
         resultUrl: null,
@@ -131,8 +149,84 @@ export default {
         error: null,
         retryCount: 0,
         processingTime: 0,
-        startTime: 0
+        startTime: 0,
+        currentStage: '',
+        stageStartTime: 0
       };
+    };
+
+    const startProgressAnimation = () => {
+      if (animationFrameId !== null) return;
+
+      const animate = () => {
+        const now = Date.now();
+        let hasActiveTasks = false;
+
+        tasks.value.forEach(task => {
+          if (task.status !== 'processing') return;
+          
+          hasActiveTasks = true;
+          
+          let targetProgress = task.progress;
+          
+          if (task.currentStage && task.stageStartTime > 0) {
+            const stage = STAGE_WEIGHTS[task.currentStage];
+            if (stage) {
+              const elapsed = now - task.stageStartTime;
+              const estimatedStageDuration = task.currentStage === 'inference' ? 5000 : 800;
+              const stageProgress = Math.min(elapsed / estimatedStageDuration, 0.95);
+              
+              const currentStepProgress = task.progress / 100;
+              const stageRange = stage.end - stage.start;
+              
+              if (task.currentStage === 'inference') {
+                const baseProgress = stage.start + stageRange * currentStepProgress;
+                const simulatedExtra = stageRange * stageProgress * (1 - currentStepProgress) * 0.3;
+                targetProgress = Math.min(baseProgress + simulatedExtra, stage.end);
+              } else {
+                targetProgress = stage.start + stageRange * Math.max(currentStepProgress, stageProgress * 0.5);
+              }
+            }
+          }
+
+          targetProgress = Math.min(targetProgress, 99);
+
+          const diff = targetProgress - task.displayProgress;
+          if (Math.abs(diff) > 0.1) {
+            task.displayProgress += diff * PROGRESS_SMOOTHING;
+            task.displayProgress = Math.round(task.displayProgress * 10) / 10;
+          }
+        });
+
+        if (hasActiveTasks) {
+          animationFrameId = window.setTimeout(animate, ANIMATION_INTERVAL);
+        } else {
+          animationFrameId = null;
+        }
+      };
+
+      animate();
+    };
+
+    const stopProgressAnimation = () => {
+      if (animationFrameId !== null) {
+        clearTimeout(animationFrameId);
+        animationFrameId = null;
+      }
+    };
+
+    const calculateWeightedProgress = (type: string, subtype: string, current: number, total: number): number => {
+      const stageKey = type === 'fetch' ? 'fetch' : subtype;
+      const stage = STAGE_WEIGHTS[stageKey];
+      
+      if (!stage) {
+        return Math.round((current / total) * 100);
+      }
+
+      const stageProgress = current / total;
+      const weightedProgress = stage.start + (stage.end - stage.start) * stageProgress;
+      
+      return Math.round(weightedProgress);
     };
 
     const addFiles = (files: FileList | File[]) => {
@@ -152,28 +246,39 @@ export default {
       task.status = 'processing';
       task.startTime = Date.now();
       task.progress = 0;
-      task.progressText = 'Initializing...';
+      task.displayProgress = 0;
+      task.progressText = '初始化中...';
       task.error = null;
+      task.currentStage = '';
+      task.stageStartTime = 0;
+
+      const stageDescriptions: Record<string, string> = {
+        fetch: '加载资源',
+        decode: '解码图片',
+        inference: 'AI处理中',
+        mask: '生成掩码',
+        encode: '编码结果'
+      };
+
+      startProgressAnimation();
 
       const config: Config = {
         ...baseConfig,
         progress: (key, current, total) => {
           const [type, subtype] = key.split(':');
-          const progress = Math.round((current / total) * 100);
+          const stageKey = type === 'fetch' ? 'fetch' : subtype;
           
-          if (type === 'fetch') {
-            task.progressText = `Loading resources: ${progress}%`;
-          } else if (type === 'compute') {
-            const stages: Record<string, string> = {
-              decode: 'Decoding image',
-              inference: 'Running AI model',
-              mask: 'Generating mask',
-              encode: 'Encoding result'
-            };
-            task.progressText = stages[subtype] || `Processing: ${progress}%`;
+          if (task.currentStage !== stageKey) {
+            task.currentStage = stageKey;
+            task.stageStartTime = Date.now();
           }
           
-          task.progress = Math.min(progress, 99);
+          const weightedProgress = calculateWeightedProgress(type, subtype, current, total);
+          const stageDesc = stageDescriptions[stageKey] || '处理中';
+          const stageProgress = Math.round((current / total) * 100);
+          
+          task.progressText = `${stageDesc}...`;
+          task.progress = Math.min(weightedProgress, 99);
         }
       };
 
@@ -188,17 +293,24 @@ export default {
         task.resultUrl = URL.createObjectURL(resultBlob);
         task.status = 'completed';
         task.progress = 100;
-        task.progressText = 'Completed';
+        task.displayProgress = 100;
+        task.progressText = '已完成';
         task.processingTime = Date.now() - task.startTime;
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        const errorMessage = error instanceof Error ? error.message : '未知错误';
         task.error = errorMessage;
         task.status = 'failed';
-        task.progressText = 'Failed';
+        task.progressText = '处理失败';
         task.processingTime = Date.now() - task.startTime;
       }
 
       activeProcessors.value--;
+      
+      const hasMoreProcessing = tasks.value.some(t => t.status === 'processing');
+      if (!hasMoreProcessing) {
+        stopProgressAnimation();
+      }
+      
       processQueue();
     };
 
@@ -222,9 +334,12 @@ export default {
       task.retryCount++;
       task.status = 'pending';
       task.progress = 0;
-      task.progressText = 'Retrying...';
+      task.displayProgress = 0;
+      task.progressText = '重试中...';
       task.error = null;
       task.processingTime = 0;
+      task.currentStage = '';
+      task.stageStartTime = 0;
       
       if (task.resultUrl) {
         URL.revokeObjectURL(task.resultUrl);
@@ -244,9 +359,12 @@ export default {
         task.retryCount++;
         task.status = 'pending';
         task.progress = 0;
-        task.progressText = 'Retrying...';
+        task.displayProgress = 0;
+        task.progressText = '重试中...';
         task.error = null;
         task.processingTime = 0;
+        task.currentStage = '';
+        task.stageStartTime = 0;
         
         if (task.resultUrl) {
           URL.revokeObjectURL(task.resultUrl);
@@ -427,6 +545,7 @@ export default {
     });
 
     onUnmounted(() => {
+      stopProgressAnimation();
       tasks.value.forEach(task => {
         if (task.originalUrl) {
           URL.revokeObjectURL(task.originalUrl);
@@ -608,8 +727,8 @@ export default {
             </div>
 
             <div v-if="task.status === 'processing'" class="progress-bar">
-              <div class="progress-fill" :style="{ width: task.progress + '%' }"></div>
-              <span class="progress-text">{{ task.progressText }}</span>
+              <div class="progress-fill" :style="{ width: task.displayProgress + '%' }"></div>
+              <span class="progress-text">{{ task.progressText }} ({{ Math.round(task.displayProgress) }}%)</span>
             </div>
 
             <div v-if="task.error" class="task-error">
@@ -1010,25 +1129,53 @@ export default {
 
 .progress-bar {
   position: relative;
-  height: 6px;
+  height: 8px;
   background: #e2e8f0;
-  border-radius: 3px;
+  border-radius: 4px;
   overflow: hidden;
+  margin-top: 4px;
 }
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #667eea, #764ba2);
-  border-radius: 3px;
-  transition: width 0.3s ease;
+  background: linear-gradient(90deg, #667eea 0%, #8b5cf6 50%, #764ba2 100%);
+  border-radius: 4px;
+  transition: width 0.1s linear;
+  position: relative;
+}
+
+.progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.3) 50%,
+    transparent 100%
+  );
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
 }
 
 .progress-text {
   position: absolute;
-  top: -20px;
+  top: -22px;
   left: 0;
-  font-size: 0.8rem;
-  color: #64748b;
+  font-size: 0.85rem;
+  color: #475569;
+  font-weight: 500;
 }
 
 .task-error {
