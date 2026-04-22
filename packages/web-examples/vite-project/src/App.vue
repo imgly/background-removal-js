@@ -22,6 +22,9 @@ interface ImageTask {
   startTime: number;
   currentStage: string;
   stageStartTime: number;
+  stageStartProgress: number;
+  stageTargetProgress: number;
+  lastActualProgress: number;
 }
 
 interface QueueStats {
@@ -37,19 +40,30 @@ interface QueueStats {
 const MAX_CONCURRENT = 1;
 const MAX_RETRIES = 3;
 
-const STAGE_WEIGHTS: Record<string, { start: number; end: number; description: string }> = {
-  fetch: { start: 0, end: 8, description: '加载资源' },
-  decode: { start: 8, end: 18, description: '解码图片' },
-  inference: { start: 18, end: 78, description: 'AI处理中' },
-  mask: { start: 78, end: 88, description: '生成掩码' },
-  encode: { start: 88, end: 98, description: '编码结果' }
+interface StageConfig {
+  start: number;
+  end: number;
+  description: string;
+  estimatedDuration: number;
+}
+
+const STAGE_CONFIG: Record<string, StageConfig> = {
+  fetch: { start: 0, end: 8, description: '加载资源', estimatedDuration: 1500 },
+  decode: { start: 8, end: 18, description: '解码图片', estimatedDuration: 800 },
+  inference: { start: 18, end: 78, description: 'AI处理中', estimatedDuration: 8000 },
+  mask: { start: 78, end: 88, description: '生成掩码', estimatedDuration: 600 },
+  encode: { start: 88, end: 98, description: '编码结果', estimatedDuration: 500 }
 };
 
-const ANIMATION_INTERVAL = 50;
-const PROGRESS_SMOOTHING = 0.15;
+const ANIMATION_FRAME_INTERVAL = 16;
+const PROGRESS_EASE_FACTOR = 0.08;
+const MIN_PROGRESS_INCREMENT = 0.05;
 
-let animationFrameId: number | null = null;
-const activeAnimations = new Map<string, { targetProgress: number; lastUpdate: number }>();
+let rafId: number | null = null;
+let lastAnimationTime = 0;
+
+const easeOutQuad = (t: number): number => t * (2 - t);
+const easeInOutQuad = (t: number): number => t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
 
 export default {
   name: 'App',
@@ -151,80 +165,118 @@ export default {
         processingTime: 0,
         startTime: 0,
         currentStage: '',
-        stageStartTime: 0
+        stageStartTime: 0,
+        stageStartProgress: 0,
+        stageTargetProgress: 0,
+        lastActualProgress: 0
       };
     };
 
-    const startProgressAnimation = () => {
-      if (animationFrameId !== null) return;
+    const updateTaskStage = (task: ImageTask, stageKey: string) => {
+      if (task.currentStage === stageKey) return;
+      
+      const stageConfig = STAGE_CONFIG[stageKey];
+      if (!stageConfig) return;
+      
+      task.currentStage = stageKey;
+      task.stageStartTime = Date.now();
+      task.stageStartProgress = task.displayProgress;
+      task.stageTargetProgress = stageConfig.end;
+      task.progressText = `${stageConfig.description}...`;
+    };
 
-      const animate = () => {
-        const now = Date.now();
-        let hasActiveTasks = false;
-
-        tasks.value.forEach(task => {
-          if (task.status !== 'processing') return;
-          
-          hasActiveTasks = true;
-          
-          let targetProgress = task.progress;
-          
-          if (task.currentStage && task.stageStartTime > 0) {
-            const stage = STAGE_WEIGHTS[task.currentStage];
-            if (stage) {
-              const elapsed = now - task.stageStartTime;
-              const estimatedStageDuration = task.currentStage === 'inference' ? 5000 : 800;
-              const stageProgress = Math.min(elapsed / estimatedStageDuration, 0.95);
-              
-              const currentStepProgress = task.progress / 100;
-              const stageRange = stage.end - stage.start;
-              
-              if (task.currentStage === 'inference') {
-                const baseProgress = stage.start + stageRange * currentStepProgress;
-                const simulatedExtra = stageRange * stageProgress * (1 - currentStepProgress) * 0.3;
-                targetProgress = Math.min(baseProgress + simulatedExtra, stage.end);
-              } else {
-                targetProgress = stage.start + stageRange * Math.max(currentStepProgress, stageProgress * 0.5);
-              }
+    const runProgressAnimation = () => {
+      const now = Date.now();
+      const deltaTime = lastAnimationTime > 0 ? now - lastAnimationTime : 16;
+      lastAnimationTime = now;
+      
+      let hasActiveTasks = false;
+      
+      tasks.value.forEach(task => {
+        if (task.status !== 'processing') return;
+        
+        hasActiveTasks = true;
+        
+        if (task.currentStage && task.stageStartTime > 0) {
+          const stageConfig = STAGE_CONFIG[task.currentStage];
+          if (stageConfig) {
+            const elapsed = now - task.stageStartTime;
+            const stageProgress = Math.min(elapsed / stageConfig.estimatedDuration, 0.99);
+            
+            const stageRange = stageConfig.end - stageConfig.start;
+            
+            let simulatedProgress: number;
+            
+            if (task.progress > task.lastActualProgress && task.progress > stageConfig.start) {
+              task.lastActualProgress = task.progress;
+              task.stageStartProgress = task.displayProgress;
+              task.stageTargetProgress = Math.min(task.progress + 2, stageConfig.end);
             }
+            
+            const easedProgress = easeOutQuad(stageProgress);
+            const currentStageRange = task.stageTargetProgress - task.stageStartProgress;
+            
+            if (currentStageRange > 0) {
+              simulatedProgress = task.stageStartProgress + easedProgress * currentStageRange;
+            } else {
+              simulatedProgress = stageConfig.start + easedProgress * stageRange;
+            }
+            
+            simulatedProgress = Math.min(simulatedProgress, stageConfig.end);
+            simulatedProgress = Math.max(simulatedProgress, task.displayProgress);
+            
+            const minIncrement = MIN_PROGRESS_INCREMENT * (deltaTime / 16);
+            if (simulatedProgress - task.displayProgress < minIncrement) {
+              simulatedProgress = task.displayProgress + minIncrement;
+            }
+            
+            const targetDiff = simulatedProgress - task.displayProgress;
+            if (Math.abs(targetDiff) > 0.01) {
+              task.displayProgress += targetDiff * PROGRESS_EASE_FACTOR;
+              task.displayProgress = Math.round(task.displayProgress * 100) / 100;
+            }
+            
+            task.displayProgress = Math.min(task.displayProgress, 99.5);
           }
-
-          targetProgress = Math.min(targetProgress, 99);
-
-          const diff = targetProgress - task.displayProgress;
-          if (Math.abs(diff) > 0.1) {
-            task.displayProgress += diff * PROGRESS_SMOOTHING;
-            task.displayProgress = Math.round(task.displayProgress * 10) / 10;
-          }
-        });
-
-        if (hasActiveTasks) {
-          animationFrameId = window.setTimeout(animate, ANIMATION_INTERVAL);
         } else {
-          animationFrameId = null;
+          if (task.displayProgress < 2) {
+            task.displayProgress += 0.02;
+          }
         }
-      };
-
-      animate();
-    };
-
-    const stopProgressAnimation = () => {
-      if (animationFrameId !== null) {
-        clearTimeout(animationFrameId);
-        animationFrameId = null;
+      });
+      
+      if (hasActiveTasks) {
+        rafId = window.requestAnimationFrame(runProgressAnimation);
+      } else {
+        rafId = null;
+        lastAnimationTime = 0;
       }
     };
 
-    const calculateWeightedProgress = (type: string, subtype: string, current: number, total: number): number => {
+    const startProgressAnimation = () => {
+      if (rafId !== null) return;
+      lastAnimationTime = Date.now();
+      rafId = window.requestAnimationFrame(runProgressAnimation);
+    };
+
+    const stopProgressAnimation = () => {
+      if (rafId !== null) {
+        window.cancelAnimationFrame(rafId);
+        rafId = null;
+        lastAnimationTime = 0;
+      }
+    };
+
+    const calculateActualProgress = (type: string, subtype: string, current: number, total: number): number => {
       const stageKey = type === 'fetch' ? 'fetch' : subtype;
-      const stage = STAGE_WEIGHTS[stageKey];
+      const stageConfig = STAGE_CONFIG[stageKey];
       
-      if (!stage) {
+      if (!stageConfig) {
         return Math.round((current / total) * 100);
       }
 
       const stageProgress = current / total;
-      const weightedProgress = stage.start + (stage.end - stage.start) * stageProgress;
+      const weightedProgress = stageConfig.start + (stageConfig.end - stageConfig.start) * stageProgress;
       
       return Math.round(weightedProgress);
     };
@@ -251,14 +303,9 @@ export default {
       task.error = null;
       task.currentStage = '';
       task.stageStartTime = 0;
-
-      const stageDescriptions: Record<string, string> = {
-        fetch: '加载资源',
-        decode: '解码图片',
-        inference: 'AI处理中',
-        mask: '生成掩码',
-        encode: '编码结果'
-      };
+      task.stageStartProgress = 0;
+      task.stageTargetProgress = 0;
+      task.lastActualProgress = 0;
 
       startProgressAnimation();
 
@@ -268,17 +315,10 @@ export default {
           const [type, subtype] = key.split(':');
           const stageKey = type === 'fetch' ? 'fetch' : subtype;
           
-          if (task.currentStage !== stageKey) {
-            task.currentStage = stageKey;
-            task.stageStartTime = Date.now();
-          }
+          updateTaskStage(task, stageKey);
           
-          const weightedProgress = calculateWeightedProgress(type, subtype, current, total);
-          const stageDesc = stageDescriptions[stageKey] || '处理中';
-          const stageProgress = Math.round((current / total) * 100);
-          
-          task.progressText = `${stageDesc}...`;
-          task.progress = Math.min(weightedProgress, 99);
+          const actualProgress = calculateActualProgress(type, subtype, current, total);
+          task.progress = Math.min(actualProgress, 99);
         }
       };
 
@@ -340,6 +380,9 @@ export default {
       task.processingTime = 0;
       task.currentStage = '';
       task.stageStartTime = 0;
+      task.stageStartProgress = 0;
+      task.stageTargetProgress = 0;
+      task.lastActualProgress = 0;
       
       if (task.resultUrl) {
         URL.revokeObjectURL(task.resultUrl);
@@ -365,6 +408,9 @@ export default {
         task.processingTime = 0;
         task.currentStage = '';
         task.stageStartTime = 0;
+        task.stageStartProgress = 0;
+        task.stageTargetProgress = 0;
+        task.lastActualProgress = 0;
         
         if (task.resultUrl) {
           URL.revokeObjectURL(task.resultUrl);
