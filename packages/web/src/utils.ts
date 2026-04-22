@@ -54,6 +54,7 @@ function tensorResizeBilinear<T extends TypedArray>(
   proportional: boolean = false
 ): NdArray<T> {
   const [srcHeight, srcWidth, srcChannels] = imageTensor.shape;
+  const srcData = imageTensor.data;
 
   let scaleX = srcWidth / newWidth;
   let scaleY = srcHeight / newHeight;
@@ -65,43 +66,48 @@ function tensorResizeBilinear<T extends TypedArray>(
       : Math.min(scaleX, scaleY);
   }
 
-  // Create a new NdArray to store the resized image
-  const resizedImageData = ndarray(
-    createTypeArray<T>(srcChannels * newWidth * newHeight),
-    [newHeight, newWidth, srcChannels]
-  );
-  // Perform interpolation to fill the resized NdArray
-  for (let y = 0; y < newHeight; y++) {
-    for (let x = 0; x < newWidth; x++) {
-      const srcX = x * scaleX;
-      const srcY = y * scaleY;
-      const x1 = Math.max(Math.floor(srcX), 0);
-      const x2 = Math.min(Math.ceil(srcX), srcWidth - 1);
-      const y1 = Math.max(Math.floor(srcY), 0);
-      const y2 = Math.min(Math.ceil(srcY), srcHeight - 1);
+  const dstData = createTypeArray<T>(srcChannels * newWidth * newHeight);
+  const srcStrideY = srcWidth * srcChannels;
+  const srcStrideX = srcChannels;
+  const dstStrideY = newWidth * srcChannels;
+  const dstStrideX = srcChannels;
 
-      const dx = srcX - x1;
-      const dy = srcY - y1;
+  for (let y = 0; y < newHeight; y++) {
+    const dstY = y * dstStrideY;
+    const srcYf = y * scaleY;
+    const srcY1 = Math.max(Math.floor(srcYf), 0);
+    const srcY2 = Math.min(Math.ceil(srcYf), srcHeight - 1);
+    const dy = srcYf - srcY1;
+    const srcY1Idx = srcY1 * srcStrideY;
+    const srcY2Idx = srcY2 * srcStrideY;
+
+    for (let x = 0; x < newWidth; x++) {
+      const dstIdx = dstY + x * dstStrideX;
+      const srcXf = x * scaleX;
+      const srcX1 = Math.max(Math.floor(srcXf), 0);
+      const srcX2 = Math.min(Math.ceil(srcXf), srcWidth - 1);
+      const dx = srcXf - srcX1;
+      const srcX1Idx = srcX1 * srcStrideX;
+      const srcX2Idx = srcX2 * srcStrideX;
 
       for (let c = 0; c < srcChannels; c++) {
-        const p1 = imageTensor.get(y1, x1, c);
-        const p2 = imageTensor.get(y1, x2, c);
-        const p3 = imageTensor.get(y2, x1, c);
-        const p4 = imageTensor.get(y2, x2, c);
+        const p1 = srcData[srcY1Idx + srcX1Idx + c];
+        const p2 = srcData[srcY1Idx + srcX2Idx + c];
+        const p3 = srcData[srcY2Idx + srcX1Idx + c];
+        const p4 = srcData[srcY2Idx + srcX2Idx + c];
 
-        // Perform bilinear interpolation
         const interpolatedValue =
           (1 - dx) * (1 - dy) * p1 +
           dx * (1 - dy) * p2 +
           (1 - dx) * dy * p3 +
           dx * dy * p4;
-        // console.log(interpolatedValue);
-        resizedImageData.set(y, x, c, interpolatedValue);
+
+        dstData[dstIdx + c] = interpolatedValue;
       }
     }
   }
 
-  return resizedImageData;
+  return ndarray(dstData, [newHeight, newWidth, srcChannels]);
 }
 
 function tensorHWCtoBCHW(

@@ -2,12 +2,13 @@ export default main;
 import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 import { globSync } from 'glob';
 
-// All paths are relative to the directory of this file
-const BaseDir = path.resolve('.');
-const DefaultOutDir = path.resolve('./dist');
+// Use current working directory as base directory
+const BaseDir = process.cwd();
+const DefaultOutDir = path.resolve(BaseDir, './dist');
 const DefaultEntry = {
   mime: 'application/octet-stream'
 };
@@ -151,12 +152,14 @@ async function transform(fileName, entry) {
 }
 
 async function loadConfig() {
-  if (fileExists(path.resolve(BaseDir, '.resources.mjs'))) {
-    const resources = await import(path.resolve(BaseDir, '.resources.mjs'));
+  const configPath = path.resolve(BaseDir, '.resources.mjs');
+  if (fileExists(configPath)) {
+    const resources = await import(`file://${configPath}`);
     const entries = resources.default;
     return entries;
   }
-  return [];
+  console.error(`Config file not found: ${configPath}`);
+  process.exit(-1);
 }
 
 async function main() {
@@ -166,12 +169,16 @@ async function main() {
   await saveResourceMetadata(resources);
 }
 
+function toUnixPath(filePath) {
+  return filePath.replace(/\\/g, '/');
+}
+
 async function generateFiles() {
   const filesToProcess = {};
   const entries = await loadConfig();
   for (const entry of entries) {
     const entryPath = path.resolve(BaseDir, entry.source);
-    const candidates = await globSync(entryPath, { nodir: true });
+    const candidates = globSync(toUnixPath(entryPath), { nodir: true });
     if (candidates.length === 0) {
       console.error(`No files found for ${entry.source}`);
       process.exit(-1);
@@ -190,12 +197,13 @@ async function loadResourceMetadata() {
   }
   return [];
 }
+
 async function saveResourceMetadata(filesToProcess) {
   const resourcesMetadata = {};
   for (const fileToProcess of Object.keys(filesToProcess)) {
     const entry = filesToProcess[fileToProcess];
     const metadata = await transform(fileToProcess, entry, DefaultOutDir);
-    const key = path.join(entry.path, fileToProcess.split('/').pop());
+    const key = toUnixPath(path.join(entry.path, path.basename(fileToProcess)));
     resourcesMetadata[key] = metadata;
   }
   fs.writeFileSync(
