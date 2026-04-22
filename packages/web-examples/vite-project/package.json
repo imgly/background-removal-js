@@ -12,8 +12,9 @@
   "dependencies": {
     "@imgly/background-removal": "workspace:*",
     "@imgly/background-removal-data": "workspace:*",
-    "vue": "^3.2.47",
-    "onnxruntime-web": "1.21.0"
+    "jszip": "^3.10.1",
+    "onnxruntime-web": "1.21.0",
+    "vue": "^3.2.47"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.1.0",
