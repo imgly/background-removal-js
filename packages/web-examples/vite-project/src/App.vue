@@ -205,6 +205,7 @@ export default {
     const isMouseOverCanvas = ref(false);
     const pendingPreviewUpdate = ref(false);
     let previewUpdateRAFId: number | null = null;
+    const previewCanvasRef = ref<HTMLCanvasElement | null>(null);
 
     const brushConfig = ref<BrushConfig>({
       size: 30,
@@ -623,6 +624,16 @@ export default {
       const ctx = canvas.getContext('2d')!;
       const imageData = ndArrayToImageData(resultData);
       ctx.putImageData(imageData, 0, 0);
+
+      if (previewCanvasRef.value) {
+        if (previewCanvasRef.value.width !== width || previewCanvasRef.value.height !== height) {
+          previewCanvasRef.value.width = width;
+          previewCanvasRef.value.height = height;
+        }
+        const previewCtx = previewCanvasRef.value.getContext('2d')!;
+        previewCtx.clearRect(0, 0, width, height);
+        previewCtx.drawImage(canvas, 0, 0);
+      }
     };
 
     const schedulePreviewUpdate = (_task: ImageTask) => {
@@ -813,8 +824,13 @@ export default {
       }
     };
 
-    const handleMouseUp = () => {
+    const handleMouseUp = async () => {
+      const wasDrawing = isDrawing.value;
       isDrawing.value = false;
+      
+      if (wasDrawing && selectedTask.value) {
+        await updateTaskPreview(selectedTask.value);
+      }
     };
 
     const selectTask = (taskId: string) => {
@@ -1169,6 +1185,8 @@ export default {
       selectedTask,
       showSidebar,
       activeTool,
+      isDrawing,
+      previewCanvasRef,
       brushConfig,
       maskSettings,
       backgroundSettings,
@@ -1558,7 +1576,21 @@ export default {
                     :src="selectedTask.previewUrl" 
                     class="result-image"
                     draggable="false"
+                    :style="{ opacity: isDrawing || (activeTool !== 'none' && isMouseOverCanvas) ? 0 : 1 }"
                   />
+                  <canvas 
+                    ref="previewCanvasRef"
+                    class="result-canvas"
+                    :style="{ 
+                      opacity: isDrawing || (activeTool !== 'none' && isMouseOverCanvas) ? 1 : 0,
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'contain'
+                    }"
+                  ></canvas>
                   <span class="image-label">结果 ({{ activeTool === 'none' ? '点击选择' : activeTool === 'erase' ? '擦除模式' : '恢复模式' }})</span>
                   
                   <div 
