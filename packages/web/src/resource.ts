@@ -1,24 +1,80 @@
-export { loadAsBlob, loadAsUrl, loadAsArrayBuffer, preload, resolveChunkUrls };
+export { loadAsBlob, loadAsUrl, loadAsArrayBuffer, preload, resolveChunkUrls, clearCache };
 
 import { Config } from './schema';
 
-async function preload(config: Config): Promise<void> {
-  // load resource metadata
+const CACHE_NAME = 'imgly-background-removal-v1';
+const resourceMetadataCache = new Map<string, any>();
+const blobCache = new Map<string, Blob>();
+
+async function getOrCreateCache(): Promise<Cache> {
+  if (typeof caches === 'undefined') {
+    return null as any;
+  }
+  try {
+    return await caches.open(CACHE_NAME);
+  } catch (e) {
+    console.warn('Cache API not available:', e);
+    return null as any;
+  }
+}
+
+async function loadResourceMetadata(config: Config): Promise<any> {
+  const cacheKey = config.publicPath;
+  if (resourceMetadataCache.has(cacheKey)) {
+    return resourceMetadataCache.get(cacheKey);
+  }
+
   const resourceUrl = new URL('resources.json', config.publicPath);
+  const cache = await getOrCreateCache();
+  
+  if (cache) {
+    const cachedResponse = await cache.match(resourceUrl.toString());
+    if (cachedResponse) {
+      const resourceMap = await cachedResponse.json();
+      resourceMetadataCache.set(cacheKey, resourceMap);
+      return resourceMap;
+    }
+  }
+
   const resourceResponse = await fetch(resourceUrl);
   if (!resourceResponse.ok) {
     throw new Error(
       `Resource metadata not found. Ensure that the config.publicPath is configured correctly: ${config.publicPath}`
     );
   }
+  
   const resourceMap = await resourceResponse.json();
+  resourceMetadataCache.set(cacheKey, resourceMap);
+  
+  if (cache) {
+    const clonedResponse = new Response(JSON.stringify(resourceMap), {
+      headers: { 'Content-Type': 'application/json' }
+    });
+    await cache.put(resourceUrl.toString(), clonedResponse);
+  }
+  
+  return resourceMap;
+}
+
+async function clearCache(): Promise<void> {
+  resourceMetadataCache.clear();
+  blobCache.clear();
+  if (typeof caches !== 'undefined') {
+    try {
+      await caches.delete(CACHE_NAME);
+    } catch (e) {
+      console.warn('Failed to clear cache:', e);
+    }
+  }
+}
+
+async function preload(config: Config): Promise<void> {
+  const resourceMap = await loadResourceMetadata(config);
   const keys = Object.keys(resourceMap);
 
-  await Promise.all(
-    keys.map(async (key) => {
-      return loadAsBlob(key, config);
-    })
-  );
+  for (const key of keys) {
+    await loadAsBlob(key, config);
+  }
 }
 
 async function loadAsUrl(url: string, config: Config): Promise<string> {
@@ -32,15 +88,23 @@ async function loadAsArrayBuffer(
 }
 
 async function loadAsBlob(key: string, config: Config) {
-  // load resource metadata
-  const resourceUrl = new URL('resources.json', config.publicPath);
-  const resourceResponse = await fetch(resourceUrl);
-  if (!resourceResponse.ok) {
-    throw new Error(
-      `Resource metadata not found. Ensure that the config.publicPath is configured correctly.`
-    );
+  const cacheKey = `${config.publicPath}:${key}`;
+  
+  if (blobCache.has(cacheKey)) {
+    return blobCache.get(cacheKey)!;
   }
-  const resourceMap = await resourceResponse.json();
+
+  const cache = await getOrCreateCache();
+  if (cache) {
+    const cachedResponse = await cache.match(cacheKey);
+    if (cachedResponse) {
+      const blob = await cachedResponse.blob();
+      blobCache.set(cacheKey, blob);
+      return blob;
+    }
+  }
+
+  const resourceMap = await loadResourceMetadata(config);
   const entry = resourceMap[key];
 
   if (!entry) {
@@ -49,21 +113,46 @@ async function loadAsBlob(key: string, config: Config) {
     );
   }
 
-  const chunks = entry.chunks; // list of entries
-
+  const chunks = entry.chunks;
   let downloadedSize = 0;
+
   const responses = chunks.map(async (chunk) => {
     const chunkSize = chunk.offsets[1] - chunk.offsets[0];
     const url = config.publicPath
       ? new URL(chunk.name, config.publicPath).toString()
       : chunk.name;
-    const response = await fetch(url, config.fetchArgs);
-    const blob = await response.blob();
 
-    if (chunkSize !== blob.size) {
-      throw new Error(
-        `Failed to fetch ${key} with size ${chunkSize} but got ${blob.size}`
-      );
+    let response = null;
+    let blob = null;
+
+    if (cache) {
+      const cachedChunk = await cache.match(url);
+      if (cachedChunk) {
+        blob = await cachedChunk.blob();
+        if (chunkSize === blob.size) {
+          response = cachedChunk;
+        } else {
+          blob = null;
+        }
+      }
+    }
+
+    if (!blob) {
+      response = await fetch(url, config.fetchArgs);
+      blob = await response.blob();
+
+      if (chunkSize !== blob.size) {
+        throw new Error(
+          `Failed to fetch ${key} with size ${chunkSize} but got ${blob.size}`
+        );
+      }
+
+      if (cache) {
+        const clonedResponse = new Response(blob, {
+          headers: { 'Content-Type': blob.type || 'application/octet-stream' }
+        });
+        await cache.put(url, clonedResponse);
+      }
     }
 
     if (config.progress) {
@@ -73,29 +162,28 @@ async function loadAsBlob(key: string, config: Config) {
     return blob;
   });
 
-  // we could create a new buffer here and use the chunk entries and combine the file instead
-
   const allChunkData = await Promise.all(responses);
-
   const data = new Blob(allChunkData, { type: entry.mime });
+  
   if (data.size !== entry.size) {
     throw new Error(
       `Failed to fetch ${key} with size ${entry.size} but got ${data.size}`
     );
   }
+
+  blobCache.set(cacheKey, data);
+  if (cache) {
+    const clonedResponse = new Response(data, {
+      headers: { 'Content-Type': entry.mime || 'application/octet-stream' }
+    });
+    await cache.put(cacheKey, clonedResponse);
+  }
+
   return data;
 }
 
 async function resolveChunkUrls(key: string, config: Config) {
-  // load resource metadata
-  const resourceUrl = new URL('resources.json', config.publicPath);
-  const resourceResponse = await fetch(resourceUrl);
-  if (!resourceResponse.ok) {
-    throw new Error(
-      `Resource metadata not found. Ensure that the config.publicPath is configured correctly.`
-    );
-  }
-  const resourceMap = await resourceResponse.json();
+  const resourceMap = await loadResourceMetadata(config);
   const entry = resourceMap[key];
 
   if (!entry) {
@@ -104,17 +192,13 @@ async function resolveChunkUrls(key: string, config: Config) {
     );
   }
 
-  const chunks = entry.chunks; // list of entries
+  const chunks = entry.chunks;
 
-  const responses = chunks.map(async (chunk) => {
-    const url = config.publicPath
+  const allUrls = chunks.map((chunk) => {
+    return config.publicPath
       ? new URL(chunk.name, config.publicPath).toString()
       : chunk.name;
-
-    return url;
   });
-  // we could create a new buffer here and use the chunk entries and combine the file instead
 
-  const allUrls = await Promise.all(responses);
   return allUrls;
 }
