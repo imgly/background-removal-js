@@ -620,32 +620,32 @@ export default {
           <div class="task-actions">
             <button
               v-if="task.status === 'completed'"
-              class="btn-icon"
-              title="Download"
+              class="btn-action btn-download"
               @click="downloadSingle(task)"
             >
-              <svg viewBox="0 0 24 24" width="20" height="20">
+              <svg viewBox="0 0 24 24" width="18" height="18">
                 <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
               </svg>
+              <span>下载</span>
             </button>
             <button
               v-if="task.status === 'failed' && task.retryCount < MAX_RETRIES"
-              class="btn-icon"
-              title="Retry"
+              class="btn-action btn-retry"
               @click="retryTask(task)"
             >
-              <svg viewBox="0 0 24 24" width="20" height="20">
+              <svg viewBox="0 0 24 24" width="18" height="18">
                 <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
               </svg>
+              <span>重试</span>
             </button>
             <button
-              class="btn-icon btn-danger"
-              title="Remove"
+              class="btn-action btn-delete"
               @click="removeTask(task)"
             >
-              <svg viewBox="0 0 24 24" width="20" height="20">
+              <svg viewBox="0 0 24 24" width="18" height="18">
                 <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
               </svg>
+              <span>删除</span>
             </button>
           </div>
         </div>
@@ -1042,41 +1042,71 @@ export default {
 
 .task-actions {
   display: flex;
-  gap: 8px;
+  gap: 10px;
   flex-shrink: 0;
 }
 
-.btn-icon {
-  width: 36px;
-  height: 36px;
+.btn-action {
+  padding: 8px 14px;
   border-radius: 8px;
   border: none;
-  background: #f1f5f9;
   cursor: pointer;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 6px;
   transition: all 0.2s ease;
+  font-size: 0.875rem;
+  font-weight: 500;
+  white-space: nowrap;
 }
 
-.btn-icon svg {
-  fill: #64748b;
+.btn-action svg {
+  flex-shrink: 0;
 }
 
-.btn-icon:hover {
-  background: #e2e8f0;
+.btn-download {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
 }
 
-.btn-icon.btn-danger {
+.btn-download svg {
+  fill: white;
+}
+
+.btn-download:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.btn-retry {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.btn-retry svg {
+  fill: #d97706;
+}
+
+.btn-retry:hover {
+  background: #fde68a;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(217, 119, 6, 0.2);
+}
+
+.btn-delete {
   background: #fee2e2;
+  color: #dc2626;
 }
 
-.btn-icon.btn-danger svg {
+.btn-delete svg {
   fill: #dc2626;
 }
 
-.btn-icon.btn-danger:hover {
+.btn-delete:hover {
   background: #fecaca;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.2);
 }
 
 .empty-state {
@@ -1121,6 +1151,16 @@ export default {
   
   .actions-row {
     justify-content: center;
+  }
+
+  .task-actions {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .btn-action {
+    padding: 10px 16px;
+    font-size: 0.9rem;
   }
 }
 </style>
