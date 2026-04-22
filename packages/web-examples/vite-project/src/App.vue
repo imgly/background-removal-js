@@ -1,5 +1,5 @@
 <script>
-import { ref, watch, onMounted, onUnmounted } from 'vue';
+import { ref, watch, onMounted, onUnmounted, computed } from 'vue';
 
 import {
   preload,
@@ -22,17 +22,16 @@ export default {
 
     const url = new URL(window.location.href);
     const params = new URLSearchParams(url.search);
-    const image = params.get('image');
+    const imageParam = params.get('image');
     const auto = params.get('auto') || false;
-    const randomImage = image
-      ? image
-      : images[Math.floor(Math.random() * images.length)];
 
-    const imageUrl = ref(randomImage);
-    const isRunning = ref(false);
+    const currentImageIndex = ref(0);
+    const displayImageUrl = ref('');
+    const isProcessing = ref(false);
+    const isPreloading = ref(true);
     const seconds = ref(0);
     const startDate = ref(Date.now());
-    const caption = ref('Click me to remove background');
+    const caption = ref('Loading model...');
     let interval = null;
 
     const publicPath = new URL(import.meta.url);
@@ -42,24 +41,19 @@ export default {
       publicPath: publicPath.href,
       progress: (key, current, total) => {
         const [type, subtype] = key.split(':');
-        caption.value = `${type} ${subtype} ${((current / total) * 100).toFixed(
-          0
-        )}%`;
+        const progress = ((current / total) * 100).toFixed(0);
+        if (type === 'fetch') {
+          caption.value = `Loading: ${progress}%`;
+        } else if (type === 'compute') {
+          caption.value = `Processing: ${subtype} ${progress}%`;
+        }
       },
-      // rescale: false,
       rescale: true,
-      device: 'gpu',
-      // device: 'cpu',
-      // model: 'isnet',
-      // model: 'isnet_fp16',
-      // model: 'isnet_quint8',
+      device: 'cpu',
+      model: 'isnet_quint8',
       output: {
         quality: 0.8,
         format: 'image/png'
-        // format: 'image/jpeg'
-        // format: 'image/webp'
-        //format: 'image/x-rgba8'
-        //format: 'image/x-alpha8'
       }
     };
 
@@ -70,7 +64,7 @@ export default {
     };
 
     watch(
-      () => isRunning.value,
+      () => isProcessing.value,
       (newVal) => {
         if (newVal) {
           interval = setInterval(() => {
@@ -85,69 +79,130 @@ export default {
       }
     );
 
-    onMounted(async () => {
-      // Optional Preload all assets
-      await preload(config).then(() => {
-        console.log('Asset preloading succeeded');
-      });
-      if (isRunning.value) {
-        interval = setInterval(() => {
-          seconds.value = calculateSecondsBetweenDates(
-            startDate.value,
-            Date.now()
-          );
-        }, 100);
+    const getCurrentOriginalImage = () => {
+      if (imageParam) {
+        return imageParam;
       }
+      return images[currentImageIndex.value];
+    };
+
+    const buttonDisabled = computed(() => {
+      return isProcessing.value || isPreloading.value;
+    });
+
+    const buttonText = computed(() => {
+      if (isPreloading.value) {
+        return 'Loading model...';
+      }
+      if (isProcessing.value) {
+        return 'Processing...';
+      }
+      return 'Remove Background';
+    });
+
+    const buttonSegmentText = computed(() => {
+      if (isPreloading.value) {
+        return 'Loading model...';
+      }
+      if (isProcessing.value) {
+        return 'Processing...';
+      }
+      return 'Segment Mask';
+    });
+
+    const selectNextImage = () => {
+      if (imageParam) {
+        displayImageUrl.value = imageParam;
+        return;
+      }
+      currentImageIndex.value = (currentImageIndex.value + 1) % images.length;
+      displayImageUrl.value = images[currentImageIndex.value];
+    };
+
+    const processCurrentImage = async (type) => {
+      if (isProcessing.value) {
+        return;
+      }
+
+      const imageToProcess = getCurrentOriginalImage();
+
+      isProcessing.value = true;
+      startDate.value = Date.now();
+      seconds.value = 0;
+      caption.value = 'Processing image...';
+
+      try {
+        let imageBlob;
+        if (type === 'remove') {
+          imageBlob = await removeBackground(imageToProcess, config);
+        } else {
+          const maskBlob = await segmentForeground(imageToProcess, config);
+          imageBlob = await applySegmentationMask(imageToProcess, maskBlob, config);
+        }
+
+        const resultUrl = URL.createObjectURL(imageBlob);
+        displayImageUrl.value = resultUrl;
+        caption.value = 'Done! Click to process another image';
+      } catch (error) {
+        console.error('Processing failed:', error);
+        caption.value = 'Processing failed, please try again';
+      } finally {
+        isProcessing.value = false;
+      }
+    };
+
+    const load = async (type) => {
+      if (isPreloading.value || isProcessing.value) {
+        return;
+      }
+
+      selectNextImage();
+      await processCurrentImage(type);
+    };
+
+    onMounted(() => {
+      selectNextImage();
+      
+      preload(config)
+        .then(() => {
+          console.log('Asset preloading succeeded');
+          isPreloading.value = false;
+          caption.value = 'Click "Remove Background" to process the current image';
+        })
+        .catch((error) => {
+          console.error('Asset preloading failed:', error);
+          isPreloading.value = false;
+          caption.value = 'Ready (will load on first use)';
+        });
     });
 
     onUnmounted(() => {
       clearInterval(interval);
     });
 
-    const resetTimer = () => {
-      isRunning.value = true;
-      startDate.value = Date.now();
-      seconds.value = 0;
-    };
-
-    const stopTimer = () => {
-      isRunning.value = false;
-    };
-
-    const load = async (type) => {
-      const randomImage = image
-        ? image
-        : images[Math.floor(Math.random() * images.length)];
-
-      isRunning.value = true;
-      resetTimer();
-
-      imageUrl.value = randomImage;
-      let imageBlob;
-      if (type === 'remove') {
-        imageBlob = await removeBackground(randomImage, config);
+    const checkAndAutoLoad = () => {
+      if (!isPreloading.value) {
+        load('remove');
       } else {
-        const maskBlob = await segmentForeground(randomImage, config);
-        console.log(maskBlob);
-        imageBlob = await applySegmentationMask(randomImage, maskBlob, config);
+        setTimeout(checkAndAutoLoad, 100);
       }
-      console.log(imageBlob);
-
-      // const imageBlob = await removeBackground(randomImage, config);
-      // const imageBlob = await alphamask(randomImage, config)
-      // const maskBlob = await trimap(randomImage, config)
-      // const imageBlob = await removeForeground(randomImage, config);
-      // const imageBlob = await segmentForeground(randomImage, config);
-
-      const url = URL.createObjectURL(imageBlob);
-      imageUrl.value = url;
-      isRunning.value = false;
-      stopTimer();
     };
 
-    if (auto) load();
+    if (auto) {
+      checkAndAutoLoad();
+    }
 
-    return { imageUrl, isRunning, seconds, caption, load };
+    return {
+      displayImageUrl,
+      isProcessing,
+      isPreloading,
+      seconds,
+      caption,
+      buttonDisabled,
+      buttonText,
+      buttonSegmentText,
+      load
+    };
   }
 };
 </script>
@@ -159,15 +214,16 @@ export default {
 <template>
   <div id="app">
     <header>
-      <img :src="imageUrl" alt="logo" />
+      <img :src="displayImageUrl" alt="logo" />
       <p>{{ caption }}</p>
-      <p>Processing: {{ seconds }} s</p>
+      <p v-if="isProcessing">Processing: {{ seconds }} s</p>
+      <p v-else-if="isPreloading">Loading model and resources...</p>
 
-      <button :disabled="isRunning" @click="load('remove')">
-        Click me (removeBackground)
+      <button :disabled="buttonDisabled" @click="load('remove')">
+        {{ buttonText }}
       </button>
-      <button :disabled="isRunning" @click="load('segment')">
-        Click me (applySegmentationMask)
+      <button :disabled="buttonDisabled" @click="load('segment')">
+        {{ buttonSegmentText }}
       </button>
     </header>
   </div>
