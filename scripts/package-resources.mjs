@@ -2,12 +2,15 @@ export default main;
 import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 import { globSync } from 'glob';
 
 // All paths are relative to the directory of this file
-const BaseDir = path.resolve('.');
-const DefaultOutDir = path.resolve('./dist');
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const BaseDir = __dirname;
+const DefaultOutDir = path.resolve(BaseDir, './dist');
 const DefaultEntry = {
   mime: 'application/octet-stream'
 };
@@ -152,7 +155,7 @@ async function transform(fileName, entry) {
 
 async function loadConfig() {
   if (fileExists(path.resolve(BaseDir, '.resources.mjs'))) {
-    const resources = await import(path.resolve(BaseDir, '.resources.mjs'));
+    const resources = await import(`file://${path.resolve(BaseDir, '.resources.mjs')}`);
     const entries = resources.default;
     return entries;
   }
@@ -166,12 +169,16 @@ async function main() {
   await saveResourceMetadata(resources);
 }
 
+function toUnixPath(filePath) {
+  return filePath.replace(/\\/g, '/');
+}
+
 async function generateFiles() {
   const filesToProcess = {};
   const entries = await loadConfig();
   for (const entry of entries) {
     const entryPath = path.resolve(BaseDir, entry.source);
-    const candidates = await globSync(entryPath, { nodir: true });
+    const candidates = globSync(toUnixPath(entryPath), { nodir: true });
     if (candidates.length === 0) {
       console.error(`No files found for ${entry.source}`);
       process.exit(-1);
@@ -195,7 +202,7 @@ async function saveResourceMetadata(filesToProcess) {
   for (const fileToProcess of Object.keys(filesToProcess)) {
     const entry = filesToProcess[fileToProcess];
     const metadata = await transform(fileToProcess, entry, DefaultOutDir);
-    const key = path.join(entry.path, fileToProcess.split('/').pop());
+    const key = path.join(entry.path, path.basename(fileToProcess));
     resourcesMetadata[key] = metadata;
   }
   fs.writeFileSync(

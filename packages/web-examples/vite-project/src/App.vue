@@ -1,5 +1,5 @@
 <script>
-import { ref, watch, onMounted, onUnmounted } from 'vue';
+import { ref, watch, onMounted, onUnmounted, computed } from 'vue';
 
 import {
   preload,
@@ -30,36 +30,36 @@ export default {
 
     const imageUrl = ref(randomImage);
     const isRunning = ref(false);
+    const isPreloading = ref(true);
     const seconds = ref(0);
     const startDate = ref(Date.now());
-    const caption = ref('Click me to remove background');
+    const caption = ref('Loading model...');
+    const progressInfo = ref('');
     let interval = null;
+    let currentLoadPromise = null;
 
     const publicPath = new URL(import.meta.url);
     publicPath.pathname = '/js/';
     const config = {
-      debug: false,
+      debug: true,
       publicPath: publicPath.href,
       progress: (key, current, total) => {
         const [type, subtype] = key.split(':');
-        caption.value = `${type} ${subtype} ${((current / total) * 100).toFixed(
-          0
-        )}%`;
+        const progress = ((current / total) * 100).toFixed(0);
+        if (type === 'fetch') {
+          progressInfo.value = `Downloading ${subtype}: ${progress}%`;
+        } else if (type === 'compute') {
+          progressInfo.value = `Processing: ${subtype} ${progress}%`;
+        }
+        caption.value = progressInfo.value;
+        console.log(`[Progress] ${type} ${subtype}: ${progress}%`);
       },
-      // rescale: false,
       rescale: true,
-      device: 'gpu',
-      // device: 'cpu',
-      // model: 'isnet',
-      // model: 'isnet_fp16',
-      // model: 'isnet_quint8',
+      device: 'cpu',
+      model: 'isnet_quint8',
       output: {
         quality: 0.8,
         format: 'image/png'
-        // format: 'image/jpeg'
-        // format: 'image/webp'
-        //format: 'image/x-rgba8'
-        //format: 'image/x-alpha8'
       }
     };
 
@@ -85,11 +85,23 @@ export default {
       }
     );
 
-    onMounted(async () => {
-      // Optional Preload all assets
-      await preload(config).then(() => {
-        console.log('Asset preloading succeeded');
-      });
+    const buttonDisabled = computed(() => {
+      return isRunning.value || isPreloading.value;
+    });
+
+    onMounted(() => {
+      preload(config)
+        .then(() => {
+          console.log('Asset preloading succeeded');
+          isPreloading.value = false;
+          caption.value = 'Click me to remove background';
+        })
+        .catch((error) => {
+          console.error('Preload failed:', error);
+          isPreloading.value = false;
+          caption.value = 'Ready (preload failed, will load on first use)';
+        });
+
       if (isRunning.value) {
         interval = setInterval(() => {
           seconds.value = calculateSecondsBetweenDates(
@@ -115,39 +127,67 @@ export default {
     };
 
     const load = async (type) => {
-      const randomImage = image
+      if (isRunning.value) {
+        console.log('Already processing, please wait...');
+        return;
+      }
+
+      if (currentLoadPromise) {
+        console.log('Waiting for previous operation...');
+        return;
+      }
+
+      const selectedImage = image
         ? image
         : images[Math.floor(Math.random() * images.length)];
 
       isRunning.value = true;
       resetTimer();
+      caption.value = 'Processing image...';
 
-      imageUrl.value = randomImage;
-      let imageBlob;
-      if (type === 'remove') {
-        imageBlob = await removeBackground(randomImage, config);
-      } else {
-        const maskBlob = await segmentForeground(randomImage, config);
-        console.log(maskBlob);
-        imageBlob = await applySegmentationMask(randomImage, maskBlob, config);
+      const originalImageUrl = imageUrl.value;
+
+      try {
+        currentLoadPromise = (async () => {
+          let imageBlob;
+          if (type === 'remove') {
+            imageBlob = await removeBackground(selectedImage, config);
+          } else {
+            const maskBlob = await segmentForeground(selectedImage, config);
+            console.log(maskBlob);
+            imageBlob = await applySegmentationMask(selectedImage, maskBlob, config);
+          }
+          console.log(imageBlob);
+
+          const resultUrl = URL.createObjectURL(imageBlob);
+          imageUrl.value = resultUrl;
+          caption.value = 'Done! Click to process another image';
+        })();
+
+        await currentLoadPromise;
+      } catch (error) {
+        console.error('Processing failed:', error);
+        imageUrl.value = originalImageUrl;
+        caption.value = 'Processing failed, please try again';
+      } finally {
+        currentLoadPromise = null;
+        isRunning.value = false;
+        stopTimer();
       }
-      console.log(imageBlob);
-
-      // const imageBlob = await removeBackground(randomImage, config);
-      // const imageBlob = await alphamask(randomImage, config)
-      // const maskBlob = await trimap(randomImage, config)
-      // const imageBlob = await removeForeground(randomImage, config);
-      // const imageBlob = await segmentForeground(randomImage, config);
-
-      const url = URL.createObjectURL(imageBlob);
-      imageUrl.value = url;
-      isRunning.value = false;
-      stopTimer();
     };
 
-    if (auto) load();
+    if (auto) {
+      const checkAndLoad = () => {
+        if (!isPreloading.value) {
+          load('remove');
+        } else {
+          setTimeout(checkAndLoad, 100);
+        }
+      };
+      checkAndLoad();
+    }
 
-    return { imageUrl, isRunning, seconds, caption, load };
+    return { imageUrl, isRunning, isPreloading, seconds, caption, buttonDisabled, load };
   }
 };
 </script>
@@ -161,13 +201,18 @@ export default {
     <header>
       <img :src="imageUrl" alt="logo" />
       <p>{{ caption }}</p>
-      <p>Processing: {{ seconds }} s</p>
+      <p v-if="isRunning">Processing: {{ seconds }} s</p>
+      <p v-else-if="isPreloading">Loading model and resources...</p>
 
-      <button :disabled="isRunning" @click="load('remove')">
-        Click me (removeBackground)
+      <button :disabled="buttonDisabled" @click="load('remove')">
+        <span v-if="isPreloading">Loading model...</span>
+        <span v-else-if="isRunning">Processing...</span>
+        <span v-else>Click me (removeBackground)</span>
       </button>
-      <button :disabled="isRunning" @click="load('segment')">
-        Click me (applySegmentationMask)
+      <button :disabled="buttonDisabled" @click="load('segment')">
+        <span v-if="isPreloading">Loading model...</span>
+        <span v-else-if="isRunning">Processing...</span>
+        <span v-else>Click me (applySegmentationMask)</span>
       </button>
     </header>
   </div>
