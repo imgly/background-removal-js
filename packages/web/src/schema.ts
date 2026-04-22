@@ -74,6 +74,76 @@ const ConfigSchema = z
           .default('image/png'),
         quality: z.number().default(0.8)
       })
+      .default({}),
+    mask: z
+      .object({
+        smoothness: z
+          .number()
+          .min(0)
+          .max(20)
+          .default(0)
+          .describe('Smoothness of the mask edges (0-20, higher = smoother).'),
+        feather: z
+          .number()
+          .min(0)
+          .max(50)
+          .default(0)
+          .describe('Feather radius for soft edges (0-50 pixels).'),
+        edgeMode: z
+          .enum(['auto', 'hard', 'soft', 'blur'])
+          .default('auto')
+          .describe('Edge processing mode.'),
+        contrast: z
+          .number()
+          .min(-100)
+          .max(100)
+          .default(0)
+          .describe('Contrast adjustment for the mask (-100 to 100).'),
+        threshold: z
+          .number()
+          .min(0)
+          .max(255)
+          .optional()
+          .describe('Threshold value for binary mask (0-255).')
+      })
+      .default({}),
+    background: z
+      .object({
+        type: z
+          .enum(['transparent', 'solid', 'image', 'checkerboard'])
+          .default('transparent')
+          .describe('Background type.'),
+        color: z
+          .object({
+            r: z.number().min(0).max(255).default(255),
+            g: z.number().min(0).max(255).default(255),
+            b: z.number().min(0).max(255).default(255)
+          })
+          .default({}),
+        image: z
+          .any()
+          .optional()
+          .describe('Background image source (ImageSource).'),
+        checkerboard: z
+          .object({
+            tileSize: z.number().min(4).max(64).default(16),
+            color1: z
+              .object({
+                r: z.number().min(0).max(255).default(255),
+                g: z.number().min(0).max(255).default(255),
+                b: z.number().min(0).max(255).default(255)
+              })
+              .default({}),
+            color2: z
+              .object({
+                r: z.number().min(0).max(255).default(204),
+                g: z.number().min(0).max(255).default(204),
+                b: z.number().min(0).max(255).default(204)
+              })
+              .default({})
+          })
+          .default({})
+      })
       .default({})
   })
   .default({})

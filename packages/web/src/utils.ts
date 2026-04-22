@@ -6,7 +6,18 @@ export {
   imageBitmapToImageData,
   imageSourceToImageData,
   type ImageSource,
-  createCanvas
+  createCanvas,
+  applyGaussianBlur,
+  applyBoxBlur,
+  applySmoothMask,
+  applyFeatherMask,
+  applyContrast,
+  applyThreshold,
+  applyErosion,
+  applyDilation,
+  applyEdgeMode,
+  composeImageWithBackground,
+  createCheckerboardBackground
 };
 
 import ndarray, { NdArray, TypedArray } from 'ndarray';
@@ -176,4 +187,358 @@ function createCanvas(width, height) {
     );
   }
   return canvas;
+}
+
+function createGaussianKernel(sigma: number, radius: number): number[] {
+  const kernelSize = radius * 2 + 1;
+  const kernel = new Array(kernelSize);
+  let sum = 0;
+
+  for (let i = 0; i < kernelSize; i++) {
+    const x = i - radius;
+    const exponent = -(x * x) / (2 * sigma * sigma);
+    kernel[i] = Math.exp(exponent);
+    sum += kernel[i];
+  }
+
+  for (let i = 0; i < kernelSize; i++) {
+    kernel[i] /= sum;
+  }
+
+  return kernel;
+}
+
+function applyBoxBlur<T extends TypedArray>(
+  imageTensor: NdArray<T>,
+  radius: number
+): NdArray<T> {
+  if (radius <= 0) return imageTensor;
+
+  const [height, width, channels] = imageTensor.shape;
+  const srcData = imageTensor.data;
+  const dstData = createTypeArray<T>(height * width * channels);
+
+  const tempData = createTypeArray<T>(height * width * channels);
+  const kernelSize = radius * 2 + 1;
+
+  for (let y = 0; y < height; y++) {
+    for (let c = 0; c < channels; c++) {
+      let sum = 0;
+      for (let x = -radius; x <= radius; x++) {
+        const px = Math.max(0, Math.min(width - 1, x));
+        sum += srcData[y * width * channels + px * channels + c];
+      }
+
+      for (let x = 0; x < width; x++) {
+        tempData[y * width * channels + x * channels + c] = sum / kernelSize;
+
+        const removeX = Math.max(0, x - radius);
+        const addX = Math.min(width - 1, x + radius + 1);
+        sum -= srcData[y * width * channels + removeX * channels + c];
+        sum += srcData[y * width * channels + addX * channels + c];
+      }
+    }
+  }
+
+  for (let x = 0; x < width; x++) {
+    for (let c = 0; c < channels; c++) {
+      let sum = 0;
+      for (let y = -radius; y <= radius; y++) {
+        const py = Math.max(0, Math.min(height - 1, y));
+        sum += tempData[py * width * channels + x * channels + c];
+      }
+
+      for (let y = 0; y < height; y++) {
+        dstData[y * width * channels + x * channels + c] = sum / kernelSize;
+
+        const removeY = Math.max(0, y - radius);
+        const addY = Math.min(height - 1, y + radius + 1);
+        sum -= tempData[removeY * width * channels + x * channels + c];
+        sum += tempData[addY * width * channels + x * channels + c];
+      }
+    }
+  }
+
+  return ndarray(dstData, [height, width, channels]);
+}
+
+function applyGaussianBlur<T extends TypedArray>(
+  imageTensor: NdArray<T>,
+  sigma: number
+): NdArray<T> {
+  if (sigma <= 0) return imageTensor;
+
+  const radius = Math.ceil(sigma * 3);
+  const kernel = createGaussianKernel(sigma, radius);
+  const [height, width, channels] = imageTensor.shape;
+  const srcData = imageTensor.data;
+  const dstData = createTypeArray<T>(height * width * channels);
+  const tempData = createTypeArray<T>(height * width * channels);
+
+  for (let y = 0; y < height; y++) {
+    for (let c = 0; c < channels; c++) {
+      for (let x = 0; x < width; x++) {
+        let sum = 0;
+        for (let k = -radius; k <= radius; k++) {
+          const px = Math.max(0, Math.min(width - 1, x + k));
+          sum += srcData[y * width * channels + px * channels + c] * kernel[k + radius];
+        }
+        tempData[y * width * channels + x * channels + c] = sum;
+      }
+    }
+  }
+
+  for (let x = 0; x < width; x++) {
+    for (let c = 0; c < channels; c++) {
+      for (let y = 0; y < height; y++) {
+        let sum = 0;
+        for (let k = -radius; k <= radius; k++) {
+          const py = Math.max(0, Math.min(height - 1, y + k));
+          sum += tempData[py * width * channels + x * channels + c] * kernel[k + radius];
+        }
+        dstData[y * width * channels + x * channels + c] = sum;
+      }
+    }
+  }
+
+  return ndarray(dstData, [height, width, channels]);
+}
+
+function applySmoothMask<T extends TypedArray>(
+  mask: NdArray<T>,
+  smoothness: number
+): NdArray<T> {
+  if (smoothness <= 0) return mask;
+  return applyGaussianBlur(mask, smoothness);
+}
+
+function applyFeatherMask<T extends TypedArray>(
+  mask: NdArray<T>,
+  featherRadius: number
+): NdArray<T> {
+  if (featherRadius <= 0) return mask;
+
+  const [height, width, channels] = mask.shape;
+  const temp = ndarray(new Uint8Array(height * width), [height, width]);
+
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      temp.data[y * width + x] = mask.data[y * width * channels];
+    }
+  }
+
+  const eroded = applyErosion(temp, featherRadius);
+  const dilated = applyDilation(temp, featherRadius);
+
+  const result = createTypeArray<T>(height * width * channels);
+
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const original = temp.data[y * width + x];
+      const erodeVal = eroded.data[y * width + x];
+      const dilateVal = dilated.data[y * width + x];
+
+      let alpha: number;
+      if (erodeVal === dilateVal) {
+        alpha = original;
+      } else {
+        const dist = (original - erodeVal) / (dilateVal - erodeVal || 1);
+        alpha = erodeVal + dist * (dilateVal - erodeVal);
+      }
+
+      result[y * width * channels] = alpha;
+    }
+  }
+
+  return ndarray(result, [height, width, channels]);
+}
+
+function applyErosion<T extends TypedArray>(
+  imageTensor: NdArray<T>,
+  radius: number
+): NdArray<T> {
+  if (radius <= 0) return imageTensor;
+
+  const [height, width, channels] = imageTensor.shape;
+  const srcData = imageTensor.data;
+  const dstData = createTypeArray<T>(height * width * channels);
+
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      for (let c = 0; c < channels; c++) {
+        let minVal = 255;
+
+        for (let dy = -radius; dy <= radius; dy++) {
+          for (let dx = -radius; dx <= radius; dx++) {
+            const ny = Math.max(0, Math.min(height - 1, y + dy));
+            const nx = Math.max(0, Math.min(width - 1, x + dx));
+            const val = srcData[ny * width * channels + nx * channels + c];
+            minVal = Math.min(minVal, val);
+          }
+        }
+
+        dstData[y * width * channels + x * channels + c] = minVal;
+      }
+    }
+  }
+
+  return ndarray(dstData, [height, width, channels]);
+}
+
+function applyDilation<T extends TypedArray>(
+  imageTensor: NdArray<T>,
+  radius: number
+): NdArray<T> {
+  if (radius <= 0) return imageTensor;
+
+  const [height, width, channels] = imageTensor.shape;
+  const srcData = imageTensor.data;
+  const dstData = createTypeArray<T>(height * width * channels);
+
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      for (let c = 0; c < channels; c++) {
+        let maxVal = 0;
+
+        for (let dy = -radius; dy <= radius; dy++) {
+          for (let dx = -radius; dx <= radius; dx++) {
+            const ny = Math.max(0, Math.min(height - 1, y + dy));
+            const nx = Math.max(0, Math.min(width - 1, x + dx));
+            const val = srcData[ny * width * channels + nx * channels + c];
+            maxVal = Math.max(maxVal, val);
+          }
+        }
+
+        dstData[y * width * channels + x * channels + c] = maxVal;
+      }
+    }
+  }
+
+  return ndarray(dstData, [height, width, channels]);
+}
+
+function applyContrast<T extends TypedArray>(
+  imageTensor: NdArray<T>,
+  contrast: number
+): NdArray<T> {
+  const factor = (259 * (contrast + 255)) / (255 * (259 - contrast));
+  const [height, width, channels] = imageTensor.shape;
+  const dstData = createTypeArray<T>(height * width * channels);
+
+  for (let i = 0; i < height * width * channels; i++) {
+    const val = imageTensor.data[i];
+    const adjusted = factor * (val - 128) + 128;
+    dstData[i] = Math.max(0, Math.min(255, adjusted));
+  }
+
+  return ndarray(dstData, [height, width, channels]);
+}
+
+function applyThreshold<T extends TypedArray>(
+  imageTensor: NdArray<T>,
+  threshold: number
+): NdArray<T> {
+  const [height, width, channels] = imageTensor.shape;
+  const dstData = createTypeArray<T>(height * width * channels);
+
+  for (let i = 0; i < height * width * channels; i++) {
+    dstData[i] = imageTensor.data[i] >= threshold ? 255 : 0;
+  }
+
+  return ndarray(dstData, [height, width, channels]);
+}
+
+function applyEdgeMode<T extends TypedArray>(
+  mask: NdArray<T>,
+  edgeMode: 'hard' | 'soft' | 'blur' | 'auto'
+): NdArray<T> {
+  switch (edgeMode) {
+    case 'hard':
+      return applyThreshold(mask, 128);
+    case 'soft':
+      return applyContrast(mask, 50);
+    case 'blur':
+      return applyGaussianBlur(mask, 2);
+    case 'auto':
+    default:
+      return mask;
+  }
+}
+
+function createCheckerboardBackground(
+  width: number,
+  height: number,
+  tileSize: number = 16,
+  color1: { r: number; g: number; b: number } = { r: 255, g: 255, b: 255 },
+  color2: { r: number; g: number; b: number } = { r: 204, g: 204, b: 204 }
+): NdArray<Uint8Array> {
+  const data = new Uint8Array(height * width * 4);
+
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const idx = (y * width + x) * 4;
+      const tileX = Math.floor(x / tileSize);
+      const tileY = Math.floor(y / tileSize);
+      const isLight = (tileX + tileY) % 2 === 0;
+
+      if (isLight) {
+        data[idx] = color1.r;
+        data[idx + 1] = color1.g;
+        data[idx + 2] = color1.b;
+      } else {
+        data[idx] = color2.r;
+        data[idx + 1] = color2.g;
+        data[idx + 2] = color2.b;
+      }
+      data[idx + 3] = 255;
+    }
+  }
+
+  return ndarray(data, [height, width, 4]);
+}
+
+function composeImageWithBackground(
+  foreground: NdArray<Uint8Array>,
+  background: NdArray<Uint8Array> | { r: number; g: number; b: number }
+): NdArray<Uint8Array> {
+  const [fgHeight, fgWidth, fgChannels] = foreground.shape;
+  const result = ndarray(new Uint8Array(fgHeight * fgWidth * 4), [fgHeight, fgWidth, 4]);
+
+  if ('r' in background) {
+    const bgColor = background;
+    for (let y = 0; y < fgHeight; y++) {
+      for (let x = 0; x < fgWidth; x++) {
+        const idx = (y * fgWidth + x) * 4;
+        const alpha = foreground.data[idx + 3] / 255;
+        const invAlpha = 1 - alpha;
+
+        result.data[idx] = foreground.data[idx] * alpha + bgColor.r * invAlpha;
+        result.data[idx + 1] = foreground.data[idx + 1] * alpha + bgColor.g * invAlpha;
+        result.data[idx + 2] = foreground.data[idx + 2] * alpha + bgColor.b * invAlpha;
+        result.data[idx + 3] = 255;
+      }
+    }
+  } else {
+    const bg = background;
+    const [bgHeight, bgWidth] = bg.shape;
+    
+    for (let y = 0; y < fgHeight; y++) {
+      for (let x = 0; x < fgWidth; x++) {
+        const idx = (y * fgWidth + x) * 4;
+        const bgX = Math.floor(x * (bgWidth / fgWidth));
+        const bgY = Math.floor(y * (bgHeight / fgHeight));
+        const bgIdx = (bgY * bgWidth + bgX) * 4;
+        
+        const alpha = foreground.data[idx + 3] / 255;
+        const invAlpha = 1 - alpha;
+
+        result.data[idx] = foreground.data[idx] * alpha + bg.data[bgIdx] * invAlpha;
+        result.data[idx + 1] = foreground.data[idx + 1] * alpha + bg.data[bgIdx + 1] * invAlpha;
+        result.data[idx + 2] = foreground.data[idx + 2] * alpha + bg.data[bgIdx + 2] * invAlpha;
+        result.data[idx + 3] = 255;
+      }
+    }
+  }
+
+  return result;
 }
