@@ -180,13 +180,13 @@ importers:
         version: 0.11.10
       ts-loader:
         specifier: ~9.4.0
-        version: 9.4.4(typescript@5.9.3)(webpack@5.85.1)
+        version: 9.4.4(typescript@5.5.4)(webpack@5.85.1)
       tslib:
         specifier: ~2.5.0
         version: 2.5.3
       typescript:
-        specifier: ~5.9.3
-        version: 5.9.3
+        specifier: ~5.5.4
+        version: 5.5.4
       util:
         specifier: ~0.12.0
         version: 0.12.5
@@ -3946,8 +3946,8 @@ packages:
     engines: {node: '>=14.17'}
     hasBin: true
 
-  typescript@5.9.3:
-    resolution: {integrity: sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw==}
+  typescript@5.5.4:
+    resolution: {integrity: sha512-Mtq29sKDAEYP7aljRgtPOpTvOfbwRWlS6dPRzwjdE+C0R4brX/GUyhHSecbHMFLNBLcJIPt9nl9yG5TZ1weH+Q==}
     engines: {node: '>=14.17'}
     hasBin: true
 
@@ -8305,13 +8305,13 @@ snapshots:
       typescript: 5.1.6
       webpack: 5.85.1(esbuild@0.18.20)(webpack-cli@5.1.4)
 
-  ts-loader@9.4.4(typescript@5.9.3)(webpack@5.85.1):
+  ts-loader@9.4.4(typescript@5.5.4)(webpack@5.85.1):
     dependencies:
       chalk: 4.1.2
       enhanced-resolve: 5.18.1
       micromatch: 4.0.8
       semver: 7.7.1
-      typescript: 5.9.3
+      typescript: 5.5.4
       webpack: 5.85.1(esbuild@0.18.20)(webpack-cli@5.1.4)
 
   tsconfig-paths@3.15.0:
@@ -8374,7 +8374,7 @@ snapshots:
 
   typescript@5.1.6: {}
 
-  typescript@5.9.3: {}
+  typescript@5.5.4: {}
 
   unbox-primitive@1.1.0:
     dependencies:
