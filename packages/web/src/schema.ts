@@ -4,13 +4,20 @@ import { z } from 'zod';
 
 import pkg from '../package.json';
 
+type Progress = (key: string, current: number, total: number) => void;
+
+const progressSignature = z.function({
+  input: [z.string(), z.number(), z.number()],
+  output: z.void()
+});
+
 const ConfigSchema = z
   .object({
     publicPath: z
       .string()
       .optional()
       .describe('The public path to the wasm files and the onnx model.')
-      .default(
+      .prefault(
         'https://staticimgly.com/@imgly/background-removal-data/${PACKAGE_VERSION}/dist/'
       )
       .transform((val) => {
@@ -39,9 +46,8 @@ const ConfigSchema = z
       .default({})
       .describe('Arguments to pass to fetch when loading the model.'),
     progress: z
-      .function()
-      .args(z.string(), z.number(), z.number())
-      .returns(z.void())
+      .custom<Progress>((value) => typeof value === 'function')
+      .transform((callback) => progressSignature.implement(callback))
       .describe('Progress callback.')
       .optional(),
     model: z
@@ -60,7 +66,7 @@ const ConfigSchema = z
         },
         z.enum(['isnet', 'isnet_fp16', 'isnet_quint8'])
       )
-      .default('medium'),
+      .default('isnet_fp16'),
     output: z
       .object({
         format: z
@@ -74,9 +80,9 @@ const ConfigSchema = z
           .default('image/png'),
         quality: z.number().default(0.8)
       })
-      .default({})
+      .prefault({})
   })
-  .default({})
+  .prefault({})
   .transform((config) => {
     if (config.debug) console.log('Config:', config);
     if (config.debug && !config.progress) {
