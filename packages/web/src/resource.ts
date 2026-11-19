@@ -1,8 +1,8 @@
 export { loadAsBlob, loadAsUrl, loadAsArrayBuffer, preload, resolveChunkUrls };
 
-import { Config } from './schema';
+import { InternalConfig } from './schema';
 
-async function preload(config: Config): Promise<void> {
+async function preload(config: InternalConfig): Promise<void> {
   // load resource metadata
   const resourceUrl = new URL('resources.json', config.publicPath);
   const resourceResponse = await fetch(resourceUrl);
@@ -21,17 +21,17 @@ async function preload(config: Config): Promise<void> {
   );
 }
 
-async function loadAsUrl(url: string, config: Config): Promise<string> {
+async function loadAsUrl(url: string, config: InternalConfig): Promise<string> {
   return URL.createObjectURL(await loadAsBlob(url, config));
 }
 async function loadAsArrayBuffer(
   url: string,
-  config: Config
+  config: InternalConfig
 ): Promise<ArrayBuffer> {
   return await (await loadAsBlob(url, config)).arrayBuffer();
 }
 
-async function loadAsBlob(key: string, config: Config) {
+async function loadAsBlob(key: string, config: InternalConfig) {
   // load resource metadata
   const resourceUrl = new URL('resources.json', config.publicPath);
   const resourceResponse = await fetch(resourceUrl);
@@ -86,7 +86,7 @@ async function loadAsBlob(key: string, config: Config) {
   return data;
 }
 
-async function resolveChunkUrls(key: string, config: Config) {
+async function resolveChunkUrls(key: string, config: InternalConfig) {
   // load resource metadata
   const resourceUrl = new URL('resources.json', config.publicPath);
   const resourceResponse = await fetch(resourceUrl);

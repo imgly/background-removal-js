@@ -4,7 +4,7 @@ import ndarray, { NdArray } from 'ndarray';
 import { InferenceSession, Tensor } from 'onnxruntime-web';
 import * as caps from './capabilities';
 import { loadAsUrl } from './resource';
-import { Config } from './schema';
+import { InternalConfig } from './schema';
 
 type ORT = typeof import('onnxruntime-web');
 // use a dynamic import to avoid bundling the entire onnxruntime-web package
@@ -21,7 +21,7 @@ const getOrt = async (useWebGPU: boolean): Promise<ORT> => {
   return ort;
 };
 
-async function createOnnxSession(model: any, config: Config) {
+async function createOnnxSession(model: any, config: InternalConfig) {
   const useWebGPU = config.device === 'gpu' && (await caps.webgpu());
   // BUG: proxyToWorker is not working for WASM/CPU Backend for now
   const proxyToWorker = useWebGPU && config.proxyToWorker;
@@ -56,14 +56,14 @@ async function createOnnxSession(model: any, config: Config) {
     console.debug('ort.env.wasm:', ort.env.wasm);
   }
 
-  const ortConfig: InferenceSession.SessionOptions = {
+  const ortInternalConfig: InferenceSession.SessionOptions = {
     executionProviders: executionProviders,
     graphOptimizationLevel: 'all',
     executionMode: 'parallel',
     enableCpuMemArena: true
   };
 
-  const session = await ort.InferenceSession.create(model, ortConfig).catch(
+  const session = await ort.InferenceSession.create(model, ortInternalConfig).catch(
     (e: any) => {
       throw new Error(
         `Failed to create session: "${e}". Please check if the publicPath is set correctly.`
@@ -77,7 +77,7 @@ async function runOnnxSession(
   session: any,
   inputs: [string, NdArray<Float32Array>][],
   outputs: [string],
-  config: Config
+  config: InternalConfig
 ) {
   const useWebGPU = config.device === 'gpu' && (await caps.webgpu());
   const ort = await getOrt(useWebGPU);

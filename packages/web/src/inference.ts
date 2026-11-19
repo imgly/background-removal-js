@@ -2,13 +2,13 @@ export { initInference, runInference };
 
 import { tensorResizeBilinear, tensorHWCtoBCHW } from './utils';
 import { createOnnxSession, runOnnxSession } from './onnx';
-import { Config, validateConfig } from './schema';
+import { Config, InternalConfig, validateConfig } from './schema';
 
 import { loadAsBlob } from './resource';
 import ndarray, { NdArray } from 'ndarray';
 import { convertFloat32ToUint8 } from './utils';
 
-async function initBase(config: Config): Promise<unknown> {
+async function initBase(config: InternalConfig): Promise<unknown> {
   if (config.debug) console.debug('Loading model...', config.model);
   const model = config.model;
   const blob = await loadAsBlob(`/models/${model}`, config);
@@ -18,16 +18,16 @@ async function initBase(config: Config): Promise<unknown> {
 }
 
 async function initInference(
-  config?: Config
-): Promise<{ config: Config; session: { base: unknown } }> {
-  config = validateConfig(config);
+  configuration?: Config
+): Promise<{ config: InternalConfig; session: { base: unknown } }> {
+  const config = validateConfig(configuration);
   const base = await initBase(config);
   return { config, session: { base } };
 }
 
 async function runInference(
   imageTensor: NdArray<Uint8Array>,
-  config: Config,
+  config: InternalConfig,
   session: { base: unknown }
 ): Promise<[NdArray<Uint8Array>, NdArray<Uint8Array>]> {
   const resolution = 1024;

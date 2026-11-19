@@ -12,7 +12,7 @@ export {
 import ndarray, { NdArray, TypedArray } from 'ndarray';
 import { imageDecode, imageEncode } from './codecs';
 import { ensureAbsoluteURI } from './url';
-import { Config } from './schema';
+import { InternalConfig } from './schema';
 
 type ImageSource =
   | ImageData
@@ -127,7 +127,7 @@ function tensorHWCtoBCHW(
 
 async function imageSourceToImageData(
   image: ImageSource,
-  config: Config
+  config: InternalConfig
 ): Promise<NdArray<Uint8Array>> {
   if (typeof image === 'string') {
     image = ensureAbsoluteURI(image, config.publicPath);
