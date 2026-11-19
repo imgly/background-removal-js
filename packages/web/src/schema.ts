@@ -1,4 +1,4 @@
-export { Config, ConfigSchema, validateConfig };
+export { Config, ConfigSchema, InternalConfig, validateConfig };
 
 import { z } from 'zod';
 
@@ -47,25 +47,23 @@ const ConfigSchema = z
       .describe('Arguments to pass to fetch when loading the model.'),
     progress: z
       .custom<Progress>((value) => typeof value === 'function')
-      .transform((callback) => progressSignature.implement(callback))
+      .transform((callback): Progress => progressSignature.implement(callback))
       .describe('Progress callback.')
       .optional(),
     model: z
-      .preprocess(
-        (val) => {
-          switch (val) {
-            case 'large':
-              return 'isnet';
-            case 'small':
-              return 'isnet_quint8';
-            case 'medium':
-              return 'isnet_fp16';
-            default:
-              return val;
-          }
-        },
-        z.enum(['isnet', 'isnet_fp16', 'isnet_quint8'])
-      )
+      .enum(['isnet', 'isnet_fp16', 'isnet_quint8', 'large', 'medium', 'small'])
+      .transform((model) => {
+        switch (model) {
+          case 'large':
+            return 'isnet';
+          case 'medium':
+            return 'isnet_fp16';
+          case 'small':
+            return 'isnet_quint8';
+          default:
+            return model;
+        }
+      })
       .default('isnet_fp16'),
     output: z
       .object({
@@ -103,8 +101,9 @@ const ConfigSchema = z
     return config;
   });
 
-type Config = z.infer<typeof ConfigSchema>;
+type Config = z.input<typeof ConfigSchema>;
+type InternalConfig = z.output<typeof ConfigSchema>;
 
-function validateConfig(configuration?: Config): Config {
+function validateConfig(configuration?: Config): InternalConfig {
   return ConfigSchema.parse(configuration ?? {});
 }

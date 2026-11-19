@@ -9,5 +9,6 @@
     "target": "ES6",
     "moduleResolution": "bundler",
     "module": "es2020"
-  }
+  },
+  "exclude": ["dist", "node_modules", "tests"]
 }

@@ -46,7 +46,7 @@
   "scripts": {
     "start": "pnpm run watch",
     "clean": "npx rimraf dist",
-    "test": "node --test scripts/test-config.mjs",
+    "test": "pnpm run types && tsc --noEmit --strict --target ES2022 --module ESNext --moduleResolution bundler tests/config-types.ts && node --test scripts/test-config.mjs",
     "resources": "node ../../scripts/package-resources.mjs",
     "changelog:create": "node ../../scripts/changelog/changelog-create.mjs",
     "changelog:generate": "node ../../scripts/changelog/changelog-generate.mjs",

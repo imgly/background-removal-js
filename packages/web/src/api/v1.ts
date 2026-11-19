@@ -149,9 +149,9 @@ async function segmentForeground(
 async function applySegmentationMask(
   image,
   mask,
-  config?: Config
+  configuration?: Config
 ): Promise<Blob> {
-  config = validateConfig(config);
+  const config = validateConfig(configuration);
   const imageTensor = await utils.imageSourceToImageData(image, config);
   const [imageHeight, imageWidth, imageChannels] = imageTensor.shape;
   const maskTensor = await utils.imageSourceToImageData(mask, config);
